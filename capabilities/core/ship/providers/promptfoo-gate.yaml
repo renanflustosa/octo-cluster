@@ -1,0 +1,10 @@
+id: promptfoo-eval
+phase: gates
+kind: script
+blocking: true
+priority: 10
+when: always
+owner:
+  global: true
+run:
+  script: capabilities/core/ship/providers/run-promptfoo.ps1

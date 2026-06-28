@@ -1,0 +1,4 @@
+FROM nomic-embed-text
+# Pin embeddings to CPU. On a 2GB-VRAM MX550 the GPU embed runner wedges when it
+# churns with the coder models; this tiny model is fast on CPU and frees the GPU.
+PARAMETER num_gpu 0

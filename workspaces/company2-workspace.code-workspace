@@ -1,0 +1,31 @@
+{
+	"folders": [
+		{
+			"path": "..",
+			"name": "octo-cluster"
+		},
+		{
+			"path": "../../personal-vault"
+		}
+	],
+	"settings": {
+		"terminal.integrated.env.windows": {
+			"OCTO_CLUSTER": "${workspaceFolder:octo-cluster}",
+			"AI_EXECUTION_CONTEXT": "company2"
+		},
+		"files.readonlyInclude": {
+			"**/personal-vault/**": true
+		},
+		"search.exclude": {
+			"**/personal-vault/**": true,
+			"**/node_modules": true,
+			"**/state/memory/**": true,
+			"**/state/backups/**": true
+		},
+		"files.watcherExclude": {
+			"**/node_modules/**": true,
+			"**/state/memory/**": true
+		},
+		"dotnet.defaultSolution": "disable"
+	}
+}

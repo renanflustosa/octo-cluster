@@ -1,0 +1,11 @@
+﻿{
+    "enabled_capability_packs":  [
+                                     "core"
+                                 ],
+    "memory_profile":  "octo-cluster",
+    "workspace_id":  "core",
+    "id":  "platform",
+    "ship_repositories":  [
+                              "octo-cluster"
+                          ]
+}

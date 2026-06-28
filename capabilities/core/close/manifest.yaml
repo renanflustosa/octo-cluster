@@ -1,0 +1,5 @@
+﻿id: core-close
+pack: core
+pipeline: close
+description: Archive session, compact memory, reset task state
+skill: domains/core/skills/core-adaptive-loop/SKILL.md

@@ -1,0 +1,3 @@
+id: core-review
+pipeline: review
+skill: domains/core/skills/code-review/SKILL.md

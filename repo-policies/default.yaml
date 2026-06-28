@@ -1,0 +1,7 @@
+﻿git:
+  strategy: direct
+  target_branch: main
+  pull_request: false
+
+verify:
+  enabled: true

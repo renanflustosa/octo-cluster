@@ -1,0 +1,31 @@
+description: CORE loop output shape checks
+providers:
+  - id: echo
+    label: echo
+prompts:
+  - "{{promptText}}"
+tests:
+  - description: scan output shape
+    vars:
+      promptText: |
+        Produce a /scan output with at most 6 bullet points for ticket MPL-0001 fixing grid sort in scheduling module.
+    assert:
+      - type: javascript
+        value: "output.split('\\n').filter(l => l.trim()).length <= 8"
+  - description: verify verdict shape
+    vars:
+      promptText: |
+        READY - all scoped tests passed. Residual risk: none. Proceed to ship gate.
+    assert:
+      - type: contains
+        value: READY
+      - type: not-contains
+        value: BLOCKED BLOCKED
+  - description: core dispatch references
+    vars:
+      promptText: file://prompts/core-dispatch-shape.txt
+    assert:
+      - type: icontains
+        value: AI_EXECUTION_CONTEXT
+      - type: icontains
+        value: invoke-pipeline

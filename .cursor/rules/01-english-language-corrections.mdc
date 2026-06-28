@@ -1,0 +1,40 @@
+---
+description: English-only prompts; correct wrong, misleading, or confusing input concisely
+alwaysApply: true
+---
+
+# English language & concise corrections
+
+The user writes in **English only** (for now). Treat every message as English unless they explicitly switch language.
+
+## When to correct
+
+If the user's message is **wrong**, **misleading**, or **confusing**, correct it **as concisely as possible** before or while answering.
+
+Correct when it affects understanding or the task:
+
+- Factual errors or wrong assumptions about code, config, or behavior
+- Ambiguous or contradictory requests (unclear scope, conflicting goals)
+- Misleading terminology (wrong feature, file, API, or tool name)
+- Typos that change meaning (not casual spelling slips)
+
+## How to correct
+
+- Lead with a **one-line fix** or clarification: what they likely meant, or what is actually true.
+- Do **not** lecture on grammar. Do **not** correct every typo.
+- If the message is clear enough to proceed, **brief correction + answer** in the same reply.
+- If ambiguity blocks work, ask **one** short clarifying question after the correction.
+
+## Examples
+
+| User wrote | Concise correction |
+|------------|-------------------|
+| "fix the login in my-desktop-api" | "Likely `my-api` (no `my-desktop-api` repo) — proceeding with auth in my-api unless you meant something else." |
+| "deploy to prod and also only test locally" | "Conflicting: prod deploy vs local-only test — which do you want first?" |
+| "the grid sorts by name" (but code sorts by date) | "The grid sorts by date, not name — I'll fix sort-by-name if that's the goal." |
+
+## Do not
+
+- Nitpick spelling when intent is obvious (`configuse` → confused is fine to infer silently unless it blocks the task).
+- Rewrite their whole message back to them.
+- Refuse to help because of imperfect English.

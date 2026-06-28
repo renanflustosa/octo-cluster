@@ -1,0 +1,40 @@
+﻿{
+    "generatedAt":  "2026-06-28T23:50:20.8771128Z",
+    "executionContext":  "platform",
+    "capabilityPacks":  [
+                            "core"
+                        ],
+    "pipelines":  [
+                      {
+                          "pipeline":  "ship",
+                          "skill":  "C:\\GitHub\\octo-cluster\\domains\\core\\skills\\core-ship\\SKILL.md"
+                      },
+                      {
+                          "pipeline":  "scan",
+                          "skill":  "C:\\GitHub\\octo-cluster\\domains\\core\\skills\\core-adaptive-loop\\SKILL.md"
+                      },
+                      {
+                          "pipeline":  "model",
+                          "skill":  "C:\\GitHub\\octo-cluster\\domains\\core\\skills\\core-adaptive-loop\\SKILL.md"
+                      },
+                      {
+                          "pipeline":  "close",
+                          "skill":  "C:\\GitHub\\octo-cluster\\domains\\core\\skills\\core-adaptive-loop\\SKILL.md"
+                      },
+                      {
+                          "pipeline":  "start-workspace",
+                          "skill":  "C:\\GitHub\\octo-cluster\\domains\\core\\skills\\core-adaptive-loop\\SKILL.md"
+                      },
+                      {
+                          "pipeline":  "review",
+                          "skill":  "C:\\GitHub\\octo-cluster\\domains\\core\\skills\\code-review\\SKILL.md"
+                      },
+                      {
+                          "pipeline":  "debug",
+                          "skill":  "C:\\GitHub\\octo-cluster\\domains\\core\\skills\\systematic-debugging\\SKILL.md"
+                      }
+                  ],
+    "auxiliary":  [
+
+                  ]
+}

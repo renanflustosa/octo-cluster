@@ -1,0 +1,7 @@
+"models": [
+  {
+    "title": "Qwen 2GB",
+    "provider": "ollama",
+    "model": "qwen-2gb"
+  }
+]

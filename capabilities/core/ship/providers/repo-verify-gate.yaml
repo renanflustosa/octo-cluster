@@ -1,0 +1,10 @@
+﻿id: repo-policy-verify
+phase: verification
+kind: script
+blocking: true
+priority: 1
+when: always
+owner:
+  global: true
+run:
+  script: capabilities/core/ship/providers/run-repo-verify.ps1

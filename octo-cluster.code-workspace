@@ -1,0 +1,17 @@
+﻿{
+	"folders": [
+		{ "path": ".", "name": "octo-cluster" }
+	],
+	"settings": {
+		"terminal.integrated.env.windows": {
+			"OCTO_CLUSTER": "${workspaceFolder:octo-cluster}",
+			"AI_EXECUTION_CONTEXT": "platform"
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.powershell",
+			"redhat.vscode-yaml"
+		]
+	}
+}

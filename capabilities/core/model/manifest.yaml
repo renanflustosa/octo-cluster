@@ -1,0 +1,5 @@
+﻿id: core-model
+pack: core
+pipeline: model
+description: Plan and design — architecture without production code
+skill: domains/core/skills/core-adaptive-loop/SKILL.md

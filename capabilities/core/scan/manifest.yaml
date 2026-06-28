@@ -1,0 +1,5 @@
+﻿id: core-scan
+pack: core
+pipeline: scan
+description: Observe and orient — bootstrap, context search, map boundaries
+skill: domains/core/skills/core-adaptive-loop/SKILL.md

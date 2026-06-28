@@ -1,0 +1,10 @@
+﻿{
+    "syncedAt":  "2026-06-28T23:50:20.9534202Z",
+    "skillsPolicy":  "core-only",
+    "executionContext":  "platform",
+    "commandsPolicy":  "core-only",
+    "childRoot":  null,
+    "coreRoot":  "domains/core",
+    "skillDiscovery":  "capabilities-skills.json + invoke-pipeline discover",
+    "domain":  "platform"
+}

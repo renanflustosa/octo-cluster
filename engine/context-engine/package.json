@@ -1,0 +1,25 @@
+﻿{
+  "name": "context-engine",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "index": "bun run src/index-vectors.ts",
+  "index-incremental": "bun run src/index-incremental.ts",
+  "index-symbols": "bun run src/index-symbols.ts",
+  "symbol-search": "bun run src/symbol-search.ts",
+    "search": "bun run src/search.ts",
+    "compress-log": "bun run src/compress-log.ts",
+    "diff": "bun run src/diff-context.ts",
+    "learn": "bun run src/learn-ticket.ts",
+    "compact": "bun run src/compact-session.ts",
+    "memory-compact": "bun run src/memory-compact.ts",
+    "budget": "bun run src/token-budget.ts",
+    "validate": "bun run src/validate.ts",
+    "map": "bun run src/map-file.ts",
+    "openapi-brief": "bun run src/openapi-brief.ts"
+  },
+  "dependencies": {
+    "@lancedb/lancedb": "^0.17.0",
+    "@xenova/transformers": "^2.17.2"
+  }
+}

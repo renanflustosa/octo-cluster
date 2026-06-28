@@ -8,7 +8,7 @@ Thanks for helping make the harness better for everyone.
 |-------------|-------------------------------------|
 | `domains/core/` — agnostic rules, skills, scripts | Company-specific repos, credentials, client names |
 | `capabilities/core/` — generic providers | Proprietary issue-tracker routing |
-| `engine/`, `scripts/`, `eval/` harness | Private `domains/companyN/`, `domains/mplan/` equivalents |
+| `engine/`, `scripts/`, `eval/` harness | Private `domains/<pack>/` in your fork |
 | Docs without employer-specific vocabulary | Internal architecture, prod URLs, secrets |
 
 **Promotion rule:** if two or more packs need the same behavior → open a PR to core. If it names one product or legacy stack → keep it in a capability pack.

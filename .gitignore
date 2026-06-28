@@ -1,0 +1,24 @@
+.DS_Store
+Thumbs.db
+*.tmp
+.env
+.env.*
+
+# Machine-local state (memory indexes, backups, metrics)
+state/memory/
+state/backups/
+state/logs/
+state/metrics/
+state/*.md
+
+# Context engine dependencies and caches
+engine/context-engine/node_modules/
+engine/context-engine/.cache/
+
+# Transformers model cache (large)
+**/.cache/
+
+generated/
+
+# OS / editor
+*.log
