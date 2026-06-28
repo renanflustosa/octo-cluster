@@ -1,2 +1,96 @@
-# octo-cluster
-All-in-one local harness for AI-assisted dev. RAG, memory, token economy, and verify gates. IDE-agnostic workspace folder; optional phase commands; extensible packs.
+# Octo Cluster
+
+**All-in-one local harness for AI-assisted development** — RAG, memory, token economy, hooks, and verify gates in one workspace folder. Maximize automation; use the model only when judgment is required.
+
+> IDE-agnostic by design. **Cursor** is supported today via generated adapters; other IDEs can add a folder adapter the same way.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+## Why Octo Cluster?
+
+Most teams stitch token savings piecemeal: grep rules here, a RAG script there, ad-hoc hooks, separate eval harnesses. Octo Cluster **bundles the full stack** so cheap layers run first and expensive LLM calls are the exception.
+
+| Layer | Role |
+|-------|------|
+| **Harness** | Scripts, hooks, repo policies, local gates (`go test`, `bun validate`, Promptfoo, …) |
+| **Context engine** | LanceDB semantic search + memory profiles per project |
+| **Token economy** | Read budgets, grep-first, compressed task cards, optional “caveman” prose mode |
+| **Core loop** | Optional phase commands (`/scan` → `/model` → `/ship` → `/close`) — useful, not required |
+| **Capability packs** | Pluggable domain extensions (issue tracker, repos, verify providers) |
+
+```text
+[COST 0]  hooks · sync · git · grep · LanceDB · gate scripts
+[COST LOW]  scoped Ask / review
+[COST HIGH]  plan · execute · ship when harness cannot finish alone
+```
+
+## Quick start
+
+**Prerequisites:** [Git](https://git-scm.com/downloads). Windows-first scripts; core concepts are portable.
+
+```powershell
+git clone https://github.com/renanflustosa/octo-cluster.git C:\GitHub\octo-cluster
+cd C:\GitHub\octo-cluster
+.\install.ps1
+gh auth login   # optional, for PR flow in /ship
+```
+
+Open [`octo-cluster.code-workspace`](./octo-cluster.code-workspace) in your IDE (Cursor today). Set `OCTO_CLUSTER` to your clone root — the workspace file does this automatically.
+
+Add your product repos as sibling folders in the workspace; keep secrets in a **local, gitignored** vault — never in this repo.
+
+## Layout
+
+```text
+octo-cluster/          ← drop this folder into any multi-root workspace
+  domains/core/        rules, skills, commands, harness scripts (IDE-agnostic source)
+  capabilities/        pack manifests + pipeline providers
+  contexts/            execution context JSON (enabled packs, ship repos)
+  engine/              context-engine (Bun + LanceDB)
+  scripts/             sync adapters, invoke-pipeline, install helpers
+  adapters/            IDE/tooling adapter scaffolding
+  .cursor/             generated for Cursor — edit domains/, then sync
+```
+
+See [context model](./docs/context-model.md) and [add a capability pack](./docs/add-child-context.md).
+
+## Optional loop (Cursor commands)
+
+One chat ≈ one work item. Phase commands are **optional**; routine edits do not need them.
+
+```text
+/start-workspace  →  /scan TICKET description  →  /model  →  Execute plan  →  /ship  →  /close
+```
+
+Discover the active pipeline skill:
+
+```powershell
+powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline scan -Action discover
+```
+
+## Docs
+
+| Doc | Content |
+|-----|---------|
+| [ONBOARDING.md](./docs/ONBOARDING.md) | Full setup (PT) |
+| [productivity-tools.md](./docs/productivity-tools.md) | Harness design, token layers, core vs packs |
+| [context-model.md](./docs/context-model.md) | Execution context and sync rules |
+| [add-child-context.md](./docs/add-child-context.md) | Scaffold a private or public capability pack |
+
+## Install helpers (official sources, no winget)
+
+| Script | Purpose |
+|--------|---------|
+| `install.ps1` | Bun, gh, ripgrep |
+| `scripts/install-go.ps1` | Go via [go.dev](https://go.dev/dl/) MSI or zip |
+| `scripts/install-ollama.ps1` | Ollama via official install script |
+| `scripts/install-docker.ps1` | Docker Desktop direct download |
+| `scripts/productivity-audit.ps1` | Local harness health check |
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md). Capability packs that name private products stay in **your fork** or a separate repo; promote shared behavior into `domains/core/`.
+
+## License
+
+[MIT](./LICENSE) © Renan Lustosa
