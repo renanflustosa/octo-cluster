@@ -49,22 +49,12 @@ if (Test-Path $validateHooks) {
 Ensure-ContextEngineDeps -AllowInstall | Out-Null
 Write-Host "context-engine deps OK (Bun + @lancedb/lancedb)" -ForegroundColor DarkGray
 
-# Seed platform memory profile
-$memProfile = Join-Path $env:OCTO_CLUSTER "state\memory\octo-cluster"
-New-Item -ItemType Directory -Force -Path (Join-Path $memProfile "context") | Out-Null
-$overview = Join-Path $memProfile "overview.md"
-if (-not (Test-Path $overview)) {
-    Set-Content -Path $overview -Encoding UTF8 -Value "# octo-cluster memory profile`n`nPlatform CORE context."
-}
-$architecture = Join-Path $memProfile "context\architecture.md"
-if (-not (Test-Path $architecture)) {
-    Set-Content -Path $architecture -Encoding UTF8 -Value "# Architecture (platform)`n`n- Core: domains/core, capabilities/, scripts/`n- Context engine: engine/context-engine`n- Execution context: contexts/platform.json"
-    Write-Host "Seeded state/memory/octo-cluster" -ForegroundColor DarkGray
-}
-
+# Seed platform memory profile from tracked fixtures
 $bun = Get-BunExecutable
 if ($bun) {
     $ce = Join-Path $env:OCTO_CLUSTER "engine\context-engine"
+    Push-Location $ce
+    try { & $bun run seed-profile octo-cluster } finally { Pop-Location }
     Write-Host "Indexing octo-cluster memory..." -ForegroundColor DarkGray
     Push-Location $ce
     try { & $bun run index-incremental octo-cluster --kind memory --incremental } finally { Pop-Location }
