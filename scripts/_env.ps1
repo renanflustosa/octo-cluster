@@ -1,30 +1,60 @@
 ﻿# Shared paths for Octo Cluster scripts. Dot-source from domains/*/scripts/*.ps1 or scripts/*.ps1
 
-if (-not $env:OCTO_CLUSTER -or -not (Test-Path -LiteralPath $env:OCTO_CLUSTER)) {
-    $here = $PSScriptRoot
-    while ($here) {
-        if (Test-Path (Join-Path $here 'install.ps1')) {
-            $env:OCTO_CLUSTER = (Resolve-Path $here).Path
-            break
-        }
-        $parent = Split-Path $here -Parent
-        if ($parent -eq $here) { break }
-        $here = $parent
-    }
+function Test-OctoClusterRoot {
+    param([string]$Path)
+    if (-not $Path) { return $false }
+    return Test-Path -LiteralPath (Join-Path $Path 'install.ps1')
 }
 
-function Get-OctoClusterRoot {
-    if ($env:OCTO_CLUSTER -and (Test-Path $env:OCTO_CLUSTER)) {
-        return (Resolve-Path $env:OCTO_CLUSTER).Path
-    }
+function Resolve-OctoClusterRootFromScript {
     $here = $PSScriptRoot
     while ($here) {
-        if (Test-Path (Join-Path $here "install.ps1")) {
+        if (Test-OctoClusterRoot $here) {
             return (Resolve-Path $here).Path
         }
         $parent = Split-Path $here -Parent
         if ($parent -eq $here) { break }
         $here = $parent
+    }
+    return $null
+}
+
+function Resolve-OctoClusterRoot {
+    param([string]$Preferred)
+
+    if (Test-OctoClusterRoot $Preferred) {
+        return (Resolve-Path $Preferred).Path
+    }
+
+    $fromScript = Resolve-OctoClusterRootFromScript
+    if ($fromScript) { return $fromScript }
+
+    if ($Preferred) {
+        $parent = Split-Path $Preferred -Parent
+        if ($parent) {
+            $sibling = Join-Path $parent 'octo-cluster'
+            if (Test-OctoClusterRoot $sibling) {
+                return (Resolve-Path $sibling).Path
+            }
+        }
+    }
+
+    return $null
+}
+
+$resolved = Resolve-OctoClusterRoot -Preferred $env:OCTO_CLUSTER
+if ($resolved) {
+    if ($env:OCTO_CLUSTER -and $env:OCTO_CLUSTER -ne $resolved) {
+        Write-Warning "OCTO_CLUSTER '$env:OCTO_CLUSTER' invalid or stale; using $resolved"
+    }
+    $env:OCTO_CLUSTER = $resolved
+}
+
+function Get-OctoClusterRoot {
+    $root = Resolve-OctoClusterRoot -Preferred $env:OCTO_CLUSTER
+    if ($root) {
+        $env:OCTO_CLUSTER = $root
+        return $root
     }
     throw "OCTO_CLUSTER not set and install.ps1 not found above $PSScriptRoot"
 }

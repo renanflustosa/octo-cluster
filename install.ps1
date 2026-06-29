@@ -12,6 +12,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $env:OCTO_CLUSTER = (Resolve-Path $WorkspaceRoot).Path
+[Environment]::SetEnvironmentVariable('OCTO_CLUSTER', $env:OCTO_CLUSTER, 'User')
 
 Write-Host "OCTO_CLUSTER=$env:OCTO_CLUSTER"
 

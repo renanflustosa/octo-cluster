@@ -1,7 +1,9 @@
 git:
-  strategy: direct
-  target_branch: main
-  pull_request: false
+  strategy: feature-branch
+  base_branch: develop
+  protected_branches: main,develop
+  pull_request: true
+  sync_remote_before_pr: true
 
 verify:
   enabled: true

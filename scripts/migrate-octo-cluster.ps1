@@ -55,13 +55,33 @@ Get-ChildItem -LiteralPath $memRoot -Directory -ErrorAction SilentlyContinue | F
 }
 
 $oldEnv = [Environment]::GetEnvironmentVariable('AI_WORKSPACE', 'User')
+$userOcto = [Environment]::GetEnvironmentVariable('OCTO_CLUSTER', 'User')
+$validRoot = if (Test-Path (Join-Path $root 'install.ps1')) { $root } else { $null }
+
+function Set-UserOctoCluster {
+    param([string]$Path)
+    if (-not $Path) { return }
+    [Environment]::SetEnvironmentVariable('OCTO_CLUSTER', $Path, 'User')
+    Write-Host "Set User OCTO_CLUSTER=$Path" -ForegroundColor Green
+}
+
+if ($userOcto -and -not (Test-Path (Join-Path $userOcto 'install.ps1'))) {
+    $parent = Split-Path $userOcto -Parent
+    $sibling = if ($parent) { Join-Path $parent 'octo-cluster' } else { $null }
+    if ($sibling -and (Test-Path (Join-Path $sibling 'install.ps1'))) {
+        Set-UserOctoCluster $sibling
+    } elseif ($validRoot) {
+        Set-UserOctoCluster $validRoot
+    } else {
+        Write-Host "WARN: User OCTO_CLUSTER points to invalid path: $userOcto" -ForegroundColor Yellow
+    }
+} elseif (-not $userOcto -and $validRoot) {
+    Set-UserOctoCluster $validRoot
+}
+
 if ($oldEnv) {
-    $current = [Environment]::GetEnvironmentVariable('OCTO_CLUSTER', 'User')
-    if (-not $current) {
-        if (Test-Path (Join-Path $oldEnv 'install.ps1')) {
-            [Environment]::SetEnvironmentVariable('OCTO_CLUSTER', $oldEnv, 'User')
-            Write-Host "Set User OCTO_CLUSTER from legacy AI_WORKSPACE" -ForegroundColor Green
-        }
+    if (-not $userOcto -and (Test-Path (Join-Path $oldEnv 'install.ps1'))) {
+        Set-UserOctoCluster $oldEnv
     }
     [Environment]::SetEnvironmentVariable('AI_WORKSPACE', $null, 'User')
     Write-Host "Removed User AI_WORKSPACE" -ForegroundColor Green

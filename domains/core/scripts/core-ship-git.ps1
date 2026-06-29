@@ -18,6 +18,35 @@ $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot '..\..\..\scripts\_load-env.ps1')
 . (Join-Path $PSScriptRoot 'get-repo-policy.ps1')
 
+function Get-ProtectedBranches {
+    param([hashtable]$GitPolicy)
+
+    $raw = $GitPolicy.protected_branches
+    if ($raw) {
+        return @([string]$raw -split '[,\s]+' | Where-Object { $_ })
+    }
+
+    $branches = New-Object System.Collections.ArrayList
+    foreach ($key in @('base_branch', 'target_branch')) {
+        $name = [string]$GitPolicy[$key]
+        if ($name -and ($branches -notcontains $name)) { [void]$branches.Add($name) }
+    }
+    return @($branches)
+}
+
+function Assert-NotProtectedBranch {
+    param(
+        [Parameter(Mandatory = $true)][string]$Branch,
+        [Parameter(Mandatory = $true)][hashtable]$GitPolicy,
+        [string]$Hint = 'Checkout a feature branch or pass -FeatureBranch.'
+    )
+
+    $protected = Get-ProtectedBranches -GitPolicy $GitPolicy
+    if ($protected -contains $Branch) {
+        throw "[ship-git] branch '$Branch' is protected ($($protected -join ', ')). $Hint"
+    }
+}
+
 function Invoke-Git {
     param([Parameter(Mandatory = $true)][string[]]$Args)
     Write-Host "git $($Args -join ' ')" -ForegroundColor DarkGray
@@ -91,6 +120,25 @@ function Rebase-OntoRemoteBase {
     return $false
 }
 
+function Get-ExistingPullRequestUrl {
+    param(
+        [Parameter(Mandatory = $true)][string]$HeadBranch,
+        [Parameter(Mandatory = $true)][string]$BaseBranch
+    )
+    if ($WhatIf) { return $null }
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $out = gh pr list --head $HeadBranch --base $BaseBranch --json url --jq '.[0].url' 2>$null
+        if ($LASTEXITCODE -ne 0) { return $null }
+        $url = ($out | Out-String).Trim()
+        if ($url -and $url -ne 'null') { return $url }
+    } finally {
+        $ErrorActionPreference = $prevEap
+    }
+    return $null
+}
+
 function New-PullRequest {
     param(
         [Parameter(Mandatory = $true)][string]$BaseBranch,
@@ -100,6 +148,12 @@ function New-PullRequest {
     if ($SkipPullRequest) {
         Write-Host '`[ship-git] skip pull request' -ForegroundColor Yellow
         return $null
+    }
+    $head = (Invoke-Git @('branch', '--show-current')).Trim()
+    $existing = Get-ExistingPullRequestUrl -HeadBranch $head -BaseBranch $BaseBranch
+    if ($existing) {
+        Write-Host "`[ship-git] PR already exists: $existing" -ForegroundColor Green
+        return $existing
     }
     $args = @('pr', 'create', '--base', $BaseBranch)
     if ($Title) { $args += @('--title', $Title) }
@@ -134,6 +188,8 @@ function Invoke-DirectStrategy {
     $target = [string]$GitPolicy.target_branch
     if (-not $target) { $target = 'main' }
 
+    Assert-NotProtectedBranch -Branch $target -GitPolicy $GitPolicy -Hint 'Use git.strategy feature-branch with pull_request instead of direct push.'
+
     $current = (Invoke-Git @('branch', '--show-current')).Trim()
     if ($current -ne $target) {
         Write-Host "`[ship-git] checkout $target" -ForegroundColor Cyan
@@ -164,26 +220,32 @@ function Invoke-FeatureBranchStrategy {
     $base = [string]$GitPolicy.base_branch
     if (-not $base) { throw "feature-branch policy requires git.base_branch" }
 
-    Sync-BaseBranch -BaseBranch $base
-
     if (-not $BranchName) {
         $BranchName = (Invoke-Git @('branch', '--show-current')).Trim()
         if ($BranchName -eq $base -or -not $BranchName) {
             throw "FeatureBranch is required when current branch is the base branch."
         }
-    } elseif ($WhatIf) {
-        Write-Host "`[ship-git] would checkout/create branch $BranchName" -ForegroundColor Cyan
-    } else {
-        $exists = git show-ref --verify --quiet "refs/heads/$BranchName"; $code = $LASTEXITCODE
-        if ($code -eq 0) {
-            Invoke-Git @('checkout', $BranchName) | Out-Null
+    }
+
+    Assert-NotProtectedBranch -Branch $BranchName -GitPolicy $GitPolicy
+
+    $current = (Invoke-Git @('branch', '--show-current')).Trim()
+    if ($current -ne $BranchName) {
+        if ($WhatIf) {
+            Write-Host "`[ship-git] would checkout/create branch $BranchName" -ForegroundColor Cyan
         } else {
-            Invoke-Git @('checkout', '-b', $BranchName) | Out-Null
+            $exists = git show-ref --verify --quiet "refs/heads/$BranchName"; $code = $LASTEXITCODE
+            if ($code -eq 0) {
+                Invoke-Git @('checkout', $BranchName) | Out-Null
+            } else {
+                Invoke-Git @('checkout', '-b', $BranchName) | Out-Null
+            }
         }
     }
 
     Ensure-Commit -Message $Message -Skip:$SkipCommit
 
+    Invoke-Git @('fetch', 'origin') | Out-Null
     $rebased = $false
     if ($GitPolicy.sync_remote_before_pr) {
         $rebased = Rebase-OntoRemoteBase -BaseBranch $base

@@ -5,7 +5,15 @@ param(
     [ValidateSet('all', 'discover', 'preflight', 'verification', 'gates', 'git', 'reviews')]
     [string]$Phase = 'all',
     [hashtable]$ScriptArgs = @{},
-    [string]$Domain
+    [string]$Domain,
+    [string]$CommitMessage,
+    [string]$FeatureBranch,
+    [string]$PrTitle,
+    [string]$PrBodyFile,
+    [switch]$SkipGit,
+    [switch]$SkipCommit,
+    [switch]$SkipEval,
+    [switch]$SkipChildGate
 )
 
 $ErrorActionPreference = "Stop"
@@ -16,13 +24,24 @@ if (-not (Test-Path $orchestrator)) {
     throw "Missing orchestrator: $orchestrator"
 }
 
+$bound = @{}
+foreach ($key in $ScriptArgs.Keys) { $bound[$key] = $ScriptArgs[$key] }
+if ($CommitMessage) { $bound['CommitMessage'] = $CommitMessage }
+if ($FeatureBranch) { $bound['FeatureBranch'] = $FeatureBranch }
+if ($PrTitle) { $bound['PrTitle'] = $PrTitle }
+if ($PrBodyFile) { $bound['PrBodyFile'] = $PrBodyFile }
+if ($SkipGit) { $bound['SkipGit'] = $true }
+if ($SkipCommit) { $bound['SkipCommit'] = $true }
+if ($SkipEval) { $bound['SkipEval'] = $true }
+if ($SkipChildGate) { $bound['SkipChildGate'] = $true }
+
 $params = @('-ExecutionPolicy', 'Bypass', '-File', $orchestrator, '-Phase', $Phase)
 if ($Domain) {
     Write-Host "[deprecation] invoke-ship -Domain is deprecated; use AI_EXECUTION_CONTEXT" -ForegroundColor Yellow
     $params += @('-Domain', $Domain)
 }
-foreach ($key in $ScriptArgs.Keys) {
-    $val = $ScriptArgs[$key]
+foreach ($key in $bound.Keys) {
+    $val = $bound[$key]
     if ($val -is [switch]) {
         if ($val) { $params += "-$key" }
     } else {
