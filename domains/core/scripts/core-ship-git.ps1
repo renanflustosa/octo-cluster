@@ -120,6 +120,25 @@ function Rebase-OntoRemoteBase {
     return $false
 }
 
+function Get-ExistingPullRequestUrl {
+    param(
+        [Parameter(Mandatory = $true)][string]$HeadBranch,
+        [Parameter(Mandatory = $true)][string]$BaseBranch
+    )
+    if ($WhatIf) { return $null }
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $out = gh pr list --head $HeadBranch --base $BaseBranch --json url --jq '.[0].url' 2>$null
+        if ($LASTEXITCODE -ne 0) { return $null }
+        $url = ($out | Out-String).Trim()
+        if ($url -and $url -ne 'null') { return $url }
+    } finally {
+        $ErrorActionPreference = $prevEap
+    }
+    return $null
+}
+
 function New-PullRequest {
     param(
         [Parameter(Mandatory = $true)][string]$BaseBranch,
@@ -129,6 +148,12 @@ function New-PullRequest {
     if ($SkipPullRequest) {
         Write-Host '`[ship-git] skip pull request' -ForegroundColor Yellow
         return $null
+    }
+    $head = (Invoke-Git @('branch', '--show-current')).Trim()
+    $existing = Get-ExistingPullRequestUrl -HeadBranch $head -BaseBranch $BaseBranch
+    if ($existing) {
+        Write-Host "`[ship-git] PR already exists: $existing" -ForegroundColor Green
+        return $existing
     }
     $args = @('pr', 'create', '--base', $BaseBranch)
     if ($Title) { $args += @('--title', $Title) }
