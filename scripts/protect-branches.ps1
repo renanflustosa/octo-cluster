@@ -48,9 +48,11 @@ $body = @{
         @{
             type       = 'pull_request'
             parameters = @{
-                required_approving_review_count = 0
-                dismiss_stale_reviews_on_push  = $false
+                dismiss_stale_reviews_on_push   = $false
                 require_code_owner_review       = $false
+                require_last_push_approval      = $false
+                required_approving_review_count = 0
+                required_review_thread_resolution = $false
             }
         },
         @{ type = 'deletion' },
