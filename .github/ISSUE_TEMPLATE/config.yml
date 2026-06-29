@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Linear (primary tracker)
+    url: https://linear.app/octo-cluster
+    about: Core team work is tracked in Linear (OCT-xxx). Use this for planned development.
+  - name: Engineering Operating System (EOS)
+    url: https://github.com/renanflustosa/octo-cluster/blob/develop/docs/governance/eos.md
+    about: Read project conventions before contributing.

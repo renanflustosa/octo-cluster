@@ -74,6 +74,6 @@ Done. Next steps:
   2. gh auth login   (once, for PRs/issues)
   3. New chat -> /scan <TICKET> description
 
-Active context: AI_EXECUTION_CONTEXT=platform. See docs/ONBOARDING.md.
+Active context: AI_EXECUTION_CONTEXT=platform. See docs/guides/onboarding.md.
 
 "@

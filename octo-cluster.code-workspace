@@ -1,6 +1,12 @@
-﻿{
+{
 	"folders": [
-		{ "path": ".", "name": "octo-cluster" }
+		{
+			"path": ".",
+			"name": "octo-cluster"
+		},
+		{
+			"path": "../personal-vault"
+		}
 	],
 	"settings": {
 		"terminal.integrated.env.windows": {

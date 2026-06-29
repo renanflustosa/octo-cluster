@@ -27,7 +27,7 @@ bun run search octo-cluster "your query"
 ## Profiles
 
 - `octo-cluster` — platform profile (core harness paths only)
-- Custom profiles via capability packs — see [`docs/add-child-context.md`](../../docs/add-child-context.md)
+- Custom profiles via capability packs — see [`docs/guides/add-child-context.md`](../../docs/guides/add-child-context.md)
 
 ## Paths
 

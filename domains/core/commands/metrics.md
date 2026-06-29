@@ -31,4 +31,4 @@ powershell -File $env:OCTO_CLUSTER\eval\metrics\report.ps1 -Last 20 -Arm ponytai
 powershell -File $env:OCTO_CLUSTER\eval\metrics\cursor-session.ps1 -Json -Redact
 ```
 
-Playbook: [`eval/metrics/README.md`](../../eval/metrics/README.md) · [`docs/metrics-kernel.md`](../../docs/metrics-kernel.md)
+Playbook: [`eval/metrics/README.md`](../../eval/metrics/README.md) · [`docs/architecture/metrics-kernel.md`](../../docs/architecture/metrics-kernel.md)

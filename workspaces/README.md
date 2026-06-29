@@ -35,4 +35,4 @@ Add your product repos as sibling folders. Keep secrets in a **local gitignored*
 - **Skill index:** `.cursor/capabilities-skills.json`
 - **Pack skills at runtime:** `invoke-pipeline.ps1 -Action discover` → `PIPELINE_SKILL`
 
-See [`docs/context-model.md`](../docs/context-model.md).
+See [`docs/architecture/context-model.md`](../docs/architecture/context-model.md).

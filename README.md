@@ -5,6 +5,11 @@
 > IDE-agnostic by design. **Cursor** is supported today via generated adapters; other IDEs can add a folder adapter the same way.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Linear](https://img.shields.io/badge/Linear-octo--cluster-5E6AD2)](https://linear.app/octo-cluster)
+
+## Engineering Operating System
+
+Octo Cluster follows the [Engineering Operating System (EOS)](./docs/governance/eos.md) — governance, delivery, quality, and AI-agent operations. Work is tracked in [Linear](https://linear.app/octo-cluster) (`OCT-xxx`).
 
 ## Why Octo Cluster?
 
@@ -52,7 +57,7 @@ octo-cluster/          ← drop this folder into any multi-root workspace
   .cursor/             generated for Cursor — edit domains/, then sync
 ```
 
-See [context model](./docs/context-model.md) and [add a capability pack](./docs/add-child-context.md).
+See [context model](./docs/architecture/context-model.md) and [add a capability pack](./docs/guides/add-child-context.md).
 
 ## Optional loop (Cursor commands)
 
@@ -72,13 +77,15 @@ powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline scan -A
 
 | Doc | Content |
 |-----|---------|
-| [ONBOARDING.md](./docs/ONBOARDING.md) | Full setup (PT) |
-| [productivity-tools.md](./docs/productivity-tools.md) | Harness design, token layers, core vs packs |
-| [context-model.md](./docs/context-model.md) | Execution context and sync rules |
-| [add-child-context.md](./docs/add-child-context.md) | Scaffold a private or public capability pack |
-| [ROADMAP.md](./ROADMAP.md) | Planned work and credibility milestones |
-| [CHANGELOG.md](./CHANGELOG.md) | Release history (Keep a Changelog) |
-| [THIRD_PARTY.md](./THIRD_PARTY.md) | Adapted skills and dependency attributions |
+| [EOS](./docs/governance/eos.md) | Engineering Operating System (canonical) |
+| [onboarding](./docs/guides/onboarding.md) | Full setup |
+| [productivity-tools](./docs/guides/productivity-tools.md) | Harness design, token layers |
+| [context-model](./docs/architecture/context-model.md) | Execution context and sync |
+| [add-child-context](./docs/guides/add-child-context.md) | Scaffold a capability pack |
+| [ROADMAP.md](./ROADMAP.md) | Planned work and semver ladder |
+| [CHANGELOG.md](./CHANGELOG.md) | Release history |
+| [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) | Community standards |
+| [THIRD_PARTY.md](./THIRD_PARTY.md) | Attributions |
 
 ## Install helpers (official sources, no winget)
 
