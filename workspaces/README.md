@@ -19,12 +19,12 @@ For a child domain scaffold (rules/hooks overlay):
 
 | Workspace file | `AI_EXECUTION_CONTEXT` | Scope |
 |----------------|------------------------|-------|
-| [`../octo-cluster.code-workspace`](../octo-cluster.code-workspace) | `platform` | Core harness only |
+| [`../octo-cluster.code-workspace.example`](../octo-cluster.code-workspace.example) | `platform` | Core harness (copy to `octo-cluster.code-workspace` locally) |
 | [`company2-workspace.code-workspace`](./company2-workspace.code-workspace) | `company2` | Scaffold example |
 | [`company3-workspace.code-workspace`](./company3-workspace.code-workspace) | `company3` | Scaffold example |
 | [`company4-workspace.code-workspace`](./company4-workspace.code-workspace) | `company4` | Scaffold example |
 
-Add your product repos as sibling folders. Keep secrets in a **local gitignored** vault — never in this repo.
+`octo-cluster.code-workspace` is **gitignored** — copy from `.example` or run `.\install.ps1`. Optionally add sibling folders (your app, local secrets vault) in your local copy only.
 
 ## How sync works
 
@@ -35,4 +35,4 @@ Add your product repos as sibling folders. Keep secrets in a **local gitignored*
 - **Skill index:** `.cursor/capabilities-skills.json`
 - **Pack skills at runtime:** `invoke-pipeline.ps1 -Action discover` → `PIPELINE_SKILL`
 
-See [`docs/context-model.md`](../docs/context-model.md).
+See [`docs/architecture/context-model.md`](../docs/architecture/context-model.md).

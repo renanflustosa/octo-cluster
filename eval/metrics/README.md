@@ -69,4 +69,4 @@ Legacy CSV in `state/logs/metrics-baseline/` migrated once via `migrate-csv`.
 
 Uses unofficial Cursor dashboard endpoints. May break; lite metrics degrade to LOC-only (`usage_source=skipped`).
 
-See [`docs/metrics-kernel.md`](../../docs/metrics-kernel.md) for openpolvo portability.
+See [`docs/architecture/metrics-kernel.md`](../../docs/architecture/metrics-kernel.md) for openpolvo portability.

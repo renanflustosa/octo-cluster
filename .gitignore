@@ -22,3 +22,8 @@ generated/
 
 # OS / editor
 *.log
+
+# Machine-local IDE workspaces (may include private vault or product repo paths)
+octo-cluster.code-workspace
+workspaces/*-local.code-workspace
+contexts/*.local.json

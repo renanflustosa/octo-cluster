@@ -33,6 +33,14 @@ if ($WithOllama) {
 # Sync domains -> .cursor
 & (Join-Path $PSScriptRoot "scripts\sync-cursor.ps1")
 
+# Seed local workspace from public template (gitignored; may add private folders)
+$wsExample = Join-Path $env:OCTO_CLUSTER 'octo-cluster.code-workspace.example'
+$wsLocal = Join-Path $env:OCTO_CLUSTER 'octo-cluster.code-workspace'
+if ((Test-Path $wsExample) -and -not (Test-Path $wsLocal)) {
+    Copy-Item -LiteralPath $wsExample -Destination $wsLocal
+    Write-Host 'Created octo-cluster.code-workspace from .example' -ForegroundColor DarkGray
+}
+
 $validateHooks = Join-Path $PSScriptRoot "scripts\validate-cursor-hooks.ps1"
 if (Test-Path $validateHooks) {
     & powershell -NoProfile -ExecutionPolicy Bypass -File $validateHooks
@@ -70,10 +78,11 @@ if (Test-Path $audit) {
 Write-Host @"
 
 Done. Next steps:
-  1. Set OCTO_CLUSTER permanently (User env) or open octo-cluster.code-workspace.
+  1. Set OCTO_CLUSTER permanently (User env) or open octo-cluster.code-workspace
+     (copy from octo-cluster.code-workspace.example on first clone).
   2. gh auth login   (once, for PRs/issues)
   3. New chat -> /scan <TICKET> description
 
-Active context: AI_EXECUTION_CONTEXT=platform. See docs/ONBOARDING.md.
+Active context: AI_EXECUTION_CONTEXT=platform. See docs/guides/onboarding.md.
 
 "@

@@ -1,0 +1,33 @@
+name: Community bug report
+description: Report a harness bug (external contributors). Core team work uses Linear.
+title: "[bug] "
+labels:
+  - Bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Core team:** use [Linear](https://linear.app/octo-cluster) for planned work (8CL-xxx).
+
+        This template is for community reports only. Maintainers will triage into Linear if accepted.
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, IDE adapter (e.g. Cursor), octo-cluster version or commit
+      placeholder: Windows 11, Cursor, develop @ abc1234
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Steps to reproduce and expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: discover
+    attributes:
+      label: Pipeline discover output (optional)
+      description: Output of `invoke-pipeline.ps1 -Pipeline scan -Action discover`
+      render: shell

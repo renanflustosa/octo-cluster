@@ -1,16 +1,26 @@
+## Related Issue
+
+8CL-XXX
+
 ## Summary
 
-<!-- What changed and why (harness / core / docs / pack)? -->
+<!-- What changed and why? Conventional Commits PR title in English. -->
 
-**PR title:** use [Conventional Commits](https://www.conventionalcommits.org/) in English (`feat:`, `fix:`, `docs:`, `chore:`).
+## Validation
 
-## Test plan
-
-- [ ] `bun run validate octo-cluster` (if context-engine touched)
-- [ ] `.\scripts\sync-cursor.ps1` (if domains/ or capabilities/ touched)
-- [ ] Other: <!-- gates, productivity-audit, … -->
+```powershell
+# exact commands run
+bun run validate octo-cluster
+```
 
 ## Checklist
 
-- [ ] No secrets or employer-specific identifiers in core paths
-- [ ] Edited source under `domains/` / `capabilities/`, not hand-edited `.cursor/`
+- [ ] Acceptance criteria satisfied
+- [ ] Tests passing
+- [ ] Documentation updated
+- [ ] CI passing
+- [ ] No breaking changes
+
+or
+
+- [ ] BREAKING CHANGE documented

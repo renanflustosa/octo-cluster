@@ -28,9 +28,9 @@ jobs:
         working-directory: engine/context-engine
         run: bun install
 
-      - name: Profile seed unit tests
+      - name: Unit and harness tests
         working-directory: engine/context-engine
-        run: bun test src/lib/ensure-profile-seed.test.ts
+        run: bun test src/lib/ensure-profile-seed.test.ts src/harness.test.ts
 
       - name: Simulate fresh clone (no state/memory)
         shell: pwsh

@@ -127,7 +127,7 @@ if (Test-Path $rp) {
     }
 }
 
-# octo-cluster.code-workspace — single root
+# octo-cluster.code-workspace.example — single root (copy locally; gitignored)
 @'
 {
 	"folders": [
@@ -146,8 +146,8 @@ if (Test-Path $rp) {
 		]
 	}
 }
-'@ | Set-Content (Join-Path $Dest 'octo-cluster.code-workspace') -Encoding UTF8
-Write-Host '[write] octo-cluster.code-workspace' -ForegroundColor Green
+'@ | Set-Content (Join-Path $Dest 'octo-cluster.code-workspace.example') -Encoding UTF8
+Write-Host '[write] octo-cluster.code-workspace.example' -ForegroundColor Green
 
 # .gitignore — ensure state is ignored
 $gitignore = Join-Path $Dest '.gitignore'
