@@ -11,6 +11,9 @@ verify:
     context_engine:
       cwd: engine/context-engine
       run: bun run validate octo-cluster
+    context_engine_seed_test:
+      cwd: engine/context-engine
+      run: bun test src/lib/ensure-profile-seed.test.ts
     core_no_allow_install:
       run: powershell -NoProfile -Command "if (Select-String -Path domains\core\scripts\*.ps1 -Pattern AllowInstall -Quiet) { Write-Error 'AllowInstall in core scripts'; exit 1 }"
     scan_discover:

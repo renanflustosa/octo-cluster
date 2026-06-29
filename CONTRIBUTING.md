@@ -26,12 +26,22 @@ bun run validate octo-cluster
 
 ## Pull requests
 
-1. One concern per PR when possible.
-2. Run local verify before opening:
+1. **Target branch:** `develop` for features and fixes; `main` only for release merges from `develop`.
+2. **Title:** [Conventional Commits](https://www.conventionalcommits.org/) in English — e.g. `feat:`, `fix:`, `docs:`, `chore:`.
+3. One concern per PR when possible.
+4. Run local verify before opening:
    - `bun run validate octo-cluster` (context-engine)
    - `.\scripts\productivity-audit.ps1` (optional smoke)
-3. Do not commit secrets, `.env`, or `state/memory/` contents.
-4. Edit **source** under `domains/` / `capabilities/` — not generated `.cursor/` (sync regenerates it).
+5. Do not commit secrets, `.env`, or `state/memory/` contents.
+6. Edit **source** under `domains/` / `capabilities/` — not generated `.cursor/` (run `.\scripts\sync-cursor.ps1` after domain edits).
+7. Adapted skills must stay attributed — see [THIRD_PARTY.md](./THIRD_PARTY.md).
+
+## Commits and releases
+
+- **Commits:** short Conventional Commits in English (`fix: null-safe exit codes`).
+- **CHANGELOG:** [Keep a Changelog](https://keepachangelog.com/) in [CHANGELOG.md](./CHANGELOG.md); release-please updates it on `main`.
+- **Branches:** `develop` = integration; `main` = stable tags (`v0.x.x`) via PR only.
+- **Roadmap:** [ROADMAP.md](./ROADMAP.md) for planned work — do not overclaim in README.
 
 ## Code style
 

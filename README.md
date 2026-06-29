@@ -76,6 +76,9 @@ powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline scan -A
 | [productivity-tools.md](./docs/productivity-tools.md) | Harness design, token layers, core vs packs |
 | [context-model.md](./docs/context-model.md) | Execution context and sync rules |
 | [add-child-context.md](./docs/add-child-context.md) | Scaffold a private or public capability pack |
+| [ROADMAP.md](./ROADMAP.md) | Planned work and credibility milestones |
+| [CHANGELOG.md](./CHANGELOG.md) | Release history (Keep a Changelog) |
+| [THIRD_PARTY.md](./THIRD_PARTY.md) | Adapted skills and dependency attributions |
 
 ## Install helpers (official sources, no winget)
 
@@ -93,4 +96,4 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md). Capability packs that name private pro
 
 ## License
 
-[MIT](./LICENSE) © Renan Lustosa
+[MIT](./LICENSE) © Renan Lustosa — see [THIRD_PARTY.md](./THIRD_PARTY.md) for adapted skills and dependencies.

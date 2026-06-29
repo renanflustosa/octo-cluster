@@ -14,6 +14,13 @@ Read `PIPELINE_SKILL` + `domains/core/skills/core-ship/SKILL.md` once.
 
 ```powershell
 powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline ship -Action run
+powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline ship -Action run -CommitMessage "fix: short conventional summary"
+powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline ship -Action run -Phase git -CommitMessage "fix: ..." -FeatureBranch "fix/my-change"
+```
+
+Advanced (hashtable; prefer `-CommitMessage` flat param above):
+
+```powershell
 powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline ship -Action run -Phase git -ScriptArgs @{ CommitMessage = "..."; FeatureBranch = "..." }
 ```
 

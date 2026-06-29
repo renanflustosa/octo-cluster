@@ -8,6 +8,7 @@ import {
   vectorPath,
 } from "./lib/paths.ts";
 import { resolveBunExecutable } from "./lib/resolve-bun.ts";
+import { ensureProfileSeed } from "./lib/ensure-profile-seed.ts";
 
 function resolveProfiles(): string[] {
   if (process.argv.length > 2) {
@@ -41,6 +42,12 @@ check("context-engine installed", await stat(join(ce, "node_modules")).then(() =
 check("bun executable", bun !== "bun" || spawnSync(bun, ["--version"], { encoding: "utf8" }).status === 0, bun);
 
 for (const profile of profiles) {
+  const seeded = await ensureProfileSeed(profile);
+  if (seeded.created.length > 0) {
+    console.log(`OK ${profile}: seeded ${seeded.created.length} bootstrap file(s) from fixture`);
+    ok++;
+  }
+
   const root = memoryRoot(profile);
   const arch = join(contextDir(profile), "architecture.md");
   check(`${profile}: memory root`, await stat(root).then(() => true).catch(() => false), root);
