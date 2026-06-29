@@ -28,12 +28,12 @@ bun run validate octo-cluster
 
 ## Branches
 
-Pattern: `<type>/OCT-<id>-<short-description>`
+Pattern: `<type>/8CL-<id>-<short-description>`
 
 ```text
-feat/OCT-123-add-memory-compaction
-fix/OCT-201-fix-rag-cache
-docs/OCT-45-update-onboarding
+feat/8CL-123-add-memory-compaction
+fix/8CL-201-fix-rag-cache
+docs/8CL-45-update-onboarding
 ```
 
 Target `develop` for features and fixes; `main` only for release merges from `develop`.
@@ -41,7 +41,7 @@ Target `develop` for features and fixes; `main` only for release merges from `de
 ## Pull requests
 
 1. **Title:** [Conventional Commits](https://www.conventionalcommits.org/) in English — e.g. `feat:`, `fix:`, `docs:`.
-2. **Related issue:** include `OCT-xxx` in PR body (see [PR template](./.github/PULL_REQUEST_TEMPLATE.md)).
+2. **Related issue:** include `8CL-xxx` in PR body (see [PR template](./.github/PULL_REQUEST_TEMPLATE.md)).
 3. One concern per PR when possible.
 4. Run local verify before opening:
    - `bun run validate octo-cluster` (context-engine)
@@ -65,7 +65,7 @@ Target `develop` for features and fixes; `main` only for release merges from `de
 
 ## Issues
 
-**Primary tracker:** [Linear workspace `octo-cluster`](https://linear.app/octo-cluster) (`OCT-xxx`).
+**Primary tracker:** [Linear workspace `octo-cluster`](https://linear.app/octo-cluster) (`8CL-xxx`).
 
 GitHub Issues are for **external community reports** only. Maintainers triage accepted reports into Linear.
 

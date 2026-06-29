@@ -86,7 +86,7 @@ Project container: **Octo Cluster EOS v1.0.0**
 ## Branch naming standard
 
 ```text
-<type>/OCT-<id>-<short-description>
+<type>/8CL-<id>-<short-description>
 ```
 
 Types: `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `security`
@@ -94,12 +94,12 @@ Types: `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`
 Examples:
 
 ```text
-feat/OCT-123-add-memory-compaction
-fix/OCT-201-fix-rag-cache
-docs/OCT-45-update-onboarding
+feat/8CL-123-add-memory-compaction
+fix/8CL-201-fix-rag-cache
+docs/8CL-45-update-onboarding
 ```
 
-Forbidden: branches without `OCT-<id>`, personal prefixes (`renan-fix`).
+Forbidden: branches without `8CL-<id>`, personal prefixes (`renan-fix`).
 
 ## Commit standard
 
@@ -173,7 +173,7 @@ Label `ai-ready` when complete.
 - [ ] CI passing
 - [ ] No critical security findings
 - [ ] Conventional Commit used
-- [ ] Linked Linear issue (`OCT-xxx` in PR)
+- [ ] Linked Linear issue (`8CL-xxx` in PR)
 - [ ] PR approved
 - [ ] Release notes generated (if applicable)
 
@@ -217,7 +217,7 @@ Executable by human developers, Cursor Agent, and future autonomous agents.
 - [ ] path/to/file
 
 ## Dependencies
-- blockedBy: OCT-xxx | none
+- blockedBy: 8CL-xxx | none
 
 ## Acceptance Criteria
 - [ ] ...
@@ -239,7 +239,7 @@ bun run validate octo-cluster
 One Cursor chat = one Linear issue. Pass ticket ID to phase commands:
 
 ```text
-/scan OCT-123 description
+/scan 8CL-123 description
 ```
 
 No Linear-specific code in `domains/core/` — use MCP or manual updates.

@@ -14,15 +14,15 @@ Read [EOS](../governance/eos.md) for project conventions.
 | Ollama (optional) | `.\scripts\install-ollama.ps1` |
 | WSL2 Ubuntu (optional) | `.\scripts\install-wsl.ps1` |
 | Docker Desktop (optional) | `.\scripts\install-docker.ps1` |
-| Cursor | Open `octo-cluster.code-workspace` |
+| Cursor | Copy `octo-cluster.code-workspace.example` → `octo-cluster.code-workspace` (or run `.\install.ps1`) |
 
 After install: `gh auth login` (once). Verify: `.\scripts\productivity-audit.ps1`
 
 ## Workspace
 
-`octo-cluster.code-workspace` — single-root with the CORE harness.
+`octo-cluster.code-workspace` — single-root with the CORE harness (seeded from `.example`; gitignored).
 
-Optional: add sibling folders (your app, local gitignored vault) in a multi-root workspace.
+Optional: add sibling folders (your app, local gitignored vault) in your local workspace copy.
 
 Terminal env:
 
@@ -32,7 +32,7 @@ Terminal env:
 ## CORE loop (optional)
 
 ```text
-/start-workspace → /scan OCT-xxx description → /model → Execute plan → /ship → /close
+/start-workspace → /scan 8CL-xxx description → /model → Execute plan → /ship → /close
 ```
 
 | Phase | Harness |
@@ -51,11 +51,11 @@ powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline scan -A
 
 ## Issue tracker (Linear)
 
-Primary tracker: [Linear `octo-cluster`](https://linear.app/octo-cluster) (`OCT-xxx`).
+Primary tracker: [Linear `octo-cluster`](https://linear.app/octo-cluster) (`8CL-xxx`).
 
-Platform context: `/scan` does **not** create issues — pass the ID (`/scan OCT-123 description`). Use Linear MCP or UI to read/update issues.
+Platform context: `/scan` does **not** create issues — pass the ID (`/scan 8CL-123 description`). Use Linear MCP or UI to read/update issues.
 
-Branch pattern: `feat/OCT-123-short-description` — see [EOS](../governance/eos.md).
+Branch pattern: `feat/8CL-123-short-description` — see [EOS](../governance/eos.md).
 
 Private capability packs may add routing — see [add-child-context.md](./add-child-context.md).
 

@@ -12,10 +12,10 @@ Octo Cluster needs a structured work tracker for weekly delivery cycles, agent-f
 
 Use the dedicated Linear workspace `octo-cluster` as the **primary** work tracker for all planned development.
 
-- Linear issues use prefix `OCT-`
+- Linear issues use prefix `8CL-` (Octo Cluster team key)
 - GitHub Issues remain for external community reports only (triage into Linear)
 - No proprietary issue-tracker routing code in `domains/core/`
-- Harness accepts any ticket ID via `/scan OCT-xxx`
+- Harness accepts any ticket ID via `/scan 8CL-xxx`
 
 ## Consequences
 

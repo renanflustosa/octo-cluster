@@ -1,5 +1,9 @@
 # Octo Cluster
 
+<p align="center">
+  <img src="./assets/branding/logo-primary.png" alt="Octo Cluster" width="128" />
+</p>
+
 **All-in-one local harness for AI-assisted development** — RAG, memory, token economy, hooks, and verify gates in one workspace folder. Maximize automation; use the model only when judgment is required.
 
 > IDE-agnostic by design. **Cursor** is supported today via generated adapters; other IDEs can add a folder adapter the same way.
@@ -9,7 +13,7 @@
 
 ## Engineering Operating System
 
-Octo Cluster follows the [Engineering Operating System (EOS)](./docs/governance/eos.md) — governance, delivery, quality, and AI-agent operations. Work is tracked in [Linear](https://linear.app/octo-cluster) (`OCT-xxx`).
+Octo Cluster follows the [Engineering Operating System (EOS)](./docs/governance/eos.md) — governance, delivery, quality, and AI-agent operations. Work is tracked in [Linear](https://linear.app/octo-cluster) (`8CL-xxx`).
 
 ## Why Octo Cluster?
 
@@ -40,9 +44,9 @@ cd C:\GitHub\octo-cluster
 gh auth login   # optional, for PR flow in /ship
 ```
 
-Open [`octo-cluster.code-workspace`](./octo-cluster.code-workspace) in your IDE (Cursor today). Set `OCTO_CLUSTER` to your clone root — the workspace file does this automatically.
+Open [`octo-cluster.code-workspace`](./octo-cluster.code-workspace) in your IDE (Cursor today). On first clone, copy from [`octo-cluster.code-workspace.example`](./octo-cluster.code-workspace.example) or run `.\install.ps1` — it seeds the local file automatically. Set `OCTO_CLUSTER` to your clone root; the workspace file does this automatically.
 
-Add your product repos as sibling folders in the workspace; keep secrets in a **local, gitignored** vault — never in this repo.
+Add your product repos or a **local gitignored** secrets vault as sibling folders in your workspace copy — never commit those paths to this repo.
 
 ## Layout
 

@@ -33,7 +33,7 @@ Current default may omit **In Review**. Add via **Team settings → Workflow**.
 
 1. Connect `renanflustosa/octo-cluster`
 2. Enable auto-link branches and auto-close on merge
-3. Linear auto-branch prefix: `oct-` (rename to EOS pattern before merge — see [eos.md](./eos.md#branch-naming-standard))
+3. Linear auto-branch prefix: `8cl-` (rename to EOS pattern before merge — see [eos.md](./eos.md#branch-naming-standard))
 
 ### Initiatives (15)
 

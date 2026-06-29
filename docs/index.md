@@ -10,6 +10,7 @@ Pipeline skills resolve at runtime via [`scripts/invoke-pipeline.ps1`](../script
 |----------|---------|
 | [governance/eos.md](./governance/eos.md) | Engineering Operating System (canonical) |
 | [governance/linear-workspace-setup.md](./governance/linear-workspace-setup.md) | Linear workspace one-time setup |
+| [assets/branding/](../assets/branding/) | Logos, app icon, favicon, GitHub avatar |
 | [adr/](./adr/) | Architecture decision records |
 
 ## Guides
@@ -34,7 +35,7 @@ Pipeline skills resolve at runtime via [`scripts/invoke-pipeline.ps1`](../script
 
 | Context | File | Workspace |
 |---------|------|-----------|
-| **Platform** (default) | [`contexts/platform.json`](../contexts/platform.json) | [`octo-cluster.code-workspace`](../octo-cluster.code-workspace) |
+| **Platform** (default) | [`contexts/platform.json`](../contexts/platform.json) | [`octo-cluster.code-workspace.example`](../octo-cluster.code-workspace.example) |
 | **Company scaffolds** | add `contexts/companyN.json` | [`workspaces/`](../workspaces/) |
 
 Private capability packs live in **your fork** — see [CONTRIBUTING.md](../CONTRIBUTING.md).
@@ -60,6 +61,6 @@ octo-cluster/
     api/
 ```
 
-Open [`octo-cluster.code-workspace`](../octo-cluster.code-workspace) for platform work. After switching workspace, run sync once.
+Copy [`octo-cluster.code-workspace.example`](../octo-cluster.code-workspace.example) to `octo-cluster.code-workspace` (gitignored) for platform work, or run `.\install.ps1`. After switching workspace, run sync once.
 
-Work tracker: [Linear `octo-cluster`](https://linear.app/octo-cluster) (`OCT-xxx`).
+Work tracker: [Linear `octo-cluster`](https://linear.app/octo-cluster) (`8CL-xxx`).
