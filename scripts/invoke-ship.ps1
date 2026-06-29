@@ -10,32 +10,38 @@ param(
     [string]$FeatureBranch,
     [string]$PrTitle,
     [string]$PrBodyFile,
+    [switch]$SkipGit,
     [switch]$SkipCommit,
-    [switch]$SkipGit
+    [switch]$SkipEval,
+    [switch]$SkipChildGate
 )
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "_load-env.ps1")
-
-if ($CommitMessage) { $ScriptArgs['CommitMessage'] = $CommitMessage }
-if ($FeatureBranch) { $ScriptArgs['FeatureBranch'] = $FeatureBranch }
-if ($PrTitle) { $ScriptArgs['PrTitle'] = $PrTitle }
-if ($PrBodyFile) { $ScriptArgs['PrBodyFile'] = $PrBodyFile }
-if ($SkipCommit) { $ScriptArgs['SkipCommit'] = $true }
-if ($SkipGit) { $ScriptArgs['SkipGit'] = $true }
 
 $orchestrator = Join-Path (Get-CoreScriptsRoot) "core-ship-orchestrator.ps1"
 if (-not (Test-Path $orchestrator)) {
     throw "Missing orchestrator: $orchestrator"
 }
 
+$bound = @{}
+foreach ($key in $ScriptArgs.Keys) { $bound[$key] = $ScriptArgs[$key] }
+if ($CommitMessage) { $bound['CommitMessage'] = $CommitMessage }
+if ($FeatureBranch) { $bound['FeatureBranch'] = $FeatureBranch }
+if ($PrTitle) { $bound['PrTitle'] = $PrTitle }
+if ($PrBodyFile) { $bound['PrBodyFile'] = $PrBodyFile }
+if ($SkipGit) { $bound['SkipGit'] = $true }
+if ($SkipCommit) { $bound['SkipCommit'] = $true }
+if ($SkipEval) { $bound['SkipEval'] = $true }
+if ($SkipChildGate) { $bound['SkipChildGate'] = $true }
+
 $params = @('-ExecutionPolicy', 'Bypass', '-File', $orchestrator, '-Phase', $Phase)
 if ($Domain) {
     Write-Host "[deprecation] invoke-ship -Domain is deprecated; use AI_EXECUTION_CONTEXT" -ForegroundColor Yellow
     $params += @('-Domain', $Domain)
 }
-foreach ($key in $ScriptArgs.Keys) {
-    $val = $ScriptArgs[$key]
+foreach ($key in $bound.Keys) {
+    $val = $bound[$key]
     if ($val -is [switch]) {
         if ($val) { $params += "-$key" }
     } else {

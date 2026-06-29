@@ -9,10 +9,23 @@ param(
     [string]$Phase = 'all',
     [hashtable]$ScriptArgs = @{},
     [string]$Domain,
-    [string]$RepoPath
+    [string]$RepoPath,
+    [string]$CommitMessage,
+    [string]$FeatureBranch,
+    [string]$PrTitle,
+    [string]$PrBodyFile,
+    [switch]$SkipGit,
+    [switch]$SkipCommit
 )
 
 $ErrorActionPreference = "Stop"
+
+if ($CommitMessage) { $ScriptArgs['CommitMessage'] = $CommitMessage }
+if ($FeatureBranch) { $ScriptArgs['FeatureBranch'] = $FeatureBranch }
+if ($PrTitle) { $ScriptArgs['PrTitle'] = $PrTitle }
+if ($PrBodyFile) { $ScriptArgs['PrBodyFile'] = $PrBodyFile }
+if ($SkipGit) { $ScriptArgs['SkipGit'] = $true }
+if ($SkipCommit) { $ScriptArgs['SkipCommit'] = $true }
 
 $allowed = @('ship', 'scan', 'model', 'close', 'start-workspace', 'review', 'debug')
 if ($Pipeline -notin $allowed) {
