@@ -76,10 +76,16 @@ if (Test-Path $audit) {
     if ($LASTEXITCODE -ne 0) { throw "productivity-audit failed - fix missing tools and re-run .\install.ps1" }
 }
 
+$userOcto = [Environment]::GetEnvironmentVariable('OCTO_CLUSTER', 'User')
+if (-not $userOcto -or -not (Test-Path -LiteralPath (Join-Path $userOcto 'install.ps1'))) {
+    [Environment]::SetEnvironmentVariable('OCTO_CLUSTER', $env:OCTO_CLUSTER, 'User')
+    Write-Host "Persisted User OCTO_CLUSTER=$($env:OCTO_CLUSTER)" -ForegroundColor Green
+}
+
 Write-Host @"
 
 Done. Next steps:
-  1. Set OCTO_CLUSTER permanently (User env) or open octo-cluster.code-workspace.
+  1. Open octo-cluster.code-workspace (OCTO_CLUSTER is set in User env).
   2. gh auth login   (once, for PRs/issues)
   3. New chat -> /scan <TICKET> description
 

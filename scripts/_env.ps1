@@ -1,15 +1,30 @@
 ﻿# Shared paths for Octo Cluster scripts. Dot-source from domains/*/scripts/*.ps1 or scripts/*.ps1
 
-if (-not $env:OCTO_CLUSTER -or -not (Test-Path -LiteralPath $env:OCTO_CLUSTER)) {
+function Test-ValidOctoClusterRoot {
+    param([string]$Path)
+    return $Path -and (Test-Path -LiteralPath (Join-Path $Path 'install.ps1'))
+}
+
+function Resolve-OctoClusterRootFromScript {
     $here = $PSScriptRoot
     while ($here) {
         if (Test-Path (Join-Path $here 'install.ps1')) {
-            $env:OCTO_CLUSTER = (Resolve-Path $here).Path
-            break
+            return (Resolve-Path $here).Path
         }
         $parent = Split-Path $here -Parent
         if ($parent -eq $here) { break }
         $here = $parent
+    }
+    return $null
+}
+
+if (-not (Test-ValidOctoClusterRoot $env:OCTO_CLUSTER)) {
+    $resolved = Resolve-OctoClusterRootFromScript
+    if ($resolved) {
+        if ($env:OCTO_CLUSTER -and $env:OCTO_CLUSTER -ne $resolved) {
+            Write-Host "WARN: OCTO_CLUSTER=$env:OCTO_CLUSTER is not a valid clone; using $resolved" -ForegroundColor Yellow
+        }
+        $env:OCTO_CLUSTER = $resolved
     }
 }
 

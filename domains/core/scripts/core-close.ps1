@@ -29,7 +29,7 @@ if (-not $Goal -and (Test-Path $taskFile)) {
 }
 $ce = Get-ContextEngineRoot
 $exitCode = Invoke-ContextEngine run --cwd $ce memory-compact $Profile
-if ($exitCode -ne 0) { exit $exitCode }
+if ($null -ne $exitCode -and $exitCode -ne 0) { exit $exitCode }
 $learnArgs = @('run', '--cwd', $ce, 'learn', $Profile, '--ticket', $Ticket)
 if ($Goal) { $learnArgs += @('--goal', $Goal) }
 if ($Files) { $learnArgs += @('--files', $Files) }
@@ -38,16 +38,17 @@ if ($Apis) { $learnArgs += @('--apis', $Apis) }
 if ($Debt) { $learnArgs += @('--debt', $Debt) }
 if ($Future) { $learnArgs += @('--future', $Future) }
 $exitCode = Invoke-ContextEngine @learnArgs
-if ($exitCode -ne 0) { exit $exitCode }
+if ($null -ne $exitCode -and $exitCode -ne 0) { exit $exitCode }
 $exitCode = Invoke-ContextEngineIncrementalIndex -Profile $Profile -Kind memory -Incremental
 if ($exitCode -ne 0) { Write-Host "WARN: incremental LanceDB reindex failed (exit $exitCode)" -ForegroundColor Yellow }
 $exitCode = Invoke-ContextEngine run --cwd $ce memory-compact $Profile
-if ($exitCode -ne 0) { exit $exitCode }
+if ($null -ne $exitCode -and $exitCode -ne 0) { exit $exitCode }
 
 if (-not $SkipMetrics) {
     $liteScript = Join-Path (Get-OctoClusterRoot) "eval\metrics\measure-card-lite.ps1"
     if (Test-Path $liteScript) {
-        $liteParams = @(
+        try {
+            $liteParams = @(
                 '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $liteScript,
                 '-Ticket', $Ticket, '-Profile', $Profile, '-Arm', $Arm,
                 '-ShipVerdict', $ShipVerdict, '-BaseRef', $BaseRef

@@ -83,8 +83,15 @@ function Invoke-ContextEngine {
     $bun = Get-BunExecutable
     if (-not $bun) { throw "Bun executable not found. Run: .\install.ps1" }
 
-    & $bun @EngineArgs
-    return $LASTEXITCODE
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        & $bun @EngineArgs 2>&1 | Out-Null
+    } finally {
+        $ErrorActionPreference = $prevEap
+    }
+    if ($null -eq $LASTEXITCODE) { return 0 }
+    return [int]$LASTEXITCODE
 }
 
 function Invoke-ContextEngineIncrementalIndex {

@@ -54,15 +54,19 @@ Get-ChildItem -LiteralPath $memRoot -Directory -ErrorAction SilentlyContinue | F
     Rename-StartStamp -ProfileDir $_.FullName
 }
 
+function Test-ValidOctoClusterRoot {
+    param([string]$Path)
+    return $Path -and (Test-Path -LiteralPath (Join-Path $Path 'install.ps1'))
+}
+
+$userOcto = [Environment]::GetEnvironmentVariable('OCTO_CLUSTER', 'User')
+if (-not (Test-ValidOctoClusterRoot $userOcto)) {
+    [Environment]::SetEnvironmentVariable('OCTO_CLUSTER', $root, 'User')
+    Write-Host "Set User OCTO_CLUSTER -> $root (was stale or missing)" -ForegroundColor Green
+}
+
 $oldEnv = [Environment]::GetEnvironmentVariable('AI_WORKSPACE', 'User')
 if ($oldEnv) {
-    $current = [Environment]::GetEnvironmentVariable('OCTO_CLUSTER', 'User')
-    if (-not $current) {
-        if (Test-Path (Join-Path $oldEnv 'install.ps1')) {
-            [Environment]::SetEnvironmentVariable('OCTO_CLUSTER', $oldEnv, 'User')
-            Write-Host "Set User OCTO_CLUSTER from legacy AI_WORKSPACE" -ForegroundColor Green
-        }
-    }
     [Environment]::SetEnvironmentVariable('AI_WORKSPACE', $null, 'User')
     Write-Host "Removed User AI_WORKSPACE" -ForegroundColor Green
 }

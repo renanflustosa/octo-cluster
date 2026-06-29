@@ -5,11 +5,24 @@ param(
     [ValidateSet('all', 'discover', 'preflight', 'verification', 'gates', 'git', 'reviews')]
     [string]$Phase = 'all',
     [hashtable]$ScriptArgs = @{},
-    [string]$Domain
+    [string]$Domain,
+    [string]$CommitMessage,
+    [string]$FeatureBranch,
+    [string]$PrTitle,
+    [string]$PrBodyFile,
+    [switch]$SkipCommit,
+    [switch]$SkipGit
 )
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "_load-env.ps1")
+
+if ($CommitMessage) { $ScriptArgs['CommitMessage'] = $CommitMessage }
+if ($FeatureBranch) { $ScriptArgs['FeatureBranch'] = $FeatureBranch }
+if ($PrTitle) { $ScriptArgs['PrTitle'] = $PrTitle }
+if ($PrBodyFile) { $ScriptArgs['PrBodyFile'] = $PrBodyFile }
+if ($SkipCommit) { $ScriptArgs['SkipCommit'] = $true }
+if ($SkipGit) { $ScriptArgs['SkipGit'] = $true }
 
 $orchestrator = Join-Path (Get-CoreScriptsRoot) "core-ship-orchestrator.ps1"
 if (-not (Test-Path $orchestrator)) {
