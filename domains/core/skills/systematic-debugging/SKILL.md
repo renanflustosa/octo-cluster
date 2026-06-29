@@ -5,6 +5,8 @@ description: Use when encountering any bug, test failure, or unexpected behavior
 
 # Systematic Debugging
 
+> Adapted from [obra/superpowers](https://github.com/obra/superpowers) (MIT). See [THIRD_PARTY.md](../../../../THIRD_PARTY.md).
+
 ## Overview
 
 Random fixes waste time and create new bugs. Quick patches mask underlying issues.

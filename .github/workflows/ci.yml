@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install context-engine dependencies
+        working-directory: engine/context-engine
+        run: bun install
+
+      - name: Validate octo-cluster profile
+        working-directory: engine/context-engine
+        run: bun run validate octo-cluster
+
+      - name: Scan pipeline discover
+        shell: pwsh
+        env:
+          OCTO_CLUSTER: ${{ github.workspace }}
+        run: |
+          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/invoke-pipeline.ps1 -Pipeline scan -Action discover

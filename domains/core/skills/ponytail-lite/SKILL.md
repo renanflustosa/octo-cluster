@@ -5,6 +5,8 @@ description: Minimal implementation ladder before writing code. Apply on Execute
 
 # Ponytail-lite — minimal implementation
 
+> Adapted from [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) (MIT). See [THIRD_PARTY.md](../../../../THIRD_PARTY.md).
+
 Lazy means efficient, not careless. Complements **caveman** (shorter replies) and **simplify** (clearer code after the solution is chosen). This skill governs **what** to implement, not how to phrase status updates.
 
 ## The ladder

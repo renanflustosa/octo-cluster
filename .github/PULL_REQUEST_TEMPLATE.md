@@ -2,6 +2,8 @@
 
 <!-- What changed and why (harness / core / docs / pack)? -->
 
+**PR title:** use [Conventional Commits](https://www.conventionalcommits.org/) in English (`feat:`, `fix:`, `docs:`, `chore:`).
+
 ## Test plan
 
 - [ ] `bun run validate octo-cluster` (if context-engine touched)
