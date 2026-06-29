@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1](https://github.com/renanflustosa/octo-cluster/compare/v0.1.0...v0.1.1) (2026-06-29)
+
+
+### Features
+
+* public octo-cluster harness (core-only split from ai-workspace) ([2ee89d1](https://github.com/renanflustosa/octo-cluster/commit/2ee89d1040f8aa5169a94664d56543a5cda968d7))
+
+
+### Bug Fixes
+
+* align release-please manifest root key ([603e064](https://github.com/renanflustosa/octo-cluster/commit/603e0642494aa77146da8d58119848866d247d40))
+* align release-please manifest root key ([d36f1f7](https://github.com/renanflustosa/octo-cluster/commit/d36f1f7547a9e03665194cf328cfa19f1d4e3ba9))
+* github ruleset required pull_request fields ([25dfd64](https://github.com/renanflustosa/octo-cluster/commit/25dfd64cb6473a2e5df42383961271ce8fdf28ca))
+* null-safe context-engine exit codes and stale OCTO_CLUSTER resolution ([c8972aa](https://github.com/renanflustosa/octo-cluster/commit/c8972aa2afa5e6f5c69cff7d55208633a734cb9b))
+* resolve OCTO_CLUSTER path and ship git chain ([da19c9c](https://github.com/renanflustosa/octo-cluster/commit/da19c9c2cd77af6598c28354a9847553e9301983))
+* seed memory profile from fixtures in CI validate ([33e7165](https://github.com/renanflustosa/octo-cluster/commit/33e71657bc4d3ac4243ff23743e02f2bde64fc5a))
+* ship git reuse existing PR on push ([85ee4d3](https://github.com/renanflustosa/octo-cluster/commit/85ee4d37c7a790728b4bfbc11c9c7f09000941b0))
+
 ## [Unreleased]
 
 ### Planned
