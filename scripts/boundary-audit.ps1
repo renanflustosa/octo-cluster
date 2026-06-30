@@ -54,7 +54,8 @@ $filenamePatterns = @(
 $allowedRepoPolicyFiles = @(
     'default.yaml',
     'octo-cluster.yaml',
-    'consumer-demo.yaml'
+    'consumer-demo.yaml',
+    'private-secrets-vault.yaml'
 )
 
 $contentExcludePaths = @(

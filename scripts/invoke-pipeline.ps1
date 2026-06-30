@@ -74,6 +74,7 @@ switch ($Pipeline) {
         $invokeShip = Join-Path $PSScriptRoot "invoke-ship.ps1"
         $shipArgs = Merge-OctoScriptArgs -Base $ScriptArgs -Flat @{ Phase = $Phase }
         if ($Domain) { $shipArgs['Domain'] = $Domain }
+        if ($RepoPath) { $shipArgs['RepoPath'] = $RepoPath }
         Write-Host "[invoke-pipeline] ship -> invoke-ship.ps1 -Phase $Phase" -ForegroundColor DarkGray
         Invoke-OctoBoundScript -Path $invokeShip -BoundArgs $shipArgs
         exit $LASTEXITCODE
