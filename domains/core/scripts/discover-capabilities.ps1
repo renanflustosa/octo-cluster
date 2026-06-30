@@ -29,10 +29,32 @@ function Get-CapabilityRegistry {
 
     . (Join-Path $PSScriptRoot 'get-repo-policy.ps1')
     $registryPath = Join-Path $WorkspaceRoot "capabilities\registry.yaml"
-    if (-not (Test-Path $registryPath)) {
-        return [ordered]@{ version = 1; packs = @() }
+    if (Test-Path $registryPath) {
+        $registry = ConvertFrom-SimpleYaml -Lines (Get-Content $registryPath -Encoding UTF8)
+    } else {
+        $registry = [ordered]@{ version = 1; packs = @{} }
     }
-    return (ConvertFrom-SimpleYaml -Lines (Get-Content $registryPath -Encoding UTF8))
+
+    $localPath = Join-Path $WorkspaceRoot "capabilities\registry.local.yaml"
+    if (Test-Path $localPath) {
+        $local = ConvertFrom-SimpleYaml -Lines (Get-Content $localPath -Encoding UTF8)
+        if ($local.packs) {
+            if (-not $registry.packs) { $registry.packs = @{} }
+            foreach ($entry in @($local.packs)) {
+                if ($entry -is [hashtable] -and $entry.id -and $entry.path) {
+                    $registry.packs[[string]$entry.id] = @{ path = [string]$entry.path }
+                    continue
+                }
+            }
+            if ($local.packs -is [hashtable]) {
+                foreach ($key in $local.packs.Keys) {
+                    $registry.packs[$key] = $local.packs[$key]
+                }
+            }
+        }
+    }
+
+    return $registry
 }
 
 function Get-CapabilityPackPath {
@@ -51,7 +73,11 @@ function Get-CapabilityPackPath {
             return Join-Path $WorkspaceRoot ([string]$entry.path -replace '/', '\')
         }
     }
-    return Join-Path $WorkspaceRoot "capabilities\$PackId"
+    foreach ($rel in @("capabilities\_private\$PackId", "capabilities\$PackId")) {
+        $candidate = Join-Path $WorkspaceRoot $rel
+        if (Test-Path $candidate) { return $candidate }
+    }
+    return Join-Path $WorkspaceRoot "capabilities\_private\$PackId"
 }
 
 function Get-ManifestProviderEntries {
@@ -373,7 +399,9 @@ function Get-DiscoveredCapabilitySkill {
         }
 
         $skillCandidates = @(
+            (Join-Path $workspace "capabilities\_private\$pack\$Pipeline\skill.md"),
             (Join-Path $workspace "capabilities\$pack\$Pipeline\skill.md"),
+            (Join-Path $workspace "domains\_private\$pack\$Pipeline\skill.md"),
             (Join-Path $workspace "domains\$pack\$Pipeline\skill.md")
         )
         foreach ($candidate in $skillCandidates) {

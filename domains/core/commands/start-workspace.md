@@ -25,4 +25,4 @@ Optional flags via `-ScriptArgs @{ SkipIndex = $true; WithStack = $true }`.
 
 **Then:** new chat → `/scan <TICKET> description`.
 
-**Playbook:** `docs/productivity-tools.md`
+**Playbook:** `docs/guides/productivity-tools.md`

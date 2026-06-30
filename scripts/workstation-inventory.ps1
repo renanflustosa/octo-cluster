@@ -1,5 +1,5 @@
 #Requires -Version 5.1
-# OPE-159 — read-only workstation inventory (hardware, OS, dev stack, Cursor, storage).
+# 8CL-159 — read-only workstation inventory (hardware, OS, dev stack, Cursor, storage).
 # Usage: .\scripts\workstation-inventory.ps1 [-Json] [-OutFile <path>]
 
 param(
@@ -35,7 +35,7 @@ $dateTag = Get-Date -Format "yyyy-MM-dd"
 
 $inv = [ordered]@{
     collectedAt = $stamp
-    ticket      = "OPE-159"
+    ticket      = "8CL-159"
     hostname    = $env:COMPUTERNAME
     user        = $env:USERNAME
 }
@@ -221,7 +221,7 @@ Set-Content -Path $OutFile -Value $jsonOut -Encoding UTF8
 if ($Json) {
     Write-Output $jsonOut
 } else {
-    Write-Host "== workstation inventory (OPE-159) ==" -ForegroundColor Cyan
+    Write-Host "== workstation inventory (8CL-159) ==" -ForegroundColor Cyan
     Write-Host "CPU:    $($inv.hardware.cpu.name)" -ForegroundColor Gray
     Write-Host "RAM:    $($inv.hardware.memory.totalGb) GB" -ForegroundColor Gray
     Write-Host "OS:     $($inv.os.caption) build $($inv.os.build)" -ForegroundColor Gray

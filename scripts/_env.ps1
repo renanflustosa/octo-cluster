@@ -91,11 +91,14 @@ function Get-DomainRoot {
     if ($Name -eq "core") {
         throw "Get-DomainRoot expects a child domain id, not 'core'."
     }
-    $root = Join-Path (Get-OctoClusterRoot) "domains\$Name"
-    if (-not (Test-Path $root)) {
-        throw "Domain '$Name' not found at $root"
+    $octo = Get-OctoClusterRoot
+    foreach ($rel in @("domains\$Name", "domains\_private\$Name")) {
+        $root = Join-Path $octo $rel
+        if (Test-Path $root) {
+            return (Resolve-Path $root).Path
+        }
     }
-    return (Resolve-Path $root).Path
+    throw "Domain '$Name' not found under domains/ or domains/_private/"
 }
 
 function Get-CoreRoot {
@@ -113,18 +116,24 @@ function Get-MemoryRoot {
 
 function Get-PackDocsRoot {
     param([Parameter(Mandatory = $true)][string]$PackId)
-    $ctxPath = Join-Path (Get-OctoClusterRoot) "contexts\$PackId.json"
-    if (Test-Path $ctxPath) {
+    $octo = Get-OctoClusterRoot
+    foreach ($ctxFile in @("$PackId.local.json", "$PackId.json")) {
+        $ctxPath = Join-Path $octo "contexts\$ctxFile"
+        if (-not (Test-Path $ctxPath)) { continue }
         try {
             $ctx = Get-Content $ctxPath -Raw | ConvertFrom-Json
             if ($ctx.docs_root) {
                 $rel = [string]$ctx.docs_root
                 if ($rel -match '^[a-zA-Z]:\\' -or $rel.StartsWith('/')) { return $rel.TrimEnd('\', '/') }
-                return (Join-Path (Get-OctoClusterRoot) $rel)
+                return (Join-Path $octo $rel)
             }
         } catch { /* fall through */ }
     }
-    Join-Path (Get-OctoClusterRoot) "domains\$PackId\docs"
+    foreach ($rel in @("domains\_private\$PackId\docs", "domains\$PackId\docs")) {
+        $path = Join-Path $octo $rel
+        if (Test-Path $path) { return $path }
+    }
+    Join-Path $octo "domains\$PackId\docs"
 }
 
 function Get-DomainScriptsRoot {

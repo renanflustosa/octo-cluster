@@ -22,3 +22,22 @@ generated/
 
 # OS / editor
 *.log
+
+# Machine-local IDE workspaces (may include private vault or product repo paths)
+octo-cluster.code-workspace
+workspaces/*
+!workspaces/README.md
+!workspaces/company*-workspace.code-workspace
+
+# Local overlays (generic — no consumer identifiers)
+contexts/*.local.json
+contexts/*.private.json
+capabilities/registry.local.yaml
+repo-policies/*.private.yaml
+repo-policies/*.local.yaml
+
+# Private pack roots (local fork or machine-only)
+domains/_private/
+capabilities/_private/
+contexts/_private/
+docs/_private/

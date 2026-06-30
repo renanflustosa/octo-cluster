@@ -1,0 +1,8 @@
+# Local capability pack registry (optional, gitignored as registry.local.yaml)
+#
+# Copy to capabilities/registry.local.yaml and add your private packs.
+# Public registry.yaml stays core-only; local entries merge at runtime.
+version: 1
+packs:
+  my-company:
+    path: capabilities/_private/my-company

@@ -40,7 +40,7 @@ Test: `cursor-session.ps1 -Json -Redact`
 
 ```powershell
 # Scan — stamp baseline
-stamp-usage-baseline.ps1 -Ticket OPE-123
+stamp-usage-baseline.ps1 -Ticket 8CL-123
 
 # Close — automatic lite metrics
 
@@ -69,4 +69,4 @@ Legacy CSV in `state/logs/metrics-baseline/` migrated once via `migrate-csv`.
 
 Uses unofficial Cursor dashboard endpoints. May break; lite metrics degrade to LOC-only (`usage_source=skipped`).
 
-See [`docs/metrics-kernel.md`](../../docs/metrics-kernel.md) for openpolvo portability.
+See [`docs/architecture/metrics-kernel.md`](../../docs/architecture/metrics-kernel.md) for portable metrics schema.

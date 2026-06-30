@@ -1,6 +1,6 @@
 # Resolve and run a domain or core harness script by logical name.
 # Usage: invoke-domain-script.ps1 -Name read-gate -ScriptArgs @{ Path = "engine\context-engine\src\search.ts" }
-#        invoke-domain-script.ps1 -Name start-workspace -Domain mplan
+#        invoke-domain-script.ps1 -Name start-workspace -Domain company2
 
 param(
     [Parameter(Mandatory = $true)][string]$Name,

@@ -2,10 +2,12 @@
 
 Thanks for helping make the harness better for everyone.
 
+Read the [Engineering Operating System (EOS)](./docs/governance/eos.md) before contributing.
+
 ## What belongs in the public repo
 
-| ✅ Core repo | ❌ Keep in your fork / private pack |
-|-------------|-------------------------------------|
+| Core repo | Keep in your fork / private pack |
+|-----------|----------------------------------|
 | `domains/core/` — agnostic rules, skills, scripts | Company-specific repos, credentials, client names |
 | `capabilities/core/` — generic providers | Proprietary issue-tracker routing |
 | `engine/`, `scripts/`, `eval/` harness | Private `domains/<pack>/` in your fork |
@@ -24,10 +26,41 @@ cd engine\context-engine
 bun run validate octo-cluster
 ```
 
+## Public framework boundary (mandatory)
+
+Octo Cluster is a **consumer-agnostic public framework**. Consumer names (clients, products, private repos, vaults, workspaces) are treated like credential leaks and must never appear in tracked files.
+
+Before every commit and push:
+
+```powershell
+.\scripts\boundary-audit.ps1          # full tracked scan
+.\scripts\boundary-audit.ps1 -Staged  # pre-commit scope
+```
+
+Install git hooks (also runs from `install.ps1`):
+
+```powershell
+.\scripts\install-git-hooks.ps1
+```
+
+Hooks run `boundary-audit` automatically. CI runs the same gate on every PR. See [public-framework-boundary.md](./docs/guides/public-framework-boundary.md).
+
+## Branches
+
+Pattern: `<type>/8CL-<id>-<short-description>`
+
+```text
+feat/8CL-123-add-memory-compaction
+fix/8CL-201-fix-rag-cache
+docs/8CL-45-update-onboarding
+```
+
+Target `develop` for features and fixes; `main` only for release merges from `develop`.
+
 ## Pull requests
 
-1. **Target branch:** `develop` for features and fixes; `main` only for release merges from `develop`.
-2. **Title:** [Conventional Commits](https://www.conventionalcommits.org/) in English — e.g. `feat:`, `fix:`, `docs:`, `chore:`.
+1. **Title:** [Conventional Commits](https://www.conventionalcommits.org/) in English — e.g. `feat:`, `fix:`, `docs:`.
+2. **Related issue:** include `8CL-xxx` in PR body (see [PR template](./.github/PULL_REQUEST_TEMPLATE.md)).
 3. One concern per PR when possible.
 4. Run local verify before opening:
    - `bun run validate octo-cluster` (context-engine)
@@ -38,21 +71,29 @@ bun run validate octo-cluster
 
 ## Commits and releases
 
-- **Commits:** short Conventional Commits in English (`fix: null-safe exit codes`).
+- **Commits:** Conventional Commits in English (`fix(memory): null-safe exit codes`).
 - **CHANGELOG:** [Keep a Changelog](https://keepachangelog.com/) in [CHANGELOG.md](./CHANGELOG.md); release-please updates it on `main`.
 - **Branches:** `develop` = integration; `main` = stable tags (`v0.x.x`) via PR only.
-- **Roadmap:** [ROADMAP.md](./ROADMAP.md) for planned work — do not overclaim in README.
+- **Releases:** SemVer 2.0.0 via release-please — see [ADR-002](./docs/adr/ADR-002-adopt-semantic-versioning.md).
 
 ## Code style
 
 - **Scripts:** PowerShell 5.1+; prefer existing helpers in `scripts/_env.ps1`.
 - **Context engine:** Bun/TypeScript; match surrounding patterns.
-- **Docs:** English in root README; PT docs under `docs/` are fine.
+- **Docs:** English only in project artifacts.
 
 ## Issues
 
-Use GitHub Issues for bugs and harness ideas. Include OS, IDE adapter (e.g. Cursor), and the output of `invoke-pipeline … -Action discover` when relevant.
+**Primary tracker:** [Linear workspace `octo-cluster`](https://linear.app/octo-cluster) (`8CL-xxx`).
+
+GitHub Issues are for **external community reports** only. Maintainers triage accepted reports into Linear.
+
+For community bugs, use the GitHub bug report template. Include OS, IDE adapter, and `invoke-pipeline … -Action discover` output when relevant.
 
 ## Security
 
 See [SECURITY.md](./SECURITY.md) — do not open public issues for undisclosed vulnerabilities.
+
+## Code of conduct
+
+See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).

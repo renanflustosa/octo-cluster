@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+# Pre-push: block consumer identifiers in all tracked files.
+set -e
+root="$(git rev-parse --show-toplevel)"
+if command -v pwsh >/dev/null 2>&1; then
+  shell=pwsh
+elif command -v powershell >/dev/null 2>&1; then
+  shell=powershell
+else
+  echo "boundary-audit: PowerShell required for pre-push hook" >&2
+  exit 1
+fi
+exec "$shell" -NoProfile -ExecutionPolicy Bypass -File "$root/scripts/boundary-audit.ps1"

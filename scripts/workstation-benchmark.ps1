@@ -1,5 +1,5 @@
 #Requires -Version 5.1
-# OPE-159 — workstation performance baseline (before/after audit).
+# 8CL-159 — workstation performance baseline (before/after audit).
 # Usage: .\scripts\workstation-benchmark.ps1 [-Label before|after] [-OutFile <path>]
 
 param(
@@ -26,7 +26,7 @@ $stamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ss"
 
 $bench = [ordered]@{
     collectedAt = $stamp
-    ticket      = "OPE-159"
+    ticket      = "8CL-159"
     label       = $Label
     metrics     = [ordered]@{}
 }
@@ -122,7 +122,7 @@ $metricsDir = Join-Path $root "state\logs\metrics-baseline"
 New-Item -ItemType Directory -Force -Path $metricsDir | Out-Null
 if (-not $OutFile) {
     $suffix = if ($Label -eq "custom") { (Get-Date -Format "yyyyMMdd-HHmmss") } else { $Label }
-    $OutFile = Join-Path $metricsDir "ope-159-$suffix.json"
+    $OutFile = Join-Path $metricsDir "8cl-159-$suffix.json"
 }
 
 $jsonOut = $bench | ConvertTo-Json -Depth 6
@@ -131,7 +131,7 @@ Set-Content -Path $OutFile -Value $jsonOut -Encoding UTF8
 if ($Json) {
     Write-Output $jsonOut
 } else {
-    Write-Host "== workstation benchmark (OPE-159) ==" -ForegroundColor Cyan
+    Write-Host "== workstation benchmark (8CL-159) ==" -ForegroundColor Cyan
     Write-Host "Label:  $Label" -ForegroundColor Gray
     foreach ($k in $bench.metrics.Keys) {
         Write-Host ("  {0,-28} {1}" -f $k, $bench.metrics[$k]) -ForegroundColor DarkGray

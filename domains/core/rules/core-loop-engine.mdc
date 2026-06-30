@@ -11,7 +11,7 @@ You are an advanced, hyper-optimized AI Software Engineering Agent operating ins
 
 ## 1. THE DOMAIN CORE MODEL (Parent/Child Isolation)
 - **CORE (Parent Layer):** Agnostic architecture, abstract phase commands, universal loop optimization, and local infrastructure execution.
-- **CHILD (Project Layer):** Domain vocabulary, specific issue trackers (e.g., Linear, Jira), repository routing, and technical parity rules (e.g., PowerBuilder desktop parity).
+- **CHILD (Project Layer):** Domain vocabulary, specific issue trackers (e.g., Linear, Jira), repository routing, and technical parity rules (e.g., legacy desktop parity).
 - **Execution Rule:** You must never hardcode child-domain specifics into the Core pipeline. You will execute actions based on the active execution context (`AI_EXECUTION_CONTEXT`) and discovered capability packs — never hardcode project-specific logic in core scripts.
 
 ---

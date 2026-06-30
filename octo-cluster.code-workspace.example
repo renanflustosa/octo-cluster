@@ -1,6 +1,9 @@
-﻿{
+{
 	"folders": [
-		{ "path": ".", "name": "octo-cluster" }
+		{
+			"path": ".",
+			"name": "octo-cluster"
+		}
 	],
 	"settings": {
 		"terminal.integrated.env.windows": {

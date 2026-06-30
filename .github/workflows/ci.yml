@@ -12,6 +12,7 @@ on:
 
 env:
   OCTO_CLUSTER: ${{ github.workspace }}
+  AI_EXECUTION_CONTEXT: platform
 
 jobs:
   validate:
@@ -28,9 +29,9 @@ jobs:
         working-directory: engine/context-engine
         run: bun install
 
-      - name: Profile seed unit tests
+      - name: Unit and harness tests
         working-directory: engine/context-engine
-        run: bun test src/lib/ensure-profile-seed.test.ts
+        run: bun test src/lib/ensure-profile-seed.test.ts src/harness.test.ts
 
       - name: Simulate fresh clone (no state/memory)
         shell: pwsh
@@ -42,6 +43,10 @@ jobs:
       - name: Validate octo-cluster profile
         working-directory: engine/context-engine
         run: bun run validate octo-cluster
+
+      - name: Public framework boundary audit
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-audit.ps1
 
       - name: Scan pipeline discover
         shell: pwsh

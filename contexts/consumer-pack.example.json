@@ -1,0 +1,29 @@
+{
+  "id": "my-company",
+  "workspace_id": "my-company-main",
+  "enabled_capability_packs": ["core", "my-company"],
+  "memory_profile": "my-company",
+  "docs_root": "domains/_private/my-company/docs",
+  "script_prefix": "my-company",
+  "workspace_root_env": "MY_COMPANY_WORKSPACE_ROOT",
+  "ship_repositories": [
+    "my-product-api",
+    "my-product-web"
+  ],
+  "index_repositories": [
+    {
+      "name": "my-product-api",
+      "path_env": "MY_COMPANY_WORKSPACE_ROOT",
+      "subdir": "my-product-api"
+    },
+    {
+      "name": "my-product-web",
+      "path_env": "MY_COMPANY_WORKSPACE_ROOT",
+      "subdir": "my-product-web"
+    },
+    {
+      "name": "my-company-docs",
+      "path_env": "MY_COMPANY_DOCS_ROOT"
+    }
+  ]
+}

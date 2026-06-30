@@ -16,7 +16,7 @@ powershell -File $env:OCTO_CLUSTER\eval\metrics\measure-harness-full.ps1 -Force
 ## Scan baseline (token delta)
 
 ```powershell
-powershell -File $env:OCTO_CLUSTER\eval\metrics\stamp-usage-baseline.ps1 -Ticket OPE-123
+powershell -File $env:OCTO_CLUSTER\eval\metrics\stamp-usage-baseline.ps1 -Ticket 8CL-123
 ```
 
 ## Report
@@ -31,4 +31,4 @@ powershell -File $env:OCTO_CLUSTER\eval\metrics\report.ps1 -Last 20 -Arm ponytai
 powershell -File $env:OCTO_CLUSTER\eval\metrics\cursor-session.ps1 -Json -Redact
 ```
 
-Playbook: [`eval/metrics/README.md`](../../eval/metrics/README.md) · [`docs/metrics-kernel.md`](../../docs/metrics-kernel.md)
+Playbook: [`eval/metrics/README.md`](../../eval/metrics/README.md) · [`docs/architecture/metrics-kernel.md`](../../docs/architecture/metrics-kernel.md)

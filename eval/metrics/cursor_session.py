@@ -68,14 +68,12 @@ def resolve_vault_path() -> Path | None:
         p = Path(env)
         if p.is_dir():
             return p
+    vault_sibling = os.environ.get("VAULT_SIBLING_NAME")
     ws = os.environ.get("OCTO_CLUSTER")
-    if ws:
-        sibling = Path(ws).parent / "personal-vault"
+    if vault_sibling and ws:
+        sibling = Path(ws).parent / vault_sibling
         if sibling.is_dir():
             return sibling
-    fallback = Path(r"C:\GitHub\personal-vault")
-    if fallback.is_dir():
-        return fallback
     return None
 
 

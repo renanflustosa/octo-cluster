@@ -53,6 +53,10 @@ These are **external CLI/runtime dependencies** of the harness, not derived sour
 
 ## Original Octo Cluster assets
 
+| Asset | Path | License |
+|-------|------|---------|
+| Brand logos and icons | [`assets/branding/`](assets/branding/) | MIT (same as project) |
+
 The following are original work © Renan Lustosa under the project MIT license, unless noted above:
 
 - Skills: `caveman`, `core-adaptive-loop`, `core-ship`, `minimal-review`, `simplify`, `find-skills`, `code-review`

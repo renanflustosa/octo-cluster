@@ -4,28 +4,45 @@ Single source of truth: **`domains/core/`** + **`capabilities/`** + **`contexts/
 
 Pipeline skills resolve at runtime via [`scripts/invoke-pipeline.ps1`](../scripts/invoke-pipeline.ps1) (`PIPELINE_SKILL`).
 
-## Global docs
+## Governance
 
 | Document | Content |
 |----------|---------|
-| [ONBOARDING.md](./ONBOARDING.md) | Install, loop, token economy, hooks |
-| [productivity-tools.md](./productivity-tools.md) | Design goals, harness, token layers |
-| [context-model.md](./context-model.md) | Execution context, capability packs, sync rules |
-| [architecture.md](./architecture.md) | Tool-agnostic workspace architecture |
-| [add-child-context.md](./add-child-context.md) | Scaffold a new capability pack |
+| [governance/eos.md](./governance/eos.md) | Engineering Operating System (canonical) |
+| [governance/linear-workspace-setup.md](./governance/linear-workspace-setup.md) | Linear workspace one-time setup |
+| [assets/branding/](../assets/branding/) | Logos, app icon, favicon, GitHub avatar |
+| [adr/](./adr/) | Architecture decision records |
+
+## Guides
+
+| Document | Content |
+|----------|---------|
+| [guides/onboarding.md](./guides/onboarding.md) | Install, loop, token economy |
+| [guides/productivity-tools.md](./guides/productivity-tools.md) | Design goals, harness, token layers |
+| [guides/add-child-context.md](./guides/add-child-context.md) | Scaffold a capability pack |
+| [guides/token-metrics-baseline.md](./guides/token-metrics-baseline.md) | Token metrics baseline |
+
+## Architecture
+
+| Document | Content |
+|----------|---------|
+| [architecture/overview.md](./architecture/overview.md) | Tool-agnostic workspace architecture |
+| [architecture/context-model.md](./architecture/context-model.md) | Execution context, packs, sync |
+| [architecture/decoupling-map.md](./architecture/decoupling-map.md) | Decoupling map |
+| [architecture/metrics-kernel.md](./architecture/metrics-kernel.md) | Metrics kernel |
 
 ## Execution contexts
 
 | Context | File | Workspace |
 |---------|------|-----------|
-| **Platform** (default) | [`contexts/platform.json`](../contexts/platform.json) | [`octo-cluster.code-workspace`](../octo-cluster.code-workspace) |
-| **Company scaffolds** | add `contexts/companyN.json` | [`workspaces/companyN-workspace.code-workspace`](../workspaces/) |
+| **Platform** (default) | [`contexts/platform.json`](../contexts/platform.json) | [`octo-cluster.code-workspace.example`](../octo-cluster.code-workspace.example) |
+| **Company scaffolds** | add `contexts/companyN.json` | [`workspaces/`](../workspaces/) |
 
-Private capability packs (issue tracker, product repos) live in **your fork** or a separate private repo — see [CONTRIBUTING.md](../CONTRIBUTING.md).
+Private capability packs live in **your fork** — see [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## Layout
 
-```
+```text
 octo-cluster/
   contexts/           # execution context (packs, repos, docs_root)
   capabilities/       # pack manifests + skill.md + providers
@@ -34,8 +51,16 @@ octo-cluster/
   adapters/           # IDE adapter scaffolding
   engine/             # context-engine (LanceDB)
   state/              # local memory indexes (gitignored)
-  workspaces/         # multi-root entry points (AI_EXECUTION_CONTEXT)
-  scripts/            # sync-cursor, invoke-pipeline, invoke-domain-script
+  workspaces/         # multi-root entry points
+  scripts/            # sync-cursor, invoke-pipeline
+  docs/
+    governance/       # EOS, linear setup
+    guides/
+    architecture/
+    adr/
+    api/
 ```
 
-Open [`octo-cluster.code-workspace`](../octo-cluster.code-workspace) for platform work. After switching workspace, run sync once.
+Copy [`octo-cluster.code-workspace.example`](../octo-cluster.code-workspace.example) to `octo-cluster.code-workspace` (gitignored) for platform work, or run `.\install.ps1`. After switching workspace, run sync once.
+
+Work tracker: [Linear `octo-cluster`](https://linear.app/octo-cluster) (`8CL-xxx`).
