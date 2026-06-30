@@ -39,7 +39,7 @@ Most teams stitch token savings piecemeal: grep rules here, a RAG script there, 
 
 ```powershell
 git clone https://github.com/renanflustosa/octo-cluster.git <clone-root>
-cd $env:OCTO_CLUSTER
+cd <clone-root>
 .\install.ps1
 gh auth login   # optional, for PR flow in /ship
 ```
@@ -74,7 +74,7 @@ One chat ≈ one work item. Phase commands are **optional**; routine edits do no
 Discover the active pipeline skill:
 
 ```powershell
-powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline scan -Action discover
+powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline scan -Action discover
 ```
 
 ## Docs
@@ -85,6 +85,7 @@ powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline scan -A
 | [onboarding](./docs/guides/onboarding.md) | Full setup |
 | [productivity-tools](./docs/guides/productivity-tools.md) | Harness design, token layers |
 | [context-model](./docs/architecture/context-model.md) | Execution context and sync |
+| [path-resolution](./docs/architecture/path-resolution.md) | Installation root discovery |
 | [add-child-context](./docs/guides/add-child-context.md) | Scaffold a capability pack |
 | [public-framework-boundary](./docs/guides/public-framework-boundary.md) | Public vs private overlay audit |
 | [ROADMAP.md](./ROADMAP.md) | Planned work and semver ladder |

@@ -84,10 +84,12 @@ if (Test-Path $audit) {
 Write-Host @"
 
 Done. Next steps:
-  1. Set OCTO_CLUSTER permanently (User env) or open octo-cluster.code-workspace
-     (copy from octo-cluster.code-workspace.example on first clone).
+  1. OCTO_CLUSTER is set at User scope (persists across terminals and agent shells).
+     Open octo-cluster.code-workspace for session env in integrated terminals.
   2. gh auth login   (once, for PRs/issues)
   3. New chat -> /scan <TICKET> description
+
+Entry point: octo.ps1 (see docs/architecture/path-resolution.md)
 
 Active context: AI_EXECUTION_CONTEXT=platform. See docs/guides/onboarding.md.
 

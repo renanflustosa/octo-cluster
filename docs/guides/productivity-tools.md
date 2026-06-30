@@ -80,7 +80,7 @@ Git repo that syncs Cursor rules, skills, and local RAG tooling. Clone once per 
 
 ```powershell
 git clone https://github.com/renanflustosa/octo-cluster.git <clone-root>
-cd $env:OCTO_CLUSTER
+cd <clone-root>
 .\install.ps1
 ```
 
@@ -92,7 +92,7 @@ cd $env:OCTO_CLUSTER
 
 Active execution context comes from `AI_EXECUTION_CONTEXT` in the workspace file (default `platform`). See [`context-model.md`](./context-model.md).
 
-**Env:** `OCTO_CLUSTER` — workspace file or user env. `AI_EXECUTION_CONTEXT` selects capability packs (`platform`, `company2`, …).
+**Env:** `OCTO_CLUSTER` — User env (set by `install.ps1`) or workspace session env. See [path-resolution.md](../architecture/path-resolution.md). `AI_EXECUTION_CONTEXT` selects capability packs (`platform`, `company2`, …).
 
 **What stays in `~/.cursor`:** Cursor runtime only (`projects/`, `skills-cursor/`, `plugins/`, plans). Migrated loop assets live in `octo-cluster`, not under the home profile.
 
@@ -427,10 +427,10 @@ Before Phase A Plan on non-trivial work:
 
 ```powershell
 # Once per day (or after memory/doc edits)
-powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline start-workspace -Action run
+powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline start-workspace -Action run
 
 # Or quick validate only
-cd $env:OCTO_CLUSTER\engine\context-engine
+cd "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\engine\context-engine"
 bun run validate octo-cluster
 ```
 
