@@ -6,6 +6,7 @@ param(
     [string]$Phase = 'all',
     [hashtable]$ScriptArgs = @{},
     [string]$Domain,
+    [string]$RepoPath,
     [string]$CommitMessage,
     [string]$FeatureBranch,
     [string]$PrTitle,
@@ -30,6 +31,7 @@ if ($CommitMessage) { $bound['CommitMessage'] = $CommitMessage }
 if ($FeatureBranch) { $bound['FeatureBranch'] = $FeatureBranch }
 if ($PrTitle) { $bound['PrTitle'] = $PrTitle }
 if ($PrBodyFile) { $bound['PrBodyFile'] = $PrBodyFile }
+if ($RepoPath) { $bound['RepoPath'] = $RepoPath }
 if ($SkipGit) { $bound['SkipGit'] = $true }
 if ($SkipCommit) { $bound['SkipCommit'] = $true }
 if ($SkipEval) { $bound['SkipEval'] = $true }
