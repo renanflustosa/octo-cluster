@@ -1,5 +1,5 @@
 # Resolve repository git policy from repo-policies/default.yaml + repo-policies/<repo>.yaml
-# Usage: . get-repo-policy.ps1; Get-RepoPolicy -RepoPath "C:\GitHub\openpolvo"
+# Usage: . get-repo-policy.ps1; Get-RepoPolicy -RepoPath "$env:OCTO_CLUSTER"
 #        Get-RepoPolicyFromGitRoot
 
 param()

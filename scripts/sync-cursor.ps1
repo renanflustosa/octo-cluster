@@ -48,14 +48,33 @@ $activeDomain = if ($Domain) {
 }
 
 
-$childRoot = if ($activeDomain) { Join-Path $domains $activeDomain } else { $null }
-
-if ($activeDomain -eq "core") {
-    Write-Error "Active domain cannot be 'core'. Choose a child domain (e.g. mplan, company2) or use platform context."
+function Resolve-ChildDomainRoot {
+    param(
+        [string]$DomainsRoot,
+        [string]$ActiveDomain
+    )
+    if (-not $ActiveDomain) { return $null }
+    foreach ($rel in @($ActiveDomain, (Join-Path '_private' $ActiveDomain))) {
+        $candidate = Join-Path $DomainsRoot $rel
+        if (Test-Path $candidate) {
+            return @{
+                Path    = $candidate
+                RelRoot = "domains/$($rel -replace '\\','/')"
+            }
+        }
+    }
+    return $null
 }
 
-if ($activeDomain -and -not (Test-Path $childRoot)) {
-    Write-Warning "Domain '$activeDomain' not found at $childRoot - syncing core only."
+$childResolved = Resolve-ChildDomainRoot -DomainsRoot $domains -ActiveDomain $activeDomain
+$childRoot = if ($childResolved) { $childResolved.Path } else { $null }
+
+if ($activeDomain -eq "core") {
+    Write-Error "Active domain cannot be 'core'. Choose a child domain (e.g. company2) or use platform context."
+}
+
+if ($activeDomain -and -not $childRoot) {
+    Write-Warning "Domain '$activeDomain' not found under domains/ or domains/_private/ - syncing core only."
     $activeDomain = $null
     $childRoot = $null
 }
@@ -152,7 +171,7 @@ $manifest = @{
     domain           = $(if ($activeDomain) { $activeDomain } else { 'platform' })
     syncedAt         = (Get-Date).ToUniversalTime().ToString("o")
     coreRoot         = "domains/core"
-    childRoot        = $(if ($activeDomain) { "domains/$activeDomain" } else { $null })
+    childRoot        = $(if ($childResolved) { $childResolved.RelRoot } else { $null })
     commandsPolicy   = "core-only"
     skillsPolicy     = "core-only"
     skillDiscovery   = "capabilities-skills.json + invoke-pipeline discover"

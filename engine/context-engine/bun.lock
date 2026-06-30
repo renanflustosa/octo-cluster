@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "sigla-context-engine",
+      "name": "context-engine",
       "dependencies": {
         "@lancedb/lancedb": "^0.17.0",
         "@xenova/transformers": "^2.17.2",

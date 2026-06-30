@@ -12,6 +12,7 @@ on:
 
 env:
   OCTO_CLUSTER: ${{ github.workspace }}
+  AI_EXECUTION_CONTEXT: platform
 
 jobs:
   validate:
@@ -42,6 +43,10 @@ jobs:
       - name: Validate octo-cluster profile
         working-directory: engine/context-engine
         run: bun run validate octo-cluster
+
+      - name: Public framework boundary audit
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-audit.ps1
 
       - name: Scan pipeline discover
         shell: pwsh

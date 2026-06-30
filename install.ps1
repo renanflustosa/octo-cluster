@@ -33,6 +33,12 @@ if ($WithOllama) {
 # Sync domains -> .cursor
 & (Join-Path $PSScriptRoot "scripts\sync-cursor.ps1")
 
+# Boundary gates (pre-commit / pre-push)
+$hooks = Join-Path $PSScriptRoot "scripts\install-git-hooks.ps1"
+if (Test-Path $hooks) {
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $hooks
+}
+
 # Seed local workspace from public template (gitignored; may add private folders)
 $wsExample = Join-Path $env:OCTO_CLUSTER 'octo-cluster.code-workspace.example'
 $wsLocal = Join-Path $env:OCTO_CLUSTER 'octo-cluster.code-workspace'

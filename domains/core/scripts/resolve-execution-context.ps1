@@ -22,10 +22,14 @@ function Get-ContextConfigPath {
     }
 
     $path = Join-Path $workspace "contexts\$ContextId.json"
-    if (-not (Test-Path $path)) {
-        throw "Execution context not found: contexts/$ContextId.json"
+    $localPath = Join-Path $workspace "contexts\$ContextId.local.json"
+    if (Test-Path $localPath) {
+        return (Resolve-Path $localPath).Path
     }
-    return (Resolve-Path $path).Path
+    if (Test-Path $path) {
+        return (Resolve-Path $path).Path
+    }
+    throw "Execution context not found: contexts/$ContextId.local.json or contexts/$ContextId.json"
 }
 
 function Resolve-ExecutionContextId {

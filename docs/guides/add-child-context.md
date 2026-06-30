@@ -110,7 +110,7 @@ Add `workspaces/my-company-workspace.code-workspace`:
   ],
   "settings": {
     "terminal.integrated.env.windows": {
-      "OCTO_CLUSTER": "C:\\octo-cluster",
+      "OCTO_CLUSTER": "${workspaceFolder:octo-cluster}",
       "AI_EXECUTION_CONTEXT": "my-company"
     }
   }
@@ -124,7 +124,7 @@ Document the mapping in [`workspaces/README.md`](../workspaces/README.md) and [`
 ## 5. Sync and discover
 
 ```powershell
-cd C:\octo-cluster
+cd $env:OCTO_CLUSTER
 $env:AI_EXECUTION_CONTEXT = "my-company"
 .\scripts\sync-cursor.ps1 -Domain my-company
 .\scripts\invoke-pipeline.ps1 -Pipeline scan -Action discover

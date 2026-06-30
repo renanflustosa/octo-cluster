@@ -5,7 +5,7 @@ Multi-root IDE workspace files. Each sets **`AI_EXECUTION_CONTEXT`** (and option
 After opening a workspace, run sync from the octo-cluster root:
 
 ```powershell
-cd C:\GitHub\octo-cluster
+cd $env:OCTO_CLUSTER
 .\scripts\sync-cursor.ps1
 ```
 

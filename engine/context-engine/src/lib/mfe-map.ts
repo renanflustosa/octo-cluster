@@ -1,6 +1,11 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { mplanDocsRoot } from "./paths.ts";
+import {
+  contextIdFromProfile,
+  resolveActiveProfile,
+  resolveBusinessDocsRoot,
+  resolveWorkspaceRoot,
+} from "./execution-context.ts";
 
 export type MfeEntry = {
   api: string[];
@@ -8,20 +13,24 @@ export type MfeEntry = {
   docs: string[];
 };
 
-let cache: Record<string, MfeEntry> | null = null;
+const cacheByProfile = new Map<string, Record<string, MfeEntry>>();
 
-export async function loadMfeMap(): Promise<Record<string, MfeEntry>> {
-  if (cache) return cache;
-  const path = join(mplanDocsRoot(), "mfe-module-map.json");
-  cache = JSON.parse(await readFile(path, "utf8")) as Record<string, MfeEntry>;
-  return cache;
+export async function loadMfeMap(profile?: string): Promise<Record<string, MfeEntry>> {
+  const key = contextIdFromProfile(resolveActiveProfile(profile));
+  const cached = cacheByProfile.get(key);
+  if (cached) return cached;
+  const docsRoot = resolveBusinessDocsRoot(key);
+  const path = join(docsRoot, "mfe-module-map.json");
+  const map = JSON.parse(await readFile(path, "utf8")) as Record<string, MfeEntry>;
+  cacheByProfile.set(key, map);
+  return map;
 }
 
-export async function resolveMfe(mfe: string): Promise<MfeEntry | undefined> {
-  const map = await loadMfeMap();
+export async function resolveMfe(mfe: string, profile?: string): Promise<MfeEntry | undefined> {
+  const map = await loadMfeMap(profile);
   return map[mfe];
 }
 
-export function defaultWorkspaceRoot(): string {
-  return process.env.SIGLA_WORKSPACE_ROOT ?? "C:/github/mplan-ingestion";
+export function defaultWorkspaceRoot(profile?: string): string {
+  return resolveWorkspaceRoot(resolveActiveProfile(profile));
 }

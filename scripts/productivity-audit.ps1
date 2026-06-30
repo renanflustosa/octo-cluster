@@ -1,5 +1,5 @@
 #Requires -Version 5.1
-# COST 0 productivity harness audit (OPE-158 F6).
+# COST 0 productivity harness audit (8CL-158 F6).
 # Usage: .\scripts\productivity-audit.ps1 [-Json] [-Workstation]
 
 param(
@@ -86,7 +86,7 @@ if (Test-Path $validateHooks) {
 }
 
 if ($Workstation) {
-    $results += (Test-Tool -Id "OCTO_CLUSTER_env" -Label "OCTO_CLUSTER env" -InstallHint "User env var C:\GitHub\octo-cluster" -Check {
+    $results += (Test-Tool -Id "OCTO_CLUSTER_env" -Label "OCTO_CLUSTER env" -InstallHint "Set OCTO_CLUSTER to your clone root" -Check {
         $v = [Environment]::GetEnvironmentVariable("OCTO_CLUSTER", "User")
         if (-not $v) { $v = $env:OCTO_CLUSTER }
         $v -and (Test-Path $v)
@@ -97,11 +97,11 @@ if ($Workstation) {
         $v -eq "platform"
     })
     $invScript = Join-Path $root "scripts\workstation-inventory.ps1"
-    $results += (Test-Tool -Id "workstation_inventory" -Label "workstation-inventory.ps1" -InstallHint "OPE-159 harness" -Check {
+    $results += (Test-Tool -Id "workstation_inventory" -Label "workstation-inventory.ps1" -InstallHint "8CL-159 harness" -Check {
         Test-Path $invScript
     })
     $benchScript = Join-Path $root "scripts\workstation-benchmark.ps1"
-    $results += (Test-Tool -Id "workstation_benchmark" -Label "workstation-benchmark.ps1" -InstallHint "OPE-159 harness" -Check {
+    $results += (Test-Tool -Id "workstation_benchmark" -Label "workstation-benchmark.ps1" -InstallHint "8CL-159 harness" -Check {
         Test-Path $benchScript
     })
     $results += (Test-Tool -Id "power_plan" -Label "Power plan (high perf)" -InstallHint "powercfg /setactive high performance" -Check {

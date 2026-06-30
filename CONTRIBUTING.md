@@ -26,6 +26,25 @@ cd engine\context-engine
 bun run validate octo-cluster
 ```
 
+## Public framework boundary (mandatory)
+
+Octo Cluster is a **consumer-agnostic public framework**. Consumer names (clients, products, private repos, vaults, workspaces) are treated like credential leaks and must never appear in tracked files.
+
+Before every commit and push:
+
+```powershell
+.\scripts\boundary-audit.ps1          # full tracked scan
+.\scripts\boundary-audit.ps1 -Staged  # pre-commit scope
+```
+
+Install git hooks (also runs from `install.ps1`):
+
+```powershell
+.\scripts\install-git-hooks.ps1
+```
+
+Hooks run `boundary-audit` automatically. CI runs the same gate on every PR. See [public-framework-boundary.md](./docs/guides/public-framework-boundary.md).
+
 ## Branches
 
 Pattern: `<type>/8CL-<id>-<short-description>`

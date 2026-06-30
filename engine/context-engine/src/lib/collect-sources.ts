@@ -1,11 +1,19 @@
+import { accessSync } from "node:fs";
 import { readdir, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { collectMemoryFiles, moduleFromRel, relSource } from "./collect.ts";
 import { chunkHtml, chunkPlainText } from "./chunk-html.ts";
 import { chunkSourceCode } from "./chunk-code.ts";
 import { chunkMarkdown } from "./chunk.ts";
-import { resolveMfe, defaultWorkspaceRoot } from "./mfe-map.ts";
-import { packDocsRoot, IGNORE_DIRS, resolveShipRepositoryRoots } from "./paths.ts";
+import { resolveMfe } from "./mfe-map.ts";
+import { IGNORE_DIRS, resolveShipRepositoryRoots } from "./paths.ts";
+import {
+  hasCodeIndex,
+  loadExecutionContext,
+  resolveBusinessDocsRoot,
+  resolveDocsRepoName,
+  resolveRepositoryRoot,
+} from "./execution-context.ts";
 import type { ChunkKind, SourceFile } from "./types.ts";
 
 export type CollectOptions = {
@@ -79,12 +87,12 @@ export async function collectMemorySources(profile: string): Promise<SourceFile[
 }
 
 export async function collectDocsSources(
-  _profile: string,
+  profile: string,
   mfe?: string,
 ): Promise<SourceFile[]> {
-  const docsRoot = packDocsRoot("mplan");
+  const docsRoot = resolveBusinessDocsRoot(profile);
   const out: SourceFile[] = [];
-  const docHints = mfe ? ((await resolveMfe(mfe))?.docs ?? []) : [];
+  const docHints = mfe ? ((await resolveMfe(mfe, profile))?.docs ?? []) : [];
   const paths: string[] = [];
 
   await walkFiles(
@@ -123,7 +131,7 @@ export async function collectDocsSources(
     out.push({
       absolutePath: abs,
       source: rel,
-      repo: "mplan-docs",
+      repo: resolveDocsRepoName(profile),
       kind: "docs",
       module: base.replace(/\.(md|html)$/i, ""),
       mtime: st.mtimeMs,
@@ -184,6 +192,95 @@ async function collectPlatformCodeSources(profile: string): Promise<SourceFile[]
 
   return out;
 }
+
+function detectCodeLayout(root: string): "api-modules" | "web-apps" | null {
+  try {
+    accessSync(join(root, "src", "modules"));
+    return "api-modules";
+  } catch {
+    /* continue */
+  }
+  try {
+    accessSync(join(root, "apps"));
+    return "web-apps";
+  } catch {
+    /* continue */
+  }
+  return null;
+}
+
+async function collectConsumerCodeSources(
+  profile: string,
+  mfe?: string,
+  moduleFilter?: string,
+): Promise<SourceFile[]> {
+  const entry = mfe ? await resolveMfe(mfe, profile) : undefined;
+  const apiModules = moduleFilter ? [moduleFilter] : (entry?.api ?? []);
+  const webApps = entry?.web ?? [];
+  const ctx = loadExecutionContext(profile);
+  const codeRepos = (ctx?.index_repositories ?? []).filter(
+    (r) => !r.name.endsWith("-docs") && r.index !== false,
+  );
+  const out: SourceFile[] = [];
+
+  for (const indexed of codeRepos) {
+    const resolved = resolveRepositoryRoot(indexed.name, profile);
+    if (!resolved) continue;
+    const { name, root } = resolved;
+    const layout = detectCodeLayout(root);
+
+    if (layout === "api-modules" && apiModules.length) {
+      for (const mod of apiModules) {
+        const modDir = join(root, "src", "modules", mod);
+        const paths: string[] = [];
+        await walkFiles(
+          modDir,
+          root,
+          (rel) => CODE_EXT.test(rel) && !SKIP_CODE.test(rel),
+          paths,
+        );
+        for (const abs of paths) {
+          const st = await stat(abs);
+          out.push({
+            absolutePath: abs,
+            source: relative(root, abs).replace(/\\/g, "/"),
+            repo: name,
+            kind: "code",
+            module: mod,
+            mtime: st.mtimeMs,
+          });
+        }
+      }
+    }
+
+    if (layout === "web-apps" && webApps.length) {
+      for (const app of webApps) {
+        const appDir = join(root, "apps", app);
+        const paths: string[] = [];
+        await walkFiles(
+          appDir,
+          root,
+          (rel) => CODE_EXT.test(rel) && !SKIP_CODE.test(rel),
+          paths,
+        );
+        for (const abs of paths) {
+          const st = await stat(abs);
+          out.push({
+            absolutePath: abs,
+            source: relative(root, abs).replace(/\\/g, "/"),
+            repo: name,
+            kind: "code",
+            module: app,
+            mtime: st.mtimeMs,
+          });
+        }
+      }
+    }
+  }
+
+  return out;
+}
+
 export async function collectCodeSources(
   profile: string,
   mfe?: string,
@@ -193,60 +290,11 @@ export async function collectCodeSources(
     return collectPlatformCodeSources(profile);
   }
 
-  const ws = defaultWorkspaceRoot();
-  const out: SourceFile[] = [];
-  const entry = mfe ? await resolveMfe(mfe) : undefined;
-
-  const apiModules = moduleFilter ? [moduleFilter] : (entry?.api ?? []);
-  const apiRoot = join(ws, "sigla-api");
-
-  for (const mod of apiModules) {
-    const modDir = join(apiRoot, "src", "modules", mod);
-    const paths: string[] = [];
-    await walkFiles(
-      modDir,
-      apiRoot,
-      (rel) => CODE_EXT.test(rel) && !SKIP_CODE.test(rel),
-      paths,
-    );
-    for (const abs of paths) {
-      const st = await stat(abs);
-      out.push({
-        absolutePath: abs,
-        source: relative(apiRoot, abs).replace(/\\/g, "/"),
-        repo: "sigla-api",
-        kind: "code",
-        module: mod,
-        mtime: st.mtimeMs,
-      });
-    }
+  if (!hasCodeIndex(profile)) {
+    return collectPlatformCodeSources(profile);
   }
 
-  const webApps = entry?.web ?? [];
-  const webRoot = join(ws, "sigla-web");
-  for (const app of webApps) {
-    const appDir = join(webRoot, "apps", app);
-    const paths: string[] = [];
-    await walkFiles(
-      appDir,
-      webRoot,
-      (rel) => CODE_EXT.test(rel) && !SKIP_CODE.test(rel),
-      paths,
-    );
-    for (const abs of paths) {
-      const st = await stat(abs);
-      out.push({
-        absolutePath: abs,
-        source: relative(webRoot, abs).replace(/\\/g, "/"),
-        repo: "sigla-web",
-        kind: "code",
-        module: app,
-        mtime: st.mtimeMs,
-      });
-    }
-  }
-
-  return out;
+  return collectConsumerCodeSources(profile, mfe, moduleFilter);
 }
 
 export async function collectAllSources(

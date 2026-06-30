@@ -34,8 +34,8 @@ if (-not $Profile) {
 }
 
 if (-not $RepoRoot) {
-    $openpolvo = Join-Path (Split-Path $root -Parent) 'openpolvo'
-    if (Test-Path $openpolvo) { $RepoRoot = $openpolvo }
+    $siblingDemo = Join-Path (Split-Path $root -Parent) 'consumer-demo'
+    if (Test-Path $siblingDemo) { $RepoRoot = $siblingDemo }
     else { $RepoRoot = $root }
 }
 
