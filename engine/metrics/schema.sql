@@ -1,5 +1,5 @@
 -- Octo Cluster metrics kernel — portable schema (SQLite)
--- Consumed by octo-cluster today; openpolvo embeds same schema.
+-- Consumed by octo-cluster; embed the same schema in consumer repos when needed.
 
 PRAGMA journal_mode = WAL;
 

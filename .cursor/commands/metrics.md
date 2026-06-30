@@ -16,7 +16,7 @@ powershell -File $env:OCTO_CLUSTER\eval\metrics\measure-harness-full.ps1 -Force
 ## Scan baseline (token delta)
 
 ```powershell
-powershell -File $env:OCTO_CLUSTER\eval\metrics\stamp-usage-baseline.ps1 -Ticket OPE-123
+powershell -File $env:OCTO_CLUSTER\eval\metrics\stamp-usage-baseline.ps1 -Ticket 8CL-123
 ```
 
 ## Report

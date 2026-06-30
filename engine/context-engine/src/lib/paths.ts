@@ -1,6 +1,7 @@
-import { basename, join } from "node:path";
+﻿import { basename, join } from "node:path";
 import { homedir } from "node:os";
 import { accessSync, readFileSync } from "node:fs";
+import { resolveRepositoryRoot, contextIdFromProfile, loadExecutionContext } from "./execution-context.ts";
 
 export const IGNORE_DIRS = new Set([
   "node_modules",
@@ -22,7 +23,6 @@ export const IGNORE_DIRS = new Set([
   "target",
   "__pycache__",
   ".venv",
-  "polvocode",
   "migrations",
 ]);
 
@@ -57,41 +57,18 @@ export function packDocsRoot(packId: string): string {
   const fromEnv = process.env[envKey]?.replace(/[\\/]+$/, "");
   if (fromEnv) return fromEnv;
 
-  if (packId === "mplan") {
-    const ws = process.env.SIGLA_WORKSPACE_ROOT ?? "";
-    if (ws) {
-      const parent = ws.replace(/[/\\]mplan-ingestion[/\\]?$/, "");
-      const external = join(parent, "mplan-docs");
-      try {
-        accessSync(join(external, "mfe-module-map.json"));
-        return external;
-      } catch {
-        /* fall through to context/default */
-      }
-    }
-  }
-
-  const ctxPath = join(octoClusterRoot(), "contexts", `${packId}.json`);
-  try {
-    const ctx = JSON.parse(readFileSync(ctxPath, "utf8")) as { docs_root?: string };
-    if (ctx.docs_root) {
-      const rel = ctx.docs_root.replace(/[\\/]+$/, "");
-      if (/^[a-zA-Z]:[\\/]/.test(rel) || rel.startsWith("/")) return rel;
-      return join(octoClusterRoot(), rel);
-    }
-  } catch {
-    /* ignore missing/invalid context */
+  const ctxId = contextIdFromProfile(packId);
+  const ctx = loadExecutionContext(ctxId);
+  if (ctx?.docs_root) {
+    const rel = ctx.docs_root.replace(/[\\/]+$/, "");
+    if (/^[a-zA-Z]:[\\/]/.test(rel) || rel.startsWith("/")) return rel;
+    return join(octoClusterRoot(), rel);
   }
 
   return join(octoClusterRoot(), "domains", packId, "docs");
 }
 
-/** @deprecated use packDocsRoot("mplan") */
-export function mplanDocsRoot(): string {
-  return packDocsRoot("mplan");
-}
-
-/** Repo folder name â†’ memory profile (sigla-api, sigla-web, â€¦). */
+/** Repo folder name → memory profile (e.g. my-product-api). */
 export function profileFromRepo(repoRoot: string): string {
   return basename(repoRoot.replace(/[\\/]+$/, ""));
 }
@@ -163,12 +140,11 @@ export function apiSummaryPath(profile: string): string {
 
 /** Ship repos from execution context JSON (platform profile -> contexts/platform.json). */
 export function resolveShipRepositoryRoots(profile: string): Array<{ name: string; root: string }> {
-  const ws = octoClusterRoot();
-  const ctxId = profile === "octo-cluster" ? "platform" : profile;
+  const ctxId = contextIdFromProfile(profile);
   let repos: string[] = [];
 
   try {
-    const ctx = JSON.parse(readFileSync(join(ws, "contexts", `${ctxId}.json`), "utf8")) as {
+    const ctx = JSON.parse(readFileSync(join(octoClusterRoot(), "contexts", `${ctxId}.json`), "utf8")) as {
       ship_repositories?: string[];
     };
     repos = ctx.ship_repositories ?? [];
@@ -182,21 +158,8 @@ export function resolveShipRepositoryRoots(profile: string): Array<{ name: strin
 
   const roots: Array<{ name: string; root: string }> = [];
   for (const name of repos) {
-    if (name === "personal-vault") continue;
-
-    let root: string;
-    if (name === "octo-cluster") {
-      root = ws;
-    } else {
-      root = join(ws, "..", name);
-    }
-
-    try {
-      accessSync(root);
-      roots.push({ name, root: root.replace(/[\\/]+$/, "") });
-    } catch {
-      /* repo not cloned beside octo-cluster */
-    }
+    const resolved = resolveRepositoryRoot(name, profile);
+    if (resolved) roots.push(resolved);
   }
 
   return roots;

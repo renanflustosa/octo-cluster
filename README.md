@@ -38,8 +38,8 @@ Most teams stitch token savings piecemeal: grep rules here, a RAG script there, 
 **Prerequisites:** [Git](https://git-scm.com/downloads). Windows-first scripts; core concepts are portable.
 
 ```powershell
-git clone https://github.com/renanflustosa/octo-cluster.git C:\GitHub\octo-cluster
-cd C:\GitHub\octo-cluster
+git clone https://github.com/renanflustosa/octo-cluster.git <clone-root>
+cd $env:OCTO_CLUSTER
 .\install.ps1
 gh auth login   # optional, for PR flow in /ship
 ```
@@ -86,6 +86,7 @@ powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline scan -A
 | [productivity-tools](./docs/guides/productivity-tools.md) | Harness design, token layers |
 | [context-model](./docs/architecture/context-model.md) | Execution context and sync |
 | [add-child-context](./docs/guides/add-child-context.md) | Scaffold a capability pack |
+| [public-framework-boundary](./docs/guides/public-framework-boundary.md) | Public vs private overlay audit |
 | [ROADMAP.md](./ROADMAP.md) | Planned work and semver ladder |
 | [CHANGELOG.md](./CHANGELOG.md) | Release history |
 | [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) | Community standards |

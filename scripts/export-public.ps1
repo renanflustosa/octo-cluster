@@ -1,9 +1,9 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Export public octo-cluster tree from ai-workspace (or any full clone) to a clean destination.
+  Export public octo-cluster tree from a full clone to a clean destination.
 .EXAMPLE
-  .\scripts\export-public.ps1 -Dest C:\GitHub\octo-cluster
+  .\scripts\export-public.ps1 -Dest <dest-path>
 #>
 param(
     [string]$Source = '',
@@ -75,15 +75,14 @@ foreach ($f in @(
     'SECURITY.md'
 )) { Copy-File $f }
 
-# Remove private paths that may have been copied under docs/workspaces/repo-policies
+# Remove private overlay paths that may have been copied
 $remove = @(
+    'docs/_private',
     'docs/reports',
-    'docs/polvo00-llm-hardware-report.md',
-    'workspaces/mplan-main-workspace.code-workspace',
-    'repo-policies/personal-vault.yaml',
-    'domains/mplan',
-    'capabilities/mplan',
-    'contexts/mplan.json',
+    'domains/_private',
+    'capabilities/_private',
+    'contexts/_private',
+    'capabilities/registry.local.yaml',
     'kernel'
 )
 foreach ($r in $remove) {
@@ -91,6 +90,18 @@ foreach ($r in $remove) {
     if (Test-Path $target) {
         Remove-Item $target -Recurse -Force -ErrorAction SilentlyContinue
         Write-Host "[remove] $r" -ForegroundColor Yellow
+    }
+}
+
+$ctxExtra = Join-Path $Dest 'contexts'
+if (Test-Path $ctxExtra) {
+    Get-ChildItem $ctxExtra -Filter '*.local.json' -ErrorAction SilentlyContinue | ForEach-Object {
+        Remove-Item $_.FullName -Force
+        Write-Host "[remove] contexts/$($_.Name)" -ForegroundColor Yellow
+    }
+    Get-ChildItem $ctxExtra -Filter '*.private.json' -ErrorAction SilentlyContinue | ForEach-Object {
+        Remove-Item $_.FullName -Force
+        Write-Host "[remove] contexts/$($_.Name)" -ForegroundColor Yellow
     }
 }
 
@@ -118,10 +129,17 @@ packs:
 Add-Content (Join-Path $regDir 'registry.yaml') '' -Encoding UTF8
 Write-Host '[write] capabilities/registry.yaml (core only)' -ForegroundColor Green
 
+foreach ($exampleFile in @(
+    'contexts/consumer-pack.example.json',
+    'capabilities/registry.local.yaml.example'
+)) {
+    Copy-File $exampleFile
+}
+
 # Filter repo-policies to public set
 $rp = Join-Path $Dest 'repo-policies'
 if (Test-Path $rp) {
-    Get-ChildItem $rp -File | Where-Object { $_.Name -notin @('default.yaml', 'octo-cluster.yaml', 'openpolvo.yaml') } | ForEach-Object {
+    Get-ChildItem $rp -File | Where-Object { $_.Name -notin @('default.yaml', 'octo-cluster.yaml', 'consumer-demo.yaml') } | ForEach-Object {
         Remove-Item $_.FullName -Force
         Write-Host "[remove] repo-policies/$($_.Name)" -ForegroundColor Yellow
     }
@@ -163,6 +181,7 @@ state/
 if (-not $SkipSync) {
     Write-Host '== sync-cursor ==' -ForegroundColor Cyan
     $env:OCTO_CLUSTER = $Dest
+    $env:AI_EXECUTION_CONTEXT = 'platform'
     & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Dest 'scripts\sync-cursor.ps1')
     if ($LASTEXITCODE -ne 0) { throw 'sync-cursor failed' }
 }
@@ -172,8 +191,13 @@ if (-not $SkipValidate) {
     $env:OCTO_CLUSTER = $Dest
     Push-Location (Join-Path $Dest 'engine\context-engine')
     try {
-        bun run validate octo-cluster 2>&1 | Write-Host
+        $prevEap = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        bun install | Write-Host
+        if ($LASTEXITCODE -ne 0) { throw 'bun install failed' }
+        bun run validate octo-cluster | Write-Host
         if ($LASTEXITCODE -ne 0) { throw 'bun validate failed' }
+        $ErrorActionPreference = $prevEap
     } finally {
         Pop-Location
     }

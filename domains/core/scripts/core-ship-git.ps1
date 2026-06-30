@@ -1,5 +1,5 @@
 # Repository-policy git delivery for /ship (direct | feature-branch).
-# Usage: core-ship-git.ps1 -RepoPath "C:\GitHub\octo-cluster" -CommitMessage "feat: ..."
+# Usage: core-ship-git.ps1 -RepoPath "$env:OCTO_CLUSTER" -CommitMessage "feat: ..."
 #        core-ship-git.ps1 -FeatureBranch "feat/my-change" -WhatIf
 
 param(

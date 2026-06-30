@@ -177,7 +177,7 @@ async function decayStaleContext(profile: string): Promise<string[]> {
       await writeFile(dest, body, "utf8");
       await writeFile(
         full,
-        `# ${name.replace(/\.md$/i, "")} (archived — retrieve via sigla-context-search)\n\n_Stale L1 — see tickets/context-archive/${name}_\n`,
+        `# ${name.replace(/\.md$/i, "")} (archived — retrieve via core-context-search)\n\n_Stale L1 — see tickets/context-archive/${name}_\n`,
         "utf8",
       );
       actions.push(`decayed stale L1 → context-archive/${name}`);

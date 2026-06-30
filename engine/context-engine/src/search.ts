@@ -222,7 +222,7 @@ if (candidates.length === 0) {
 }
 
 if (candidates.length === 0) {
-  console.log(`[${profile}] No chunks. Run: sigla-context-index.ps1 -Profile ${profile}`);
+  console.log(`[${profile}] No chunks. Run: core-context-index.ps1 -Profile ${profile}`);
   process.exit(0);
 }
 

@@ -24,7 +24,7 @@ if (-not (Test-IsAdmin)) {
     exit $LASTEXITCODE
 }
 
-Write-Host "== WSL2 install OPE-159 no winget ==" -ForegroundColor Cyan
+Write-Host "== WSL2 install 8CL-159 no winget ==" -ForegroundColor Cyan
 
 $distList = cmd /c "wsl -l -v 2>nul"
 if ($LASTEXITCODE -eq 0 -and $distList -match $Distribution) {

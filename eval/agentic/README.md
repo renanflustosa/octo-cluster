@@ -15,8 +15,8 @@ Inspired by [Ponytail agentic benchmark](https://github.com/DietrichGebert/ponyt
 ### score-diff.ps1
 
 ```powershell
-powershell -File eval/agentic/score-diff.ps1 -RepoRoot C:\GitHub\openpolvo -BaseRef develop -HeadRef HEAD
-powershell -File eval/agentic/score-diff.ps1 -RepoRoot C:\GitHub\openpolvo -ExcludeTests
+powershell -File eval/agentic/score-diff.ps1 -RepoRoot $env:CONSUMER_DEMO_ROOT -BaseRef develop -HeadRef HEAD
+powershell -File eval/agentic/score-diff.ps1 -RepoRoot $env:CONSUMER_DEMO_ROOT -ExcludeTests
 ```
 
 Output: `{"added":N,"deleted":M,"net":N-M,"files_changed":K,...}`
@@ -34,9 +34,9 @@ Run `--selftest` before any pilot — good refs must pass, bad refs must fail.
 
 ## Manual pilot
 
-See [`protocol/openpolvo-pilot.md`](protocol/openpolvo-pilot.md).
+See [`protocol/consumer-pilot.md`](protocol/consumer-pilot.md).
 
-Record results under `results/<date>-openpolvo-pilot.md`.
+Record results under `results/<date>-consumer-pilot.md`.
 
 ## Arms (manual)
 

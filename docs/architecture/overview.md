@@ -33,7 +33,7 @@ AI_EXECUTION_CONTEXT → contexts/<id>.json
   → invoke-domain-script.ps1              → domains/<pack>/scripts/<prefix>-*.ps1
 ```
 
-Legacy `AI_DOMAIN` maps to child pack id with deprecation warning.
+Use `AI_EXECUTION_CONTEXT` only — older pack-selector env vars are removed by `scripts/migrate-octo-cluster.ps1`.
 
 ## Adapter strategy
 
@@ -48,4 +48,4 @@ Legacy `AI_DOMAIN` maps to child pack id with deprecation warning.
 2. ✅ Capability packs replace hardcoded domain ship discovery
 3. ✅ Skills: core-only sync; pack skills in `capabilities/`
 4. 🔄 `adapters/` directory for explicit multi-tool generation
-5. 🔄 Full doc migration off `AI_DOMAIN`
+5. 🔄 Full doc migration off legacy pack-selector env vars

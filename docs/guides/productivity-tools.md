@@ -79,8 +79,8 @@ Git repo that syncs Cursor rules, skills, and local RAG tooling. Clone once per 
 **Bootstrap (new machine):**
 
 ```powershell
-git clone https://github.com/renanflustosa/octo-cluster.git C:\octo-cluster
-cd C:\octo-cluster
+git clone https://github.com/renanflustosa/octo-cluster.git <clone-root>
+cd $env:OCTO_CLUSTER
 .\install.ps1
 ```
 
@@ -90,7 +90,7 @@ cd C:\octo-cluster
 .\scripts\sync-cursor.ps1
 ```
 
-Active execution context comes from `AI_EXECUTION_CONTEXT` in the workspace file (default `platform`). Legacy `AI_DOMAIN` is deprecated. See [`context-model.md`](./context-model.md).
+Active execution context comes from `AI_EXECUTION_CONTEXT` in the workspace file (default `platform`). See [`context-model.md`](./context-model.md).
 
 **Env:** `OCTO_CLUSTER` — workspace file or user env. `AI_EXECUTION_CONTEXT` selects capability packs (`platform`, `company2`, …).
 
@@ -390,7 +390,7 @@ Before proposing a fix (`systematic-debugging` skill):
 
 ---
 
-## This folder (`C:\octo-cluster\docs\`)
+## This folder (`docs/`)
 
 | File | Content |
 |------|---------|
@@ -401,7 +401,7 @@ Before proposing a fix (`systematic-debugging` skill):
 
 ---
 
-## COST 0 install audit (OPE-158 F6)
+## COST 0 install audit (8CL-158 F6)
 
 Run locally after `install.ps1` or when onboarding a machine:
 
@@ -438,7 +438,7 @@ Cursor Compute index covers codebase exploration; LanceDB covers harness scripts
 
 ---
 
-## OPE-158 acceptance (platform context)
+## 8CL-158 acceptance (platform context)
 
 Open `octo-cluster.code-workspace` (`AI_EXECUTION_CONTEXT=platform`).
 
@@ -463,7 +463,7 @@ Git delivery and scoped verify commands live in `repo-policies/` — core script
 |------|------|
 | `default.yaml` | Base git + `verify.enabled` |
 | `octo-cluster.yaml` | Direct-to-main; context-engine validate + core grep gates |
-| `openpolvo.yaml` | Example: feature branch + PR; `go build` / `go vet` |
+| `consumer-demo.yaml` | Example: feature branch + PR; `go build` / `go vet` |
 
 Ship orchestration: **verification** phase runs policy commands via `repo-policy-verify` provider; **git** phase reads policy only.
 

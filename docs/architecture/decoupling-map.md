@@ -34,6 +34,6 @@ How the **platform** context stays isolated from optional capability packs.
 |------|--------------|
 | `default.yaml` | Base merge |
 | `octo-cluster.yaml` | Self-verify on ship |
-| `openpolvo.yaml` | Optional sample for Go monorepos |
+| `consumer-demo.yaml` | Optional sample for Go monorepos |
 
 See [`context-model.md`](./context-model.md).

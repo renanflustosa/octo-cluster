@@ -33,7 +33,7 @@ let index: { symbols: SymbolEntry[] };
 try {
   index = JSON.parse(await readFile(symbolsPath(profile), "utf8"));
 } catch {
-  console.log(`[${profile}] No symbol index. Run: sigla-index-module.ps1 -Profile ${profile}`);
+  console.log(`[${profile}] No symbol index. Run: core-context-search.ps1 -Profile ${profile} (after index-symbols)`);
   process.exit(0);
 }
 
