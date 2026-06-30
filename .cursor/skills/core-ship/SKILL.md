@@ -1,11 +1,13 @@
 ---
 name: core-ship
-description: Core /ship â€” discovered providers, repository-policy git delivery. Domain-agnostic.
+description: Core /ship — discovered providers, repository-policy git delivery. Domain-agnostic.
 ---
 
-# /ship â€” verify + gate + repository policy
+# /ship — verify + gate + repository policy
 
-**Never ship without implicit verify.** If verdict â‰  READY, stop â€” user fixes via Execute plan, then re-runs `/ship`.
+**Master rule:** consumer identifiers are secrets — public repos must never store them. Every git change in `octo-cluster` must pass `scripts/boundary-audit.ps1` (see `domains/core/rules/00-consumer-boundary.mdc`).
+
+**Never ship without implicit verify.** If verdict ≠ READY, stop — user fixes via Execute plan, then re-runs `/ship`.
 
 ## Orchestration
 
@@ -24,15 +26,15 @@ SHIP_PROVIDERS=<count>
 
 Read `SHIP_SKILL` once per thread.
 
-## Step 1 â€” Verify (implicit)
+## Step 1 — Verify (implicit)
 
-**Read budget:** â‰¤3 files Â· â‰¤300 lines Â· grep-first
+**Read budget:** ≤3 files · ≤300 lines · grep-first
 
-Run scoped checks from the /model validation plan plus epo-policies/<repo>.yaml verify commands (provider epo-policy-verify).
+Run scoped checks from the /model validation plan plus repo-policies/<repo>.yaml verify commands (provider repo-policy-verify).
 
 **Optional (non-blocking):** on large diffs (~100+ added lines), run `/minimal-review` or read `minimal-review` skill for a delete-list before verify — does not replace gates.
 
-**Verdict (â‰¤40 lines):** `READY` | `NEEDS FIXES` | `BLOCKED`
+**Verdict (≤40 lines):** `READY` | `NEEDS FIXES` | `BLOCKED`
 
 | Verdict | Action |
 |---------|--------|
@@ -40,7 +42,7 @@ Run scoped checks from the /model validation plan plus epo-policies/<repo>.yaml
 | NEEDS FIXES | Stop; Execute plan fixes; re-run `/ship` |
 | BLOCKED | Stop; report blocker |
 
-## Step 2 â€” Ship (READY only)
+## Step 2 — Ship (READY only)
 
 **Gates + git:**
 
@@ -59,9 +61,9 @@ powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline ship -A
 }
 ```
 
-Git phase uses `repo-policies/default.yaml` merged with `repo-policies/<repo>.yaml` only â€” providers never override git policy.
+Git phase uses `repo-policies/default.yaml` merged with `repo-policies/<repo>.yaml` only — providers never override git policy.
 
-**Output (â‰¤8 lines):** verify verdict + branch/PR URL + gate result + residual risk
+**Output (≤8 lines):** verify verdict + branch/PR URL + gate result + residual risk
 
 ## Customization
 
