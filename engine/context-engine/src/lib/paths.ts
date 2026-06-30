@@ -26,16 +26,49 @@ export const IGNORE_DIRS = new Set([
   "migrations",
 ]);
 
+function walkToInstallPs1(start: string): string | null {
+  let here = start.replace(/[\\/]+$/, "");
+  for (let depth = 0; depth < 32; depth++) {
+    try {
+      accessSync(join(here, "install.ps1"));
+      return here;
+    } catch {
+      const parent = join(here, "..");
+      const normalized = parent.replace(/[\\/]+$/, "");
+      if (normalized === here) break;
+      here = normalized;
+    }
+  }
+  return null;
+}
+
 /** octo-cluster root (git source of truth). */
 export function octoClusterRoot(): string {
   const fromEnv = process.env.OCTO_CLUSTER?.replace(/[\\/]+$/, "");
-  if (fromEnv) return fromEnv;
-  // bun run from engine/context-engine
-  const cwd = process.cwd().replace(/[\\/]+$/, "");
-  if (cwd.endsWith("context-engine")) {
-    return join(cwd, "..", "..");
+  if (fromEnv) {
+    try {
+      accessSync(join(fromEnv, "install.ps1"));
+      return fromEnv;
+    } catch {
+      try {
+        accessSync(fromEnv);
+        return fromEnv;
+      } catch {
+        /* fall through */
+      }
+    }
   }
-  throw new Error("Set OCTO_CLUSTER to the octo-cluster repo root");
+
+  const fromScript = walkToInstallPs1(join(import.meta.dir, "..", "..", ".."));
+  if (fromScript) return fromScript;
+
+  const cwd = process.cwd().replace(/[\\/]+$/, "");
+  const fromCwd = walkToInstallPs1(cwd);
+  if (fromCwd) return fromCwd;
+
+  throw new Error(
+    "OCTO_CLUSTER not resolved. Run install.ps1 from your clone root or set User-level OCTO_CLUSTER.",
+  );
 }
 
 /** @deprecated use octoClusterRoot */

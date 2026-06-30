@@ -10,6 +10,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "_load-env.ps1")
+. (Join-Path $PSScriptRoot "_octo-args.ps1")
 
 $Domain = Get-ResolvedChildDomain -Override $Domain
 
@@ -70,16 +71,7 @@ function Resolve-DomainScriptPath {
 
 function Invoke-ScriptFile {
     param([string]$Path, [hashtable]$BoundArgs = @{})
-    $params = @("-ExecutionPolicy", "Bypass", "-File", $Path)
-    foreach ($key in $BoundArgs.Keys) {
-        $val = $BoundArgs[$key]
-        if ($val -is [switch]) {
-            if ($val) { $params += "-$key" }
-        } else {
-            $params += @("-$key", [string]$val)
-        }
-    }
-    & powershell @params
+    Invoke-OctoBoundScript -Path $Path -BoundArgs $BoundArgs
 }
 
 # start-workspace: core bootstrap always, then optional child extension (additive).

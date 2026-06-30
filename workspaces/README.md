@@ -5,7 +5,7 @@ Multi-root IDE workspace files. Each sets **`AI_EXECUTION_CONTEXT`** (and option
 After opening a workspace, run sync from the octo-cluster root:
 
 ```powershell
-cd $env:OCTO_CLUSTER
+cd "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))"
 .\scripts\sync-cursor.ps1
 ```
 
