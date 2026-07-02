@@ -1,9 +1,21 @@
 ﻿# Bun + context-engine helpers for core harness scripts.
 # Dot-sourced from scripts/_env.ps1
 
+function Test-BunNpmShimPath {
+    param([string]$Path)
+    if (-not $Path) { return $false }
+    $normalized = $Path -replace '/', '\'
+    return ($normalized -match '\\npm\\' -or $normalized -match 'node_modules[\\/]\.bin')
+}
+
 function Get-BunExecutable {
     $cmd = Get-Command bun -ErrorAction SilentlyContinue
-    if ($cmd) { return $cmd.Source }
+    if ($cmd -and $cmd.Source) {
+        $src = $cmd.Source
+        if ((Test-Path -LiteralPath $src) -and -not (Test-BunNpmShimPath $src)) {
+            return (Resolve-Path -LiteralPath $src).Path
+        }
+    }
 
     $candidates = @(
         (Join-Path $env:USERPROFILE ".bun\bin\bun.exe"),

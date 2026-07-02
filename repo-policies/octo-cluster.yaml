@@ -20,3 +20,5 @@ verify:
       run: powershell -NoProfile -Command "if (Select-String -Path domains\core\scripts\*.ps1 -Pattern AllowInstall -Quiet) { Write-Error 'AllowInstall in core scripts'; exit 1 }"
     scan_discover:
       run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts\invoke-pipeline.ps1 -Pipeline scan -Action discover
+    bootstrap_allsigned:
+      run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts\test-bootstrap-allsigned.ps1

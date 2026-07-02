@@ -44,6 +44,8 @@ cd <clone-root>
 gh auth login   # optional, for PR flow in /ship
 ```
 
+On corporate Windows with `ExecutionPolicy = AllSigned`, use `.\install.cmd` instead — see [onboarding guide](./docs/guides/onboarding.md#corporate-windows).
+
 Open [`octo-cluster.code-workspace`](./octo-cluster.code-workspace) in your IDE (Cursor today). On first clone, copy from [`octo-cluster.code-workspace.example`](./octo-cluster.code-workspace.example) or run `.\install.ps1` — it seeds the local file automatically. Set `OCTO_CLUSTER` to your clone root; the workspace file does this automatically.
 
 Add your product repos or a **local gitignored** secrets vault as sibling folders in your workspace copy — never commit those paths to this repo.
