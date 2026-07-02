@@ -12,7 +12,6 @@ Demonstrate measurable token impact from Octo Cluster harness practices (grep-fi
 |-------|--------|------|
 | Card-lite | `eval/metrics/measure-card-lite.ps1` | Each `/close` |
 | Baseline stamp | `eval/metrics/stamp-usage-baseline.ps1` | Each `/scan` with `8CL-xxx` |
-| Full harness | `eval/metrics/measure-harness-full.ps1` | Weekly start-workspace |
 
 See [`eval/metrics/README.md`](../../eval/metrics/README.md) and [`architecture/metrics-kernel.md`](../architecture/metrics-kernel.md).
 

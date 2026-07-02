@@ -8,7 +8,7 @@ Close the PDCA loop with data:
 
 1. Hypothesis (new rule/skill)
 2. Card execution (1 chat = 1 ticket)
-3. Measure (lite at close, full weekly)
+3. Measure (lite at close)
 4. Promote or reject via SQL trends
 
 ## Architecture
@@ -17,14 +17,12 @@ Close the PDCA loop with data:
 flowchart LR
   scan["/scan"] --> baseline["usage-baseline.json"]
   close["/close"] --> lite["measure-card-lite"]
-  daystart["/start-workspace"] --> full["measure-harness-full"]
   lite --> db["state/metrics/metrics.db"]
-  full --> db
 ```
 
 ## Schema
 
-[`engine/metrics/schema.sql`](../engine/metrics/schema.sql) — tables `cards`, `harness_snapshots`.
+[`engine/metrics/schema.sql`](../engine/metrics/schema.sql) — tables `cards`, `harness_snapshots` (legacy, no writer).
 
 ## Loop integration
 
@@ -32,7 +30,6 @@ flowchart LR
 |-------|--------|
 | `/scan` | `stamp-usage-baseline.ps1` |
 | `/close` | `measure-card-lite.ps1` |
-| `/start-workspace` | `measure-harness-full.ps1` (weekly if due) |
 | ad hoc | `report.ps1`, `/metrics` command |
 
 ## Secrets
