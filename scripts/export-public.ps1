@@ -67,6 +67,9 @@ foreach ($p in $copyPaths) { Copy-Tree $p }
 
 foreach ($f in @(
     'install.ps1',
+    'install.cmd',
+    'octo.cmd',
+    'audit.cmd',
     '.gitignore',
     '.gitattributes',
     'LICENSE',
