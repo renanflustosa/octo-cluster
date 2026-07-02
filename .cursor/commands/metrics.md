@@ -1,17 +1,10 @@
 # metrics
 
-**Agent mode** — Octo Cluster metrics (lite/full/report).
+**Agent mode** — Octo Cluster metrics (lite/report).
 
 ## Lite (automatic at `/close`)
 
 Runs via `core-close.ps1` → `measure-card-lite.ps1` → SQLite.
-
-## Full (weekly at `/start-workspace`)
-
-```powershell
-powershell -File $env:OCTO_CLUSTER\eval\metrics\measure-harness-full.ps1
-powershell -File $env:OCTO_CLUSTER\eval\metrics\measure-harness-full.ps1 -Force
-```
 
 ## Scan baseline (token delta)
 

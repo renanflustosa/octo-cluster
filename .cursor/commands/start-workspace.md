@@ -23,7 +23,6 @@ Optional flags use flat switches (`-SkipIndex`, `-WithStack`), not `-ScriptArgs 
 - Memory profile review under `state/memory/<profile>/`
 - Stamp: `last-start-workspace.txt`
 - Child pack scripts run additively when enabled in execution context
-- Weekly metrics full run when due (>7 days)
 
 **Then:** new chat → `/scan <TICKET> description`.
 

@@ -9,18 +9,6 @@
 - Context budget alerts + gates
 - **SQLite** `state/metrics/metrics.db` table `cards`
 
-## Full (weekly)
-
-[`measure-harness-full.ps1`](measure-harness-full.ps1) — automatic via [`core-start-workspace.ps1`](../../domains/core/scripts/core-start-workspace.ps1) if last run >7 days:
-
-- productivity-audit
-- context budget
-- agentic safety selftest
-- promptfoo (optional)
-- SQLite table `harness_snapshots` + report trends
-
-Force: `measure-harness-full.ps1 -Force`
-
 ## Token setup
 
 1. **Auto:** `%APPDATA%\Cursor\User\globalStorage\state.vscdb` (Elis-style)
@@ -46,9 +34,6 @@ stamp-usage-baseline.ps1 -Ticket 8CL-123
 
 # Report
 report.ps1 -Last 20 -Arm ponytail-lite
-
-# Full harness
-measure-harness-full.ps1 -Force
 
 # DB admin
 engine/metrics/metrics-store.ps1 -StoreAction init
