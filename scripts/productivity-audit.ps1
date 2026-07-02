@@ -50,6 +50,18 @@ $results += @(
     (Test-Tool -Id "git" -Label "Git" -InstallHint "https://git-scm.com" -Check {
         $null -ne (Get-Command git -ErrorAction SilentlyContinue)
     })
+    (Test-Tool -Id "pwsh" -Label "PowerShell 7+ (pwsh)" -InstallHint ".\install.ps1" -Check {
+        if (Get-Command Get-PwshExecutable -ErrorAction SilentlyContinue) {
+            $exe = Get-PwshExecutable
+            if (-not $exe) { return $false }
+            $ver = & $exe -NoProfile -Command '$PSVersionTable.PSVersion.Major'
+            return [int]$ver -ge 7
+        }
+        $cmd = Get-Command pwsh -ErrorAction SilentlyContinue
+        if (-not $cmd) { return $false }
+        $ver = & $cmd.Source -NoProfile -Command '$PSVersionTable.PSVersion.Major'
+        [int]$ver -ge 7
+    })
     (Test-Tool -Id "gh" -Label "GitHub CLI" -InstallHint ".\install.ps1" -Check {
         if (Get-Command Get-GhExecutable -ErrorAction SilentlyContinue) { return [bool](Get-GhExecutable) }
         $null -ne (Get-Command gh -ErrorAction SilentlyContinue)
