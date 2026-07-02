@@ -1,0 +1,12 @@
+﻿# Cursor indexing — exclude machine-local state and build artifacts
+
+state/memory/
+state/backups/
+state/logs/
+state/metrics/
+engine/context-engine/node_modules/
+engine/context-engine/.cache/
+**/.cache/
+generated/
+.git/
+*.log
