@@ -6,7 +6,7 @@ Official Octo Cluster logos and icons. MIT-licensed project assets — see [LICE
 
 | File | Variant | Dimensions | Use when |
 |------|---------|------------|----------|
-| [`logo-primary.png`](./logo-primary.png) | Primary symbol (detailed, **no wordmark**) | 1672×941 | Docs headers, README hero, presentations |
+| [`logo-primary.png`](./logo-primary.png) | Primary symbol (detailed, **no wordmark**; circular light background, transparent outside) | 1024×1024 | Docs headers, README hero, presentations |
 | [`app-icon.png`](./app-icon.png) | App icon (rounded square) | 565×565 | Desktop/mobile app icons, PWA manifest |
 | [`favicon.png`](./favicon.png) | Favicon (simplified mark) | 256×256 | Browser tabs, small UI chrome |
 | [`github-avatar.png`](./github-avatar.png) | GitHub avatar (circle) | 415×415 | GitHub org/repo profile image |
@@ -17,7 +17,7 @@ Official Octo Cluster logos and icons. MIT-licensed project assets — see [LICE
 
 - Prefer **PNG** sources from this folder; do not upscale raster assets.
 - Keep aspect ratio; do not stretch or recolor without a design pass.
-- For README embed: `width` must be ≤ native width of `logo-primary.png` (downscale only).
+- For README embed: `width` must be ≤ native width of `logo-primary.png` (downscale only). Square canvas with circular light disc — transparent corners integrate with GitHub dark mode.
 
 ## Validation
 
