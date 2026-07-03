@@ -1,7 +1,7 @@
 # Octo Cluster
 
 <p align="center">
-  <img src="./assets/branding/logo-primary.png" alt="Octo Cluster" width="128" />
+  <img src="./assets/branding/logo-primary.png" alt="Octo Cluster" width="320" />
 </p>
 
 **All-in-one local harness for AI-assisted development** — RAG, memory, token economy, hooks, and verify gates in one workspace folder. Maximize automation; use the model only when judgment is required.
