@@ -6,10 +6,10 @@ Official Octo Cluster logos and icons. MIT-licensed project assets — see [LICE
 
 | File | Variant | Use when |
 |------|---------|----------|
-| [`logo-primary.png`](./logo-primary.png) | Primary logo (circle, celestial) | Docs headers, presentations, social banners |
-| [`app-icon.png`](./app-icon.png) | App icon (rounded square) | Desktop/mobile app icons, PWA manifest |
-| [`favicon.png`](./favicon.png) | Favicon (circle, ring border) | Browser tabs, small UI chrome |
-| [`github-avatar.png`](./github-avatar.png) | GitHub avatar (high-contrast circle) | GitHub org/repo profile image |
+| [`logo-primary.png`](./logo-primary.png) | Primary logo (refurbished, with wordmark) | Docs headers, presentations, social banners |
+| [`app-icon.png`](./app-icon.png) | App icon (rounded square, 1024×1024) | Desktop/mobile app icons, PWA manifest |
+| [`favicon.png`](./favicon.png) | Favicon (simplified mark, ring border) | Browser tabs, small UI chrome |
+| [`github-avatar.png`](./github-avatar.png) | GitHub avatar (512×512 circle) | GitHub org/repo profile image |
 | [`logo-system-overview.png`](./logo-system-overview.png) | Reference sheet (A–D) | Design reference only — not for production embed |
 
 ## Usage

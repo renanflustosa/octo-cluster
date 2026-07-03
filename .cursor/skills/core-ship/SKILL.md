@@ -5,8 +5,6 @@ description: Core /ship — discovered providers, repository-policy git delivery
 
 # /ship — verify + gate + repository policy
 
-**Master rule:** consumer identifiers are secrets — public repos must never store them. Every git change in `octo-cluster` must pass `scripts/boundary-audit.ps1` (see `domains/core/rules/00-consumer-boundary.mdc`).
-
 **Never ship without implicit verify.** If verdict ≠ READY, stop — user fixes via Execute plan, then re-runs `/ship`.
 
 ## Orchestration

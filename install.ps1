@@ -2,7 +2,7 @@
 <#
 .SYNOPSIS
   Bootstrap octo-cluster on a new machine (platform / CORE context).
-  Installs prerequisites via direct download (no winget): git check, bun, gh, ripgrep.
+  Installs prerequisites via direct download (no winget): git check, bun, PowerShell 7 (pwsh), gh, ripgrep.
 #>
 param(
     [string]$WorkspaceRoot = $PSScriptRoot,

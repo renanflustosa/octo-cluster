@@ -28,7 +28,7 @@ Test: `cursor-session.ps1 -Json -Redact`
 
 ```powershell
 # Scan — stamp baseline
-stamp-usage-baseline.ps1 -Ticket 8CL-123
+stamp-usage-baseline.ps1 -Ticket ISSUE-123
 
 # Close — automatic lite metrics
 

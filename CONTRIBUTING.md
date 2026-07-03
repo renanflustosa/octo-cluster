@@ -47,12 +47,12 @@ Hooks run `boundary-audit` automatically. CI runs the same gate on every PR. See
 
 ## Branches
 
-Pattern: `<type>/8CL-<id>-<short-description>`
+Pattern: `<type>/<issue#>-<short-description>`
 
 ```text
-feat/8CL-123-add-memory-compaction
-fix/8CL-201-fix-rag-cache
-docs/8CL-45-update-onboarding
+feat/42-add-memory-compaction
+fix/201-fix-rag-cache
+docs/45-update-onboarding
 ```
 
 Target `develop` for features and fixes; `main` only for release merges from `develop`.
@@ -60,7 +60,7 @@ Target `develop` for features and fixes; `main` only for release merges from `de
 ## Pull requests
 
 1. **Title:** [Conventional Commits](https://www.conventionalcommits.org/) in English — e.g. `feat:`, `fix:`, `docs:`.
-2. **Related issue:** include `8CL-xxx` in PR body (see [PR template](./.github/PULL_REQUEST_TEMPLATE.md)).
+2. **Related issue:** include `Fixes #NNN` in PR body (see [PR template](./.github/PULL_REQUEST_TEMPLATE.md)).
 3. One concern per PR when possible.
 4. Run local verify before opening:
    - `bun run validate octo-cluster` (context-engine)
@@ -84,11 +84,11 @@ Target `develop` for features and fixes; `main` only for release merges from `de
 
 ## Issues
 
-**Primary tracker:** [Linear workspace `octo-cluster`](https://linear.app/octo-cluster) (`8CL-xxx`).
+**Public tracker:** [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues).
 
-GitHub Issues are for **external community reports** only. Maintainers triage accepted reports into Linear.
+Open an issue before large changes when possible. Use [GitHub Milestones](https://github.com/renanflustosa/octo-cluster/milestones) for release planning.
 
-For community bugs, use the GitHub bug report template. Include OS, IDE adapter, and `invoke-pipeline … -Action discover` output when relevant.
+For bugs, use the GitHub bug report template. Include OS, IDE adapter, and `invoke-pipeline … -Action discover` output when relevant.
 
 ## Security
 

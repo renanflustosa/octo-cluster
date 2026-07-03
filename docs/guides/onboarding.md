@@ -58,7 +58,7 @@ Terminal env:
 ## CORE loop (optional)
 
 ```text
-/start-workspace → /scan 8CL-xxx description → /model → Execute plan → /ship → /close
+/start-workspace → /scan ISSUE-123 description → /model → Execute plan → /ship → /close
 ```
 
 | Phase | Harness |
@@ -75,13 +75,13 @@ Terminal env:
 powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline scan -Action discover
 ```
 
-## Issue tracker (Linear)
+## Issue tracker (GitHub)
 
-Primary tracker: [Linear `octo-cluster`](https://linear.app/octo-cluster) (`8CL-xxx`).
+Public tracker: [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues).
 
-Platform context: `/scan` does **not** create issues — pass the ID (`/scan 8CL-123 description`). Use Linear MCP or UI to read/update issues.
+Platform context: `/scan` does **not** create issues — pass the ID (`/scan ISSUE-123 description`). Use GitHub CLI (`gh issue view`) or the web UI to read/update issues.
 
-Branch pattern: `feat/8CL-123-short-description` — see [EOS](../governance/eos.md).
+Branch pattern: `feat/42-short-description` — see [EOS](../governance/eos.md).
 
 Private capability packs may add routing — see [add-child-context.md](./add-child-context.md).
 
@@ -128,5 +128,3 @@ PowerShell · YAML — see `octo-cluster.code-workspace`
 ## Next step
 
 Scaffold your capability pack: [add-child-context.md](./add-child-context.md)
-
-Linear workspace setup: [linear-workspace-setup.md](../governance/linear-workspace-setup.md)

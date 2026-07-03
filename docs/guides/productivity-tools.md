@@ -50,7 +50,7 @@ Use the cheapest layer that can finish the job:
 | Cursor rules/skills/hooks/Plan | Domain commands wired to core loop |
 | `gh`, GitHub Actions CI | Ship/verify gates calling repo test commands |
 | LanceDB + Bun context-engine | Index profiles per child domain |
-| Context7, Linear MCP | Pack-specific routing docs only |
+| Context7, issue-tracker MCP | Pack-specific routing docs only |
 | Promptfoo, Cursor babysit | Optional eval overlays per domain |
 
 **Principle:** *established tools execute; custom assets orient and glue.*
@@ -239,7 +239,7 @@ Integrations the agent can call during chat.
 
 | Server | Generic use |
 |--------|-------------|
-| **Linear** | Issues, projects, documents, milestones, status updates |
+| **Issue tracker** | Issues, projects, milestones (private overlay / capability pack) |
 | **Context7** | Library docs (React, Hono, Prisma, etc.) without API hallucination |
 | **Langfuse** | Agent traces, datasets, scores, prompt debugging |
 | **Sourcegraph** | Semantic search and navigation in large codebases |
@@ -401,7 +401,7 @@ Before proposing a fix (`systematic-debugging` skill):
 
 ---
 
-## COST 0 install audit (8CL-158 F6)
+## COST 0 install audit
 
 Run locally after `install.ps1` or when onboarding a machine:
 
@@ -438,7 +438,7 @@ Cursor Compute index covers codebase exploration; LanceDB covers harness scripts
 
 ---
 
-## 8CL-158 acceptance (platform context)
+## Platform context acceptance
 
 Open `octo-cluster.code-workspace` (`AI_EXECUTION_CONTEXT=platform`).
 
