@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2](https://github.com/renanflustosa/octo-cluster/compare/v0.1.1...v0.1.2) (2026-07-03)
+
+
+### Features
+
+* add consumer boundary master rule for octo-cluster ([832a990](https://github.com/renanflustosa/octo-cluster/commit/832a990774973a4d57a1a460b03c78e29f68e7b9))
+* add consumer boundary master rule for octo-cluster ([c887662](https://github.com/renanflustosa/octo-cluster/commit/c887662bb3e33dbbf05ca055c18d7de664b389f3))
+
+
+### Bug Fixes
+
+* bootstrap Windows AllSigned via cmd launchers and bun shim resolution ([e39ce92](https://github.com/renanflustosa/octo-cluster/commit/e39ce92aab7d11a3b6ed24931defdfc547bb3055))
+* bootstrap Windows AllSigned via cmd launchers and bun shim resolution ([876f27a](https://github.com/renanflustosa/octo-cluster/commit/876f27acbcac0c8339ee158801d56677c86f74cf))
+* centralize Octo path resolution and in-process entry points ([f5384c5](https://github.com/renanflustosa/octo-cluster/commit/f5384c5e3d4c6199a5fe528150b1db484c62d1e9))
+* pass RepoPath through ship; generic private-secrets-vault repo policy ([a744586](https://github.com/renanflustosa/octo-cluster/commit/a74458664096a91a354f58929e81804c2881f4be))
+* remove broken weekly methics ([6941992](https://github.com/renanflustosa/octo-cluster/commit/694199230ca6ac0ee9ab043122d31163f6368741))
+* remove broken weekly methics ([7961230](https://github.com/renanflustosa/octo-cluster/commit/796123093f97461aac21a731e3155f0c9e7d4665))
+
 ## [0.1.1](https://github.com/renanflustosa/octo-cluster/compare/v0.1.0...v0.1.1) (2026-06-30)
 
 
