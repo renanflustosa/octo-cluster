@@ -1,6 +1,6 @@
 ## Related Issue
 
-8CL-XXX
+Fixes #NNN
 
 ## Summary
 

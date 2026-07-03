@@ -22,6 +22,6 @@ Promotion rule: behavior needed by two or more packs moves to CORE; product-spec
 ## Consequences
 
 - `.cursor/` is generated — edit `domains/` and `capabilities/`, then sync
-- Linear integration is documentation + MCP, not core code
+- Private issue tracker integration is documentation + MCP via capability packs, not core code
 - New adapters (Roo Code, Continue) plug in without changing the kernel loop
 - Child domains scaffold under `domains/companyN/` for private extensions

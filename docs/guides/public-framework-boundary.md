@@ -205,7 +205,7 @@ If exclusion is required before a generic `_private/` layout exists, enforce via
 
 Public docs may describe **patterns**, not real consumers.
 
-- Use placeholders: `my-company`, `my-product-api`, `8CL-123`, `company2`.
+- Use placeholders: `my-company`, `my-product-api`, `ISSUE-123`, `company2`.
 - Sample repo policies: self-verify (`octo-cluster.yaml`) or fictional demo (`consumer-demo.yaml`).
 - Migration or audit prompts that reference a real employer belong in **private** repos or gitignored local docs — not in public `docs/guides/`.
 

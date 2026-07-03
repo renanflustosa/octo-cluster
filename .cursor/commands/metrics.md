@@ -9,7 +9,7 @@ Runs via `core-close.ps1` → `measure-card-lite.ps1` → SQLite.
 ## Scan baseline (token delta)
 
 ```powershell
-powershell -File $env:OCTO_CLUSTER\eval\metrics\stamp-usage-baseline.ps1 -Ticket 8CL-123
+powershell -File $env:OCTO_CLUSTER\eval\metrics\stamp-usage-baseline.ps1 -Ticket ISSUE-123
 ```
 
 ## Report

@@ -2,7 +2,7 @@
 
 Public priorities for Octo Cluster under the [Engineering Operating System (EOS)](./docs/governance/eos.md).
 
-Tracked in Linear project [**Octo Cluster EOS v1.0.0**](https://linear.app/octo-cluster). No dates until pilot data exists — credibility over hype.
+Tracked via [GitHub Issues and Milestones](https://github.com/renanflustosa/octo-cluster/issues). No dates until pilot data exists — credibility over hype.
 
 ## Shipped (v0.1.x)
 
@@ -49,4 +49,4 @@ Tracked in Linear project [**Octo Cluster EOS v1.0.0**](https://linear.app/octo-
 
 ## How to suggest changes
 
-Open a Linear issue in the EOS project or a small PR against `develop`. Follow [CONTRIBUTING.md](./CONTRIBUTING.md).
+Open a [GitHub issue](https://github.com/renanflustosa/octo-cluster/issues/new/choose) or a small PR against `develop`. Follow [CONTRIBUTING.md](./CONTRIBUTING.md).

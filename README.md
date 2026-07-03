@@ -9,11 +9,10 @@
 > IDE-agnostic by design. **Cursor** is supported today via generated adapters; other IDEs can add a folder adapter the same way.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Linear](https://img.shields.io/badge/Linear-octo--cluster-5E6AD2)](https://linear.app/octo-cluster)
 
 ## Engineering Operating System
 
-Octo Cluster follows the [Engineering Operating System (EOS)](./docs/governance/eos.md) — governance, delivery, quality, and AI-agent operations. Work is tracked in [Linear](https://linear.app/octo-cluster) (`8CL-xxx`).
+Octo Cluster follows the [Engineering Operating System (EOS)](./docs/governance/eos.md) — governance, delivery, quality, and AI-agent operations. Planned work is tracked in [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues); see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Why Octo Cluster?
 
@@ -70,7 +69,7 @@ See [context model](./docs/architecture/context-model.md) and [add a capability 
 One chat ≈ one work item. Phase commands are **optional**; routine edits do not need them.
 
 ```text
-/start-workspace  →  /scan TICKET description  →  /model  →  Execute plan  →  /ship  →  /close
+/start-workspace  →  /scan ISSUE-123 description  →  /model  →  Execute plan  →  /ship  →  /close
 ```
 
 Discover the active pipeline skill:

@@ -1,5 +1,5 @@
 name: Community bug report
-description: Report a harness bug (external contributors). Core team work uses Linear.
+description: Report a harness bug or unexpected behavior.
 title: "[bug] "
 labels:
   - Bug
@@ -7,9 +7,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Core team:** use [Linear](https://linear.app/octo-cluster) for planned work (8CL-xxx).
-
-        This template is for community reports only. Maintainers will triage into Linear if accepted.
+        Thanks for helping improve Octo Cluster. Include reproduction steps and environment details below.
+        For feature ideas, open a general issue instead of this template.
   - type: input
     id: environment
     attributes:

@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Superseded by [ADR-004](./ADR-004-use-github-issues-as-public-work-tracker.md)
 
 ## Context
 
@@ -23,3 +23,7 @@ Use the dedicated Linear workspace `octo-cluster` as the **primary** work tracke
 - EOS conventions live in `docs/governance/eos.md`
 - Manual Linear UI setup required for cycles and GitHub integration
 - MCP Linear plugin enables agent issue management without core coupling
+
+## Supersession rationale
+
+The public OSS repository must not expose private maintainer workspace identifiers (`linear.app/…`, `8CL-` prefixes). GitHub Issues and Milestones are sufficient for community contributors. Private team trackers belong in gitignored local overlays or capability packs — see ADR-004.
