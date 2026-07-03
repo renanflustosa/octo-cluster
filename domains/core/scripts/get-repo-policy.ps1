@@ -88,13 +88,25 @@ function Merge-RepoPolicyMaps {
     return $result
 }
 
-function Get-RepoNameFromPath {
+function Get-RepoPolicyFileName {
     param([Parameter(Mandatory = $true)][string]$RepoPath)
+
     $resolved = (Resolve-Path $RepoPath).Path
+    $marker = Join-Path $resolved '.octo\repo-policy'
+    if (Test-Path $marker) {
+        $id = (Get-Content -Path $marker -Raw -Encoding UTF8).Trim()
+        if ($id) { return $id }
+    }
+
     if (Test-Path (Join-Path $resolved 'install.ps1')) {
         return 'octo-cluster'
     }
     return (Split-Path $resolved -Leaf)
+}
+
+function Get-RepoNameFromPath {
+    param([Parameter(Mandatory = $true)][string]$RepoPath)
+    return Get-RepoPolicyFileName -RepoPath $RepoPath
 }
 
 function Get-RepoPolicyPath {

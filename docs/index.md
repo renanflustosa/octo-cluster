@@ -9,7 +9,6 @@ Pipeline skills resolve at runtime via [`scripts/invoke-pipeline.ps1`](../script
 | Document | Content |
 |----------|---------|
 | [governance/eos.md](./governance/eos.md) | Engineering Operating System (canonical) |
-| [governance/linear-workspace-setup.md](./governance/linear-workspace-setup.md) | Linear workspace one-time setup |
 | [assets/branding/](../assets/branding/) | Logos, app icon, favicon, GitHub avatar |
 | [adr/](./adr/) | Architecture decision records |
 
@@ -54,7 +53,7 @@ octo-cluster/
   workspaces/         # multi-root entry points
   scripts/            # sync-cursor, invoke-pipeline
   docs/
-    governance/       # EOS, linear setup
+    governance/       # EOS
     guides/
     architecture/
     adr/
@@ -63,4 +62,4 @@ octo-cluster/
 
 Copy [`octo-cluster.code-workspace.example`](../octo-cluster.code-workspace.example) to `octo-cluster.code-workspace` (gitignored) for platform work, or run `.\install.ps1`. After switching workspace, run sync once.
 
-Work tracker: [Linear `octo-cluster`](https://linear.app/octo-cluster) (`8CL-xxx`).
+Work tracker: [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues).

@@ -50,7 +50,7 @@ Use the cheapest layer that can finish the job:
 | Cursor rules/skills/hooks/Plan | Domain commands wired to core loop |
 | `gh`, GitHub Actions CI | Ship/verify gates calling repo test commands |
 | LanceDB + Bun context-engine | Index profiles per child domain |
-| Context7, Linear MCP | Pack-specific routing docs only |
+| Context7, issue-tracker MCP | Pack-specific routing docs only |
 | Promptfoo, Cursor babysit | Optional eval overlays per domain |
 
 **Principle:** *established tools execute; custom assets orient and glue.*
@@ -80,7 +80,7 @@ Git repo that syncs Cursor rules, skills, and local RAG tooling. Clone once per 
 
 ```powershell
 git clone https://github.com/renanflustosa/octo-cluster.git <clone-root>
-cd $env:OCTO_CLUSTER
+cd <clone-root>
 .\install.ps1
 ```
 
@@ -92,7 +92,7 @@ cd $env:OCTO_CLUSTER
 
 Active execution context comes from `AI_EXECUTION_CONTEXT` in the workspace file (default `platform`). See [`context-model.md`](./context-model.md).
 
-**Env:** `OCTO_CLUSTER` — workspace file or user env. `AI_EXECUTION_CONTEXT` selects capability packs (`platform`, `company2`, …).
+**Env:** `OCTO_CLUSTER` — User env (set by `install.ps1`) or workspace session env. See [path-resolution.md](../architecture/path-resolution.md). `AI_EXECUTION_CONTEXT` selects capability packs (`platform`, `company2`, …).
 
 **What stays in `~/.cursor`:** Cursor runtime only (`projects/`, `skills-cursor/`, `plugins/`, plans). Migrated loop assets live in `octo-cluster`, not under the home profile.
 
@@ -239,7 +239,7 @@ Integrations the agent can call during chat.
 
 | Server | Generic use |
 |--------|-------------|
-| **Linear** | Issues, projects, documents, milestones, status updates |
+| **Issue tracker** | Issues, projects, milestones (private overlay / capability pack) |
 | **Context7** | Library docs (React, Hono, Prisma, etc.) without API hallucination |
 | **Langfuse** | Agent traces, datasets, scores, prompt debugging |
 | **Sourcegraph** | Semantic search and navigation in large codebases |
@@ -401,7 +401,7 @@ Before proposing a fix (`systematic-debugging` skill):
 
 ---
 
-## COST 0 install audit (8CL-158 F6)
+## COST 0 install audit
 
 Run locally after `install.ps1` or when onboarding a machine:
 
@@ -427,10 +427,10 @@ Before Phase A Plan on non-trivial work:
 
 ```powershell
 # Once per day (or after memory/doc edits)
-powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline start-workspace -Action run
+powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline start-workspace -Action run
 
 # Or quick validate only
-cd $env:OCTO_CLUSTER\engine\context-engine
+cd "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\engine\context-engine"
 bun run validate octo-cluster
 ```
 
@@ -438,7 +438,7 @@ Cursor Compute index covers codebase exploration; LanceDB covers harness scripts
 
 ---
 
-## 8CL-158 acceptance (platform context)
+## Platform context acceptance
 
 Open `octo-cluster.code-workspace` (`AI_EXECUTION_CONTEXT=platform`).
 

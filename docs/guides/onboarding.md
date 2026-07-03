@@ -9,14 +9,40 @@ Read [EOS](../governance/eos.md) for project conventions.
 | Item | How |
 |------|-----|
 | Git | [git-scm.com](https://git-scm.com/download/win) |
-| Bun, gh, ripgrep | `.\install.ps1` (direct download, no winget) |
+| Bun, gh, ripgrep | `.\install.ps1` (direct download, no winget) — or `.\install.cmd` on corporate Windows |
 | Go (optional) | `.\scripts\install-go.ps1` — [go.dev](https://go.dev/dl/) |
 | Ollama (optional) | `.\scripts\install-ollama.ps1` |
 | WSL2 Ubuntu (optional) | `.\scripts\install-wsl.ps1` |
 | Docker Desktop (optional) | `.\scripts\install-docker.ps1` |
-| Cursor | Copy `octo-cluster.code-workspace.example` → `octo-cluster.code-workspace` (or run `.\install.ps1`) |
+| Cursor | Copy `octo-cluster.code-workspace.example` → `octo-cluster.code-workspace` (or run `.\install.ps1` / `.\install.cmd`) |
 
-After install: `gh auth login` (once). Verify: `.\scripts\productivity-audit.ps1`
+After install: `gh auth login` (once). Verify: `.\audit.cmd` or `.\scripts\productivity-audit.ps1`
+
+## Corporate Windows (AllSigned)
+
+<a id="corporate-windows"></a>
+
+Many corporate machines set **Group Policy** `ExecutionPolicy = AllSigned`. Unsigned `.ps1` files fail when invoked directly (dot-sourcing `_load-env.ps1` is blocked).
+
+**Use the `.cmd` launchers** at the repo root — they always invoke PowerShell with `-ExecutionPolicy Bypass`:
+
+| Launcher | Purpose |
+|----------|---------|
+| `install.cmd` | Bootstrap (Bun, gh, ripgrep, context-engine deps) |
+| `octo.cmd` | Pipeline CLI (`scan`, `ship`, `start-workspace`, …) |
+| `audit.cmd` | Productivity harness health check |
+
+Example:
+
+```powershell
+.\install.cmd
+.\octo.cmd -Pipeline start-workspace -Action run
+.\audit.cmd
+```
+
+**Defender SmartScreen** is separate from execution policy. If Windows blocks an unsigned script, choose **Run anyway** or allow the clone folder — that is not an AllSigned issue.
+
+When policy is AllSigned or Restricted, `audit.cmd` reports a **WARN** with a link back to this section.
 
 ## Workspace
 
@@ -32,7 +58,7 @@ Terminal env:
 ## CORE loop (optional)
 
 ```text
-/start-workspace → /scan 8CL-xxx description → /model → Execute plan → /ship → /close
+/start-workspace → /scan ISSUE-123 description → /model → Execute plan → /ship → /close
 ```
 
 | Phase | Harness |
@@ -46,16 +72,16 @@ Terminal env:
 **Discover (once per thread):**
 
 ```powershell
-powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline scan -Action discover
+powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline scan -Action discover
 ```
 
-## Issue tracker (Linear)
+## Issue tracker (GitHub)
 
-Primary tracker: [Linear `octo-cluster`](https://linear.app/octo-cluster) (`8CL-xxx`).
+Public tracker: [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues).
 
-Platform context: `/scan` does **not** create issues — pass the ID (`/scan 8CL-123 description`). Use Linear MCP or UI to read/update issues.
+Platform context: `/scan` does **not** create issues — pass the ID (`/scan ISSUE-123 description`). Use GitHub CLI (`gh issue view`) or the web UI to read/update issues.
 
-Branch pattern: `feat/8CL-123-short-description` — see [EOS](../governance/eos.md).
+Branch pattern: `feat/42-short-description` — see [EOS](../governance/eos.md).
 
 Private capability packs may add routing — see [add-child-context.md](./add-child-context.md).
 
@@ -102,5 +128,3 @@ PowerShell · YAML — see `octo-cluster.code-workspace`
 ## Next step
 
 Scaffold your capability pack: [add-child-context.md](./add-child-context.md)
-
-Linear workspace setup: [linear-workspace-setup.md](../governance/linear-workspace-setup.md)

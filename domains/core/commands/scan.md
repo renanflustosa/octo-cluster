@@ -7,7 +7,7 @@
 **Discover (once per thread):**
 
 ```powershell
-powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline scan -Action discover
+powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline scan -Action discover
 ```
 
 Read `PIPELINE_SKILL` once.
@@ -15,22 +15,24 @@ Read `PIPELINE_SKILL` once.
 **Harness (run):**
 
 ```powershell
-powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline scan -Action run
+powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline scan -Action run
 ```
 
 Then as needed:
 
 ```powershell
-powershell -File $env:OCTO_CLUSTER\scripts\invoke-domain-script.ps1 -Name context-search
-powershell -File $env:OCTO_CLUSTER\scripts\invoke-domain-script.ps1 -Name read-gate -ScriptArgs @{ Path = "<file>" }
+powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo-domain.ps1" -Name context-search
+powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo-domain.ps1" -Name read-gate -Path "<file>"
 ```
+
+Use flat `-Path` (not `-ScriptArgs @{ Path = ... }`) when calling via `powershell -File`.
 
 Update `state/memory/<profile>/current_task.md` (≤200 tokens).
 
 **Usage baseline (best-effort, for token metrics at `/close`):**
 
 ```powershell
-powershell -File $env:OCTO_CLUSTER\eval\metrics\stamp-usage-baseline.ps1 -Ticket "<TICKET>" -Profile "<profile>"
+powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo-run.ps1" -RelativePath eval\metrics\stamp-usage-baseline.ps1 -Ticket "<TICKET>" -Profile "<profile>"
 ```
 
 **Output:** Objective, Scope, Git, Risks, Next — **≤6 bullets**.

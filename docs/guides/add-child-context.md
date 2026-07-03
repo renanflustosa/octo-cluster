@@ -124,7 +124,7 @@ Document the mapping in [`workspaces/README.md`](../workspaces/README.md) and [`
 ## 5. Sync and discover
 
 ```powershell
-cd $env:OCTO_CLUSTER
+cd "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))"
 $env:AI_EXECUTION_CONTEXT = "my-company"
 .\scripts\sync-cursor.ps1 -Domain my-company
 .\scripts\invoke-pipeline.ps1 -Pipeline scan -Action discover

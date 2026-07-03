@@ -144,6 +144,9 @@ function Install-PlatformPrerequisites {
     $runtime = Join-Path $PSScriptRoot 'context-engine-runtime.ps1'
     if (Test-Path $runtime) { . $runtime }
 
+    $pwshScript = Join-Path $PSScriptRoot 'install-powershell.ps1'
+    if (Test-Path $pwshScript) { . $pwshScript }
+
     $gitOk = Ensure-Git
     if (-not $gitOk) { throw 'Git is required. Install from https://git-scm.com/download/win' }
 
@@ -155,6 +158,8 @@ function Install-PlatformPrerequisites {
 
     $bunBin = Join-Path $env:USERPROFILE '.bun\bin'
     Add-UserPathEntry -Directory $bunBin
+
+    if (-not (Install-PowerShell7)) { throw 'PowerShell 7 (pwsh) install failed — run .\scripts\install-powershell.ps1' }
 
     if (-not (Install-GhCli)) { throw 'GitHub CLI (gh) install failed' }
 

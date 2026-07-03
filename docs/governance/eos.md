@@ -8,7 +8,7 @@ Defines governance, delivery, architecture, releases, quality, security, OSS ope
 
 ### Language
 
-**English-only** for source code, documentation, comments, commits, PRs, branches, Linear issues, ADRs, release notes, discussions, and CI logs (when configurable).
+**English-only** for source code, documentation, comments, commits, PRs, branches, GitHub issues, ADRs, release notes, discussions, and CI logs (when configurable).
 
 ### Software development standards
 
@@ -29,13 +29,11 @@ Defines governance, delivery, architecture, releases, quality, security, OSS ope
 | Automation First | CI on every PR, release-please, `/ship` gates |
 | AI-Agent-Friendly Development | Structured issues, DoR/DoD, validation commands |
 
-## Linear operations
+## GitHub Issues operations
 
-Primary work tracker: [Linear workspace `octo-cluster`](https://linear.app/octo-cluster).
+Primary public work tracker: [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues).
 
-GitHub Issues are for **external community reports only** — triage into Linear.
-
-Setup checklist: [linear-workspace-setup.md](./linear-workspace-setup.md)
+Use [GitHub Milestones](https://github.com/renanflustosa/octo-cluster/milestones) for release planning. Private team trackers belong in a local gitignored overlay — never in the public tree.
 
 ### Issue naming
 
@@ -50,14 +48,14 @@ Forbidden: vague titles (`Fix stuff`, `Improve code`), gerunds without imperativ
 ### Workflow
 
 ```text
-Backlog → Todo → In Progress → In Review → Done
+Open → In Progress → In Review → Done
 ```
 
 Rules per issue:
 
-- Exactly 1 assignee
+- Exactly 1 assignee (when applicable)
 - Exactly 1 domain label
-- Exactly 1 cycle (when active)
+- Linked to a milestone when part of a release
 - Max 3 days duration
 - Max 1 objective — split if larger
 
@@ -81,12 +79,12 @@ Rules per issue:
 | CI/CD | `.github/workflows/` |
 | Security | SECURITY.md, scanning |
 
-Project container: **Octo Cluster EOS v1.0.0**
+Strategic container: **Octo Cluster EOS v1.0.0** (GitHub Milestone)
 
 ## Branch naming standard
 
 ```text
-<type>/8CL-<id>-<short-description>
+<type>/<issue#>-<short-description>
 ```
 
 Types: `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `security`
@@ -94,12 +92,12 @@ Types: `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`
 Examples:
 
 ```text
-feat/8CL-123-add-memory-compaction
-fix/8CL-201-fix-rag-cache
-docs/8CL-45-update-onboarding
+feat/42-add-memory-compaction
+fix/201-fix-rag-cache
+docs/45-update-onboarding
 ```
 
-Forbidden: branches without `8CL-<id>`, personal prefixes (`renan-fix`).
+Forbidden: branches without issue number, personal prefixes (`renan-fix`).
 
 ## Commit standard
 
@@ -141,7 +139,7 @@ Relevant architectural decisions **must** become ADRs before merge.
 ```text
 docs/
   architecture/
-  governance/       # this file, linear setup
+  governance/       # this file, EOS conventions
   guides/
   adr/
   api/
@@ -173,7 +171,7 @@ Label `ai-ready` when complete.
 - [ ] CI passing
 - [ ] No critical security findings
 - [ ] Conventional Commit used
-- [ ] Linked Linear issue (`8CL-xxx` in PR)
+- [ ] Linked GitHub issue (`Fixes #NNN` in PR)
 - [ ] PR approved
 - [ ] Release notes generated (if applicable)
 
@@ -217,7 +215,7 @@ Executable by human developers, Cursor Agent, and future autonomous agents.
 - [ ] path/to/file
 
 ## Dependencies
-- blockedBy: 8CL-xxx | none
+- blockedBy: #NNN | none
 
 ## Acceptance Criteria
 - [ ] ...
@@ -236,13 +234,13 @@ bun run validate octo-cluster
 
 ## Harness integration
 
-One Cursor chat = one Linear issue. Pass ticket ID to phase commands:
+One Cursor chat = one work item. Pass ticket ID to phase commands:
 
 ```text
-/scan 8CL-123 description
+/scan ISSUE-123 description
 ```
 
-No Linear-specific code in `domains/core/` — use MCP or manual updates.
+No issue-tracker-specific code in `domains/core/` — use capability packs or MCP for private trackers.
 
 ## Semver path to 1.0.0
 
@@ -253,4 +251,4 @@ No Linear-specific code in `domains/core/` — use MCP or manual updates.
 | 0.x | ADR process, feature docs, 2nd adapter |
 | 1.0.0 | Stable kernel API, eval in CI, full OSS governance |
 
-Linear project EOS v1.0.0 = strategic container; tags via release-please on `main`.
+GitHub Milestone EOS v1.0.0 = strategic container; tags via release-please on `main`.

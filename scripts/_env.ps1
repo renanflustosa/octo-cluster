@@ -6,6 +6,18 @@ function Test-OctoClusterRoot {
     return Test-Path -LiteralPath (Join-Path $Path 'install.ps1')
 }
 
+function Get-OctoClusterEnvVar {
+    param(
+        [ValidateSet('Process', 'User', 'Machine')]
+        [string]$Scope = 'Process'
+    )
+    switch ($Scope) {
+        'Process' { return $env:OCTO_CLUSTER }
+        'User' { return [Environment]::GetEnvironmentVariable('OCTO_CLUSTER', 'User') }
+        'Machine' { return [Environment]::GetEnvironmentVariable('OCTO_CLUSTER', 'Machine') }
+    }
+}
+
 function Resolve-OctoClusterRootFromScript {
     $here = $PSScriptRoot
     while ($here) {
@@ -29,6 +41,13 @@ function Resolve-OctoClusterRoot {
     $fromScript = Resolve-OctoClusterRootFromScript
     if ($fromScript) { return $fromScript }
 
+    foreach ($scope in @('Process', 'User', 'Machine')) {
+        $candidate = Get-OctoClusterEnvVar -Scope $scope
+        if (Test-OctoClusterRoot $candidate) {
+            return (Resolve-Path $candidate).Path
+        }
+    }
+
     if ($Preferred) {
         $parent = Split-Path $Preferred -Parent
         if ($parent) {
@@ -42,10 +61,35 @@ function Resolve-OctoClusterRoot {
     return $null
 }
 
+function Get-OctoClusterInstallPath {
+    foreach ($scope in @('User', 'Machine', 'Process')) {
+        $candidate = Get-OctoClusterEnvVar -Scope $scope
+        if (Test-OctoClusterRoot $candidate) {
+            return (Resolve-Path $candidate).Path
+        }
+    }
+    return Resolve-OctoClusterRootFromScript
+}
+
+function Get-OctoClusterRootErrorMessage {
+    @"
+OCTO_CLUSTER could not be resolved.
+
+Remediation (choose one):
+  1. Run install.ps1 from your clone root (recommended — sets persistent User-level OCTO_CLUSTER):
+       powershell -NoProfile -ExecutionPolicy Bypass -File "<clone-root>\install.ps1"
+  2. Open octo-cluster.code-workspace in your IDE (sets session OCTO_CLUSTER for integrated terminals).
+  3. Invoke a self-locating entry script with a full -File path (no env required):
+       powershell -NoProfile -ExecutionPolicy Bypass -File "<clone-root>\octo.ps1" -Pipeline scan -Action discover
+
+install.ps1 runs once per machine. Workspace-only usage covers integrated terminals; agents and external shells rely on the User env var or a full -File path to octo.ps1.
+"@
+}
+
 $resolved = Resolve-OctoClusterRoot -Preferred $env:OCTO_CLUSTER
 if ($resolved) {
     if ($env:OCTO_CLUSTER -and $env:OCTO_CLUSTER -ne $resolved) {
-        Write-Warning "OCTO_CLUSTER '$env:OCTO_CLUSTER' invalid or stale; using $resolved"
+        Write-Warning "Session OCTO_CLUSTER '$env:OCTO_CLUSTER' differs from resolved root '$resolved'; using resolved path."
     }
     $env:OCTO_CLUSTER = $resolved
 }
@@ -56,7 +100,7 @@ function Get-OctoClusterRoot {
         $env:OCTO_CLUSTER = $root
         return $root
     }
-    throw "OCTO_CLUSTER not set and install.ps1 not found above $PSScriptRoot"
+    throw (Get-OctoClusterRootErrorMessage)
 }
 
 function Import-ExecutionContextModule {

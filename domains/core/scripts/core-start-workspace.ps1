@@ -45,10 +45,5 @@ New-Item -ItemType Directory -Force -Path (Split-Path $startStamp -Parent) | Out
 Set-Content -Path $startStamp -Value (Get-Date -Format "yyyy-MM-dd") -Encoding UTF8
 Step "Scan bootstrap (core)"
 & powershell -ExecutionPolicy Bypass -File (Get-CoreScriptPath "scan-bootstrap") -Profile $Profile -SkipStartWorkspace
-$fullMetrics = Join-Path (Get-OctoClusterRoot) "eval\metrics\measure-harness-full.ps1"
-if (Test-Path $fullMetrics) {
-    Step "Metrics full (weekly if due)"
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $fullMetrics 2>&1 | Out-Null
-}
 Write-Host ""; Write-Host "Core start-workspace OK. New chat -> /scan <TICKET> description" -ForegroundColor Green
 exit 0

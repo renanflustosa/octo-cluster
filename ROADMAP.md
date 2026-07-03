@@ -2,16 +2,19 @@
 
 Public priorities for Octo Cluster under the [Engineering Operating System (EOS)](./docs/governance/eos.md).
 
-Tracked in Linear project [**Octo Cluster EOS v1.0.0**](https://linear.app/octo-cluster). No dates until pilot data exists — credibility over hype.
+Tracked via [GitHub Issues and Milestones](https://github.com/renanflustosa/octo-cluster/issues). No dates until pilot data exists — credibility over hype.
 
-## Now (v0.1.0)
+## Shipped (v0.1.x)
 
 - [x] Public repo split, MIT license, CONTRIBUTING / SECURITY
 - [x] PR-only flow: `feature` → `develop` → `main`
 - [x] THIRD_PARTY attributions for adapted skills
 - [x] CI on every PR (`bun run validate octo-cluster`)
 - [x] EOS governance docs, ADRs, CODE_OF_CONDUCT
-- [ ] First merge `develop` → `main` with release-please tag `v0.1.0`
+- [x] First merge `develop` → `main` with release-please tag `v0.1.0`
+- [x] Public framework boundary hardening — tagged **`v0.1.1`** (2026-06-30)
+
+**Current release:** `v0.1.1` on `main`. **Next semver target:** `v0.2.x` (credibility milestone below).
 
 ## Next — credibility (v0.2.x)
 
@@ -34,6 +37,7 @@ Tracked in Linear project [**Octo Cluster EOS v1.0.0**](https://linear.app/octo-
 | Version | Gate |
 |---------|------|
 | **0.1.0** | Public harness, basic CI, Cursor validated |
+| **0.1.1** | Public framework boundary audit, consumer-agnostic naming |
 | **0.2.x** | EOS published, metrics baseline, expanded CI |
 | **0.x** | ADR process active, feature docs complete, 2nd adapter |
 | **1.0.0** | Stable kernel API, eval suite in CI, full OSS governance |
@@ -45,4 +49,4 @@ Tracked in Linear project [**Octo Cluster EOS v1.0.0**](https://linear.app/octo-
 
 ## How to suggest changes
 
-Open a Linear issue in the EOS project or a small PR against `develop`. Follow [CONTRIBUTING.md](./CONTRIBUTING.md).
+Open a [GitHub issue](https://github.com/renanflustosa/octo-cluster/issues/new/choose) or a small PR against `develop`. Follow [CONTRIBUTING.md](./CONTRIBUTING.md).

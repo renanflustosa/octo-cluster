@@ -20,6 +20,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+. (Join-Path $PSScriptRoot "_octo-args.ps1")
+
 if ($CommitMessage) { $ScriptArgs['CommitMessage'] = $CommitMessage }
 if ($FeatureBranch) { $ScriptArgs['FeatureBranch'] = $FeatureBranch }
 if ($PrTitle) { $ScriptArgs['PrTitle'] = $PrTitle }
@@ -43,17 +45,12 @@ function Invoke-DomainScript {
     )
 
     $invokeScript = Join-Path $PSScriptRoot "invoke-domain-script.ps1"
-    $params = @('-ExecutionPolicy', 'Bypass', '-File', $invokeScript, '-Name', $Name)
-    if ($DomainOverride) { $params += @('-Domain', $DomainOverride) }
-    foreach ($key in $BoundArgs.Keys) {
-        $val = $BoundArgs[$key]
-        if ($val -is [switch]) {
-            if ($val) { $params += "-$key" }
-        } else {
-            $params += @("-$key", [string]$val)
-        }
+    $bound = @{
+        Name       = $Name
+        ScriptArgs = $BoundArgs
     }
-    & powershell @params
+    if ($DomainOverride) { $bound['Domain'] = $DomainOverride }
+    Invoke-OctoBoundScript -Path $invokeScript -BoundArgs $bound
 }
 
 if (-not $RepoPath) {
@@ -75,18 +72,11 @@ if ($Action -eq 'discover') {
 switch ($Pipeline) {
     'ship' {
         $invokeShip = Join-Path $PSScriptRoot "invoke-ship.ps1"
-        $params = @('-ExecutionPolicy', 'Bypass', '-File', $invokeShip, '-Phase', $Phase)
-        if ($Domain) { $params += @('-Domain', $Domain) }
-        foreach ($key in $ScriptArgs.Keys) {
-            $val = $ScriptArgs[$key]
-            if ($val -is [switch]) {
-                if ($val) { $params += "-$key" }
-            } else {
-                $params += @("-$key", [string]$val)
-            }
-        }
+        $shipArgs = Merge-OctoScriptArgs -Base $ScriptArgs -Flat @{ Phase = $Phase }
+        if ($Domain) { $shipArgs['Domain'] = $Domain }
+        if ($RepoPath) { $shipArgs['RepoPath'] = $RepoPath }
         Write-Host "[invoke-pipeline] ship -> invoke-ship.ps1 -Phase $Phase" -ForegroundColor DarkGray
-        & powershell @params
+        Invoke-OctoBoundScript -Path $invokeShip -BoundArgs $shipArgs
         exit $LASTEXITCODE
     }
     'start-workspace' {

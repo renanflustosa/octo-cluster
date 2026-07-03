@@ -18,7 +18,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$root = if ($env:OCTO_CLUSTER) { $env:OCTO_CLUSTER } else { Split-Path $PSScriptRoot -Parent }
+. (Join-Path $PSScriptRoot '_load-env.ps1')
+$root = Get-OctoClusterRoot
 Set-Location $root
 
 $contentPatterns = @(
@@ -53,7 +54,8 @@ $filenamePatterns = @(
 $allowedRepoPolicyFiles = @(
     'default.yaml',
     'octo-cluster.yaml',
-    'consumer-demo.yaml'
+    'consumer-demo.yaml',
+    'private-secrets-vault.yaml'
 )
 
 $contentExcludePaths = @(

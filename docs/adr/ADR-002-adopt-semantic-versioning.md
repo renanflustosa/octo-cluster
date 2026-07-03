@@ -23,4 +23,4 @@ Adopt [SemVer 2.0.0](https://semver.org/) for all releases.
 
 - `develop` integrates features; `main` receives release PRs with tags `v0.x.x`
 - Breaking changes require explicit footer and major bump
-- Linear project EOS v1.0.0 is strategic; semver tags track actual releases
+- GitHub Milestone EOS v1.0.0 is strategic; semver tags track actual releases

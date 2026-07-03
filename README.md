@@ -1,7 +1,7 @@
 # Octo Cluster
 
 <p align="center">
-  <img src="./assets/branding/logo-primary.png" alt="Octo Cluster" width="128" />
+  <img src="./assets/branding/logo-primary.png" alt="Octo Cluster" width="320" />
 </p>
 
 **All-in-one local harness for AI-assisted development** — RAG, memory, token economy, hooks, and verify gates in one workspace folder. Maximize automation; use the model only when judgment is required.
@@ -9,11 +9,10 @@
 > IDE-agnostic by design. **Cursor** is supported today via generated adapters; other IDEs can add a folder adapter the same way.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Linear](https://img.shields.io/badge/Linear-octo--cluster-5E6AD2)](https://linear.app/octo-cluster)
 
 ## Engineering Operating System
 
-Octo Cluster follows the [Engineering Operating System (EOS)](./docs/governance/eos.md) — governance, delivery, quality, and AI-agent operations. Work is tracked in [Linear](https://linear.app/octo-cluster) (`8CL-xxx`).
+Octo Cluster follows the [Engineering Operating System (EOS)](./docs/governance/eos.md) — governance, delivery, quality, and AI-agent operations. Planned work is tracked in [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues); see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Why Octo Cluster?
 
@@ -39,10 +38,12 @@ Most teams stitch token savings piecemeal: grep rules here, a RAG script there, 
 
 ```powershell
 git clone https://github.com/renanflustosa/octo-cluster.git <clone-root>
-cd $env:OCTO_CLUSTER
+cd <clone-root>
 .\install.ps1
 gh auth login   # optional, for PR flow in /ship
 ```
+
+On corporate Windows with `ExecutionPolicy = AllSigned`, use `.\install.cmd` instead — see [onboarding guide](./docs/guides/onboarding.md#corporate-windows).
 
 Open [`octo-cluster.code-workspace`](./octo-cluster.code-workspace) in your IDE (Cursor today). On first clone, copy from [`octo-cluster.code-workspace.example`](./octo-cluster.code-workspace.example) or run `.\install.ps1` — it seeds the local file automatically. Set `OCTO_CLUSTER` to your clone root; the workspace file does this automatically.
 
@@ -68,13 +69,13 @@ See [context model](./docs/architecture/context-model.md) and [add a capability 
 One chat ≈ one work item. Phase commands are **optional**; routine edits do not need them.
 
 ```text
-/start-workspace  →  /scan TICKET description  →  /model  →  Execute plan  →  /ship  →  /close
+/start-workspace  →  /scan ISSUE-123 description  →  /model  →  Execute plan  →  /ship  →  /close
 ```
 
 Discover the active pipeline skill:
 
 ```powershell
-powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline scan -Action discover
+powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline scan -Action discover
 ```
 
 ## Docs
@@ -85,6 +86,7 @@ powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline scan -A
 | [onboarding](./docs/guides/onboarding.md) | Full setup |
 | [productivity-tools](./docs/guides/productivity-tools.md) | Harness design, token layers |
 | [context-model](./docs/architecture/context-model.md) | Execution context and sync |
+| [path-resolution](./docs/architecture/path-resolution.md) | Installation root discovery |
 | [add-child-context](./docs/guides/add-child-context.md) | Scaffold a capability pack |
 | [public-framework-boundary](./docs/guides/public-framework-boundary.md) | Public vs private overlay audit |
 | [ROADMAP.md](./ROADMAP.md) | Planned work and semver ladder |

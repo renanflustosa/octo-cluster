@@ -30,9 +30,37 @@ function Test-Tool {
 }
 
 $root = Get-OctoClusterRoot
-$results = @(
+$results = @()
+
+$effectivePolicy = Get-ExecutionPolicy
+$userPolicy = Get-ExecutionPolicy -Scope CurrentUser
+$machinePolicy = Get-ExecutionPolicy -Scope LocalMachine
+if ($effectivePolicy -in @('AllSigned', 'Restricted') -or
+    $userPolicy -in @('AllSigned', 'Restricted') -or
+    $machinePolicy -in @('AllSigned', 'Restricted')) {
+    $results += [ordered]@{
+        id     = 'execution_policy'
+        label  = 'PowerShell execution policy'
+        status = 'WARN'
+        hint   = 'Use .\install.cmd / .\octo.cmd / .\audit.cmd (Bypass) — see docs/guides/onboarding.md#corporate-windows'
+    }
+}
+
+$results += @(
     (Test-Tool -Id "git" -Label "Git" -InstallHint "https://git-scm.com" -Check {
         $null -ne (Get-Command git -ErrorAction SilentlyContinue)
+    })
+    (Test-Tool -Id "pwsh" -Label "PowerShell 7+ (pwsh)" -InstallHint ".\install.ps1" -Check {
+        if (Get-Command Get-PwshExecutable -ErrorAction SilentlyContinue) {
+            $exe = Get-PwshExecutable
+            if (-not $exe) { return $false }
+            $ver = & $exe -NoProfile -Command '$PSVersionTable.PSVersion.Major'
+            return [int]$ver -ge 7
+        }
+        $cmd = Get-Command pwsh -ErrorAction SilentlyContinue
+        if (-not $cmd) { return $false }
+        $ver = & $cmd.Source -NoProfile -Command '$PSVersionTable.PSVersion.Major'
+        [int]$ver -ge 7
     })
     (Test-Tool -Id "gh" -Label "GitHub CLI" -InstallHint ".\install.ps1" -Check {
         if (Get-Command Get-GhExecutable -ErrorAction SilentlyContinue) { return [bool](Get-GhExecutable) }

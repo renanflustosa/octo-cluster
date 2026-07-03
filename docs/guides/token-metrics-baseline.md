@@ -11,8 +11,7 @@ Demonstrate measurable token impact from Octo Cluster harness practices (grep-fi
 | Layer | Script | When |
 |-------|--------|------|
 | Card-lite | `eval/metrics/measure-card-lite.ps1` | Each `/close` |
-| Baseline stamp | `eval/metrics/stamp-usage-baseline.ps1` | Each `/scan` with `8CL-xxx` |
-| Full harness | `eval/metrics/measure-harness-full.ps1` | Weekly start-workspace |
+| Baseline stamp | `eval/metrics/stamp-usage-baseline.ps1` | Each `/scan` with `ISSUE-123` |
 
 See [`eval/metrics/README.md`](../../eval/metrics/README.md) and [`architecture/metrics-kernel.md`](../architecture/metrics-kernel.md).
 
@@ -21,7 +20,7 @@ See [`eval/metrics/README.md`](../../eval/metrics/README.md) and [`architecture/
 ```powershell
 cd engine\context-engine
 bun run validate octo-cluster
-.\..\..\eval\metrics\stamp-usage-baseline.ps1 -Ticket 8CL-XXX -Profile octo-cluster
+.\..\..\eval\metrics\stamp-usage-baseline.ps1 -Ticket ISSUE-123 -Profile octo-cluster
 .\..\..\scripts\productivity-audit.ps1
 ```
 
