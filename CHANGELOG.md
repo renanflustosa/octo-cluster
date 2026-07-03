@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3](https://github.com/renanflustosa/octo-cluster/compare/v0.1.2...v0.1.3) (2026-07-03)
+
+
+### Bug Fixes
+
+* circular logo-primary hero for GitHub README ([8188902](https://github.com/renanflustosa/octo-cluster/commit/8188902fdf0c3c236a7951ca14ca8d9e69b3c771))
+* recompose logo-primary as circular hero for GitHub README ([d780d8b](https://github.com/renanflustosa/octo-cluster/commit/d780d8b4d01012489e1b8193ec246db59c9c82a1))
+
 ## [0.1.2](https://github.com/renanflustosa/octo-cluster/compare/v0.1.1...v0.1.2) (2026-07-03)
 
 
