@@ -12,7 +12,7 @@
 Audite meu PC Windows antes de apagar o sistema. Liste o que falta no backup:
 
 1. Pastas em C:\GitHub\ e outros clones git fora dela
-2. Pasta local de secrets (personal-vault) — só caminhos, nunca valores
+2. Pasta local de secrets (vault gitignored) — só caminhos, nunca valores
 3. ~/.ssh, chaves GPG, .gitconfig
 4. gh auth, tokens em .env / .env.local nos repos
 5. Cursor/VS Code settings úteis
@@ -30,7 +30,7 @@ Saída: checklist pass/fail + destino do backup + riscos se eu instalar Ubuntu h
 | **O pendrive de instalação será apagado** | Gravar Ubuntu no USB **apaga** tudo nele. Backup **não** pode ficar só no pendrive. |
 | **Destino do backup** | Outro HD/partição, NAS, ou nuvem **criptografada** (OneDrive com zip senha, etc.). |
 | **Full disk** | Instalação “apagar disco e instalar Ubuntu” remove **Windows e todos os dados em C:**. |
-| **Secrets** | `personal-vault` e `.env` — copiar para mídia **local criptografada**; nunca commitar no GitHub. |
+| **Secrets** | vault local gitignored e `.env` — copiar para mídia **local criptografada**; nunca commitar no GitHub. |
 | **gh / SSH** | No Ubuntu você roda `gh auth login` e pode reutilizar `~/.ssh` se copiar a pasta. |
 
 ---
@@ -64,14 +64,14 @@ Get-ChildItem -Path C:\Users\$env:USERNAME -Filter .git -Recurse -Directory -Err
 
 ### 1.2 Secrets locais (nunca no Git)
 
-- [ ] Pasta **personal-vault** (secrets, `ai-context`, `http/`)
+- [ ] Pasta de **secrets locais** gitignored (ex.: `secrets/`, `ai-context/`, `http/`)
 - [ ] Todos os arquivos `.env`, `.env.local`, `*.pem`, credenciais soltas nos repos
 
 ```powershell
-# Ajuste o caminho da vault se diferente
-$vault = "C:\GitHub\personal-vault"   # ou C:\personal-vault
+# Ajuste o caminho da vault local (gitignored, fora do repo público)
+$vault = "C:\GitHub\secrets-vault"   # ou outro caminho local
 if (Test-Path $vault) {
-  robocopy $vault D:\backup-migracao-2026\personal-vault /E /R:2 /W:5
+  robocopy $vault D:\backup-migracao-2026\secrets-vault /E /R:2 /W:5
 }
 ```
 
