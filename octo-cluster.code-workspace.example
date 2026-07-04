@@ -9,6 +9,14 @@
 		"terminal.integrated.env.windows": {
 			"OCTO_CLUSTER": "${workspaceFolder:octo-cluster}",
 			"AI_EXECUTION_CONTEXT": "platform"
+		},
+		"terminal.integrated.env.linux": {
+			"OCTO_CLUSTER": "${workspaceFolder:octo-cluster}",
+			"AI_EXECUTION_CONTEXT": "platform"
+		},
+		"terminal.integrated.env.osx": {
+			"OCTO_CLUSTER": "${workspaceFolder:octo-cluster}",
+			"AI_EXECUTION_CONTEXT": "platform"
 		}
 	},
 	"extensions": {

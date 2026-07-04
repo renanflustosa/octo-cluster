@@ -34,18 +34,26 @@ Most teams stitch token savings piecemeal: grep rules here, a RAG script there, 
 
 ## Quick start
 
-**Prerequisites:** [Git](https://git-scm.com/downloads). Windows-first scripts; core concepts are portable.
+**Prerequisites:** [Git](https://git-scm.com/downloads) and [Docker](https://docs.docker.com/get-docker/) (Desktop on Windows/macOS, Engine on Linux). [Cursor](https://cursor.com) or VS Code with the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 
-```powershell
+```bash
 git clone https://github.com/renanflustosa/octo-cluster.git <clone-root>
 cd <clone-root>
-.\install.ps1
-gh auth login   # optional, for PR flow in /ship
 ```
 
-On corporate Windows with `ExecutionPolicy = AllSigned`, use `.\install.cmd` instead — see [onboarding guide](./docs/guides/onboarding.md#corporate-windows).
+Open the folder in Cursor → **Dev Containers: Reopen in Container**. The first build runs [`.devcontainer/post-create.sh`](.devcontainer/post-create.sh) (Bun deps, `.cursor/` sync, memory index, harness audit).
 
-Open [`octo-cluster.code-workspace`](./octo-cluster.code-workspace) in your IDE (Cursor today). On first clone, copy from [`octo-cluster.code-workspace.example`](./octo-cluster.code-workspace.example) or run `.\install.ps1` — it seeds the local file automatically. Set `OCTO_CLUSTER` to your clone root; the workspace file does this automatically.
+Inside the container (same on every host):
+
+```bash
+gh auth login   # once, for PR flow in /ship
+pwsh octo.ps1 -Pipeline scan -Action discover
+cd engine/context-engine && bun run validate octo-cluster
+```
+
+Full guide: [onboarding](./docs/guides/onboarding.md).
+
+Copy [`octo-cluster.code-workspace.example`](./octo-cluster.code-workspace.example) → `octo-cluster.code-workspace` if you open the workspace file directly. Env vars are set by the dev container; the workspace file covers local terminals when not in a container.
 
 Add your product repos or a **local gitignored** secrets vault as sibling folders in your workspace copy — never commit those paths to this repo.
 
@@ -72,10 +80,10 @@ One chat ≈ one work item. Phase commands are **optional**; routine edits do no
 /start-workspace  →  /scan ISSUE-123 description  →  /model  →  Execute plan  →  /ship  →  /close
 ```
 
-Discover the active pipeline skill:
+Discover the active pipeline skill (inside the dev container):
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline scan -Action discover
+```bash
+pwsh octo.ps1 -Pipeline scan -Action discover
 ```
 
 ## Docs
@@ -84,6 +92,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnviron
 |-----|---------|
 | [EOS](./docs/governance/eos.md) | Engineering Operating System (canonical) |
 | [onboarding](./docs/guides/onboarding.md) | Full setup |
+| [oss-workstation-setup](./docs/guides/oss-workstation-setup.md) | Ubuntu + VSCodium + Continue + Ollama |
 | [productivity-tools](./docs/guides/productivity-tools.md) | Harness design, token layers |
 | [context-model](./docs/architecture/context-model.md) | Execution context and sync |
 | [path-resolution](./docs/architecture/path-resolution.md) | Installation root discovery |
@@ -94,14 +103,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnviron
 | [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) | Community standards |
 | [THIRD_PARTY.md](./THIRD_PARTY.md) | Attributions |
 
-## Install helpers (official sources, no winget)
+## Install helpers (optional, inside dev container)
+
+Most tools are pre-installed by [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json). Optional extras:
 
 | Script | Purpose |
 |--------|---------|
-| `install.ps1` | Bun, gh, ripgrep |
 | `scripts/install-go.ps1` | Go via [go.dev](https://go.dev/dl/) MSI or zip |
 | `scripts/install-ollama.ps1` | Ollama via official install script |
-| `scripts/install-docker.ps1` | Docker Desktop direct download |
 | `scripts/productivity-audit.ps1` | Local harness health check |
 
 ## Contributing

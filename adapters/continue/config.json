@@ -1,7 +1,12 @@
-"models": [
-  {
-    "title": "Qwen 2GB",
-    "provider": "ollama",
-    "model": "qwen-2gb"
-  }
-]
+{
+  "allowAnonymousTelemetry": false,
+  "models": [
+    {
+      "title": "Qwen2.5 Coder 3B (Ollama host)",
+      "provider": "ollama",
+      "model": "qwen2.5-coder:3b",
+      "apiBase": "http://127.0.0.1:11434"
+    }
+  ],
+  "systemMessage": "You are a dev agent for octo-cluster. Prefer COST 0: grep, LanceDB (bun run search), read-gate before large reads. Run shell commands via the terminal when asked — pwsh scripts on harness paths, never paste secrets. Custom loop: pwsh octo.ps1 -Pipeline scan|ship|start-workspace."
+}
