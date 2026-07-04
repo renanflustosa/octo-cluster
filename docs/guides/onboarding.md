@@ -4,45 +4,54 @@ Full setup guide. Quick start: [README.md](../../README.md).
 
 Read [EOS](../governance/eos.md) for project conventions.
 
-## Prerequisites
+## Dev Container (all platforms)
+
+One path for **Windows, macOS, and Linux**: Docker on the host, Ubuntu inside the container.
+
+### Host prerequisites
 
 | Item | How |
 |------|-----|
-| Git | [git-scm.com](https://git-scm.com/download/win) |
-| Bun, gh, ripgrep | `.\install.ps1` (direct download, no winget) — or `.\install.cmd` on corporate Windows |
-| Go (optional) | `.\scripts\install-go.ps1` — [go.dev](https://go.dev/dl/) |
-| Ollama (optional) | `.\scripts\install-ollama.ps1` |
-| WSL2 Ubuntu (optional) | `.\scripts\install-wsl.ps1` |
-| Docker Desktop (optional) | `.\scripts\install-docker.ps1` |
-| Cursor | Copy `octo-cluster.code-workspace.example` → `octo-cluster.code-workspace` (or run `.\install.ps1` / `.\install.cmd`) |
+| Git | [git-scm.com](https://git-scm.com/downloads) |
+| Docker | [Docker Desktop](https://docs.docker.com/desktop/) (Windows/macOS) or [Docker Engine](https://docs.docker.com/engine/install/) (Linux) |
+| Cursor or VS Code | [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) |
 
-After install: `gh auth login` (once). Verify: `.\audit.cmd` or `.\scripts\productivity-audit.ps1`
+### First open
 
-## Corporate Windows (AllSigned)
-
-<a id="corporate-windows"></a>
-
-Many corporate machines set **Group Policy** `ExecutionPolicy = AllSigned`. Unsigned `.ps1` files fail when invoked directly (dot-sourcing `_load-env.ps1` is blocked).
-
-**Use the `.cmd` launchers** at the repo root — they always invoke PowerShell with `-ExecutionPolicy Bypass`:
-
-| Launcher | Purpose |
-|----------|---------|
-| `install.cmd` | Bootstrap (Bun, gh, ripgrep, context-engine deps) |
-| `octo.cmd` | Pipeline CLI (`scan`, `ship`, `start-workspace`, …) |
-| `audit.cmd` | Productivity harness health check |
-
-Example:
-
-```powershell
-.\install.cmd
-.\octo.cmd -Pipeline start-workspace -Action run
-.\audit.cmd
+```bash
+git clone https://github.com/renanflustosa/octo-cluster.git
+cd octo-cluster
 ```
 
-**Defender SmartScreen** is separate from execution policy. If Windows blocks an unsigned script, choose **Run anyway** or allow the clone folder — that is not an AllSigned issue.
+1. Open the folder in Cursor.
+2. Command palette → **Dev Containers: Reopen in Container** (or accept the prompt).
+3. Wait for `.devcontainer/post-create.sh` — installs Bun deps, syncs `.cursor/`, seeds memory, runs `bun run validate octo-cluster`.
 
-When policy is AllSigned or Restricted, `audit.cmd` reports a **WARN** with a link back to this section.
+After build:
+
+```bash
+gh auth login   # once, for PRs and /ship
+pwsh scripts/productivity-audit.ps1
+```
+
+Expected: `[READY]` with optional `gh auth` WARN until you log in.
+
+### Inside the container
+
+Env is set automatically:
+
+- `OCTO_CLUSTER` → workspace root (`${localWorkspaceFolder}`)
+- `AI_EXECUTION_CONTEXT=platform`
+
+| Task | Command |
+|------|---------|
+| Pipeline discover | `pwsh octo.ps1 -Pipeline scan -Action discover` |
+| Start workspace | `pwsh octo.ps1 -Pipeline start-workspace -Action run` |
+| Validate harness | `cd engine/context-engine && bun run validate octo-cluster` |
+| Sync adapters after editing `domains/` | `pwsh scripts/sync-cursor.ps1` |
+| Health check | `pwsh scripts/productivity-audit.ps1` |
+
+Optional: copy `octo-cluster.code-workspace.example` → `octo-cluster.code-workspace` and add sibling folders (your app, local gitignored vault).
 
 ## Workspace
 
@@ -50,7 +59,7 @@ When policy is AllSigned or Restricted, `audit.cmd` reports a **WARN** with a li
 
 Optional: add sibling folders (your app, local gitignored vault) in your local workspace copy.
 
-Terminal env:
+Terminal env (when not using Dev Container — local shell only):
 
 - `AI_EXECUTION_CONTEXT=platform`
 - `OCTO_CLUSTER` → clone root
@@ -71,8 +80,8 @@ Terminal env:
 
 **Discover (once per thread):**
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline scan -Action discover
+```bash
+pwsh octo.ps1 -Pipeline scan -Action discover
 ```
 
 ## Issue tracker (GitHub)
@@ -107,7 +116,7 @@ CORE rules:
 
 | Layer | Status |
 |-------|--------|
-| install + audit | OK |
+| devcontainer bootstrap + audit | OK |
 | invoke-pipeline + capabilities | OK |
 | repo-policies verify | OK |
 | LanceDB memory + code (cap 80) | OK |
@@ -119,11 +128,11 @@ Platform: `domains/core/hooks/hooks.platform.json` → `{}` (no Write block).
 
 Child domains merge hooks via `sync-cursor.ps1 -Domain <pack>`.
 
-If Write is blocked: `.\scripts\sync-cursor.ps1` + `.\scripts\validate-cursor-hooks.ps1`
+If Write is blocked: `pwsh scripts/sync-cursor.ps1` + `pwsh scripts/validate-cursor-hooks.ps1`
 
 ## Recommended extensions
 
-PowerShell · YAML — see `octo-cluster.code-workspace`
+PowerShell · YAML — installed via `.devcontainer/devcontainer.json`
 
 ## Next step
 

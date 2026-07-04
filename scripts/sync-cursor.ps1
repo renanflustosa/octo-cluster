@@ -23,7 +23,8 @@ function Sync-Tree {
         Write-Host "Would sync $Source to $Dest"
         return $true
     }
-    robocopy $Source $Dest /E /IS /IT /NFL /NDL /NJH /NJS /nc /ns /np | Out-Null
+    # ponytail: Copy-Item replaces robocopy — Linux pwsh + Windows
+    Get-ChildItem -Path $Source -Force | Copy-Item -Destination $Dest -Recurse -Force
     return $true
 }
 
