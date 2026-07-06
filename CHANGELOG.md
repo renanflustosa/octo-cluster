@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4](https://github.com/renanflustosa/octo-cluster/compare/v0.1.3...v0.1.4) (2026-07-06)
+
+
+### Features
+
+* add cross-platform OSS harness bootstrap for Linux and Ubuntu CI ([ab5f786](https://github.com/renanflustosa/octo-cluster/commit/ab5f7860386686dd2d787f183f822a3caf2224dc))
+* cross-platform OSS harness (Linux bootstrap + Ubuntu CI) ([3cdc2ff](https://github.com/renanflustosa/octo-cluster/commit/3cdc2ff30898481bbcf5f6d8c4aa6ba11b209fc3))
+
+
+### Bug Fixes
+
+* use gh pr create --fill when no body file ([adc5326](https://github.com/renanflustosa/octo-cluster/commit/adc532675f5bd112507dcaf68c3fd47a27bd869a))
+* use gh pr create --fill when no body file ([475ac5b](https://github.com/renanflustosa/octo-cluster/commit/475ac5b3ba1f5cb672c2aa4d45236408b70e5caf))
+
 ## [0.1.3](https://github.com/renanflustosa/octo-cluster/compare/v0.1.2...v0.1.3) (2026-07-03)
 
 
