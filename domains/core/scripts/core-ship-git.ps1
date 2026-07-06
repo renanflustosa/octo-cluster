@@ -160,10 +160,8 @@ function New-PullRequest {
     if ($BodyFile) {
         if (-not (Test-Path $BodyFile)) { throw "PR body file not found: $BodyFile" }
         $args += @('--body-file', $BodyFile)
-    } elseif (-not $Title) {
-        $args += '--fill'
     } else {
-        $args += @('--body', '')
+        $args += '--fill'
     }
     $prevEap = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
