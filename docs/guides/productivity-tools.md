@@ -20,9 +20,9 @@
 | **Maximize CORE vs pack split** | Generic in core; product-specific in capability packs | `domains/core/` + `capabilities/<pack>/` + `contexts/`; see [`context-model.md`](./context-model.md) |
 | **Prefer established tools** | Mature stack executes; custom code orients | Cursor, `gh`, Context7, Turbo/Vitest/Biome, Promptfoo — thin domain adapters, not a second framework |
 
-### Token cost layers
+### Token cost layers (official framework contract)
 
-Use the cheapest layer that can finish the job:
+Use the cheapest layer that can finish the job. This ordering is the **public contract** for all capability packs:
 
 ```text
 [COST 0]     hooks, sync, git, gh, bun test, LanceDB search, grep, gate scripts

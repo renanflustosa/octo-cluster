@@ -27,7 +27,7 @@ Integrated terminals opened from `octo-cluster.code-workspace` worked because `t
 │  Get-OctoClusterRoot()                                      │
 └────────────────────────────┬────────────────────────────────┘
                              │
-         Resolution order (first valid install.ps1 marker):
+         Resolution order (first valid install.ps1 or install.sh marker):
          1. Session  $env:OCTO_CLUSTER
          2. Walk up from executing script ($PSScriptRoot)
          3. User     [Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User')
@@ -37,17 +37,19 @@ Integrated terminals opened from `octo-cluster.code-workspace` worked because `t
 
 **Single source of truth:** `scripts/_env.ps1` — all PowerShell harness scripts dot-source this via `_load-env.ps1`.
 
-**TypeScript context-engine:** `engine/context-engine/src/lib/paths.ts` — walks up to `install.ps1` when `process.env.OCTO_CLUSTER` is unset or invalid.
+**TypeScript context-engine:** `engine/context-engine/src/lib/paths.ts` — walks up to `install.ps1` or `install.sh` when `process.env.OCTO_CLUSTER` is unset or invalid.
 
 ## Supported usage models
 
 | Model | Session env | User env | Works in agent shells |
 |-------|-------------|----------|------------------------|
-| `install.ps1` (recommended) | optional | set | yes |
-| `octo-cluster.code-workspace` only | set in IDE terminal | may be unset | no — run `install.ps1` once |
+| Dev Container (recommended) | set automatically | optional | yes |
+| `install.sh` (Linux/macOS native) | set in shell | optional | yes with `export OCTO_CLUSTER` |
+| `install.ps1` (Windows host optional) | optional | set | yes |
+| `octo-cluster.code-workspace` only | set in IDE terminal | may be unset | no — run install once |
 | Full `-File` path to `octo.ps1` | not required | not required | yes (self-locating) |
 
-`install.ps1` sets User-level `OCTO_CLUSTER` and is the only required bootstrap step for reliable agent + external shell usage.
+Dev Container or `./install.sh` / `install.ps1` is the bootstrap step for reliable agent + external shell usage.
 
 ## Entry points
 
@@ -56,6 +58,8 @@ Integrated terminals opened from `octo-cluster.code-workspace` worked because `t
 | `octo.ps1` | `scripts/invoke-pipeline.ps1` |
 | `octo-domain.ps1` | `scripts/invoke-domain-script.ps1` |
 | `octo-run.ps1` | any script under the root (`eval/metrics/...`) |
+| `scripts/octo` (bash shim) | `octo.ps1` via `pwsh` |
+| `scripts/octo-domain` (bash shim) | `octo-domain.ps1` via `pwsh` |
 
 ## Documented command pattern
 

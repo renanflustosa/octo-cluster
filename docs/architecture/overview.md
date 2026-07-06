@@ -49,3 +49,15 @@ Use `AI_EXECUTION_CONTEXT` only — older pack-selector env vars are removed by 
 3. ✅ Skills: core-only sync; pack skills in `capabilities/`
 4. 🔄 `adapters/` directory for explicit multi-tool generation
 5. 🔄 Full doc migration off legacy pack-selector env vars
+
+## Portability contract
+
+**Supported:** desktop OS (Linux Ubuntu 24.04 official, macOS, Windows) via Dev Container or native `pwsh` + Bun.
+
+**Canonical setup:** Dev Container Ubuntu 24.04 — same commands on every host (`pwsh octo.ps1`, `bun run validate`).
+
+**Native Linux:** `./install.sh` + `./scripts/octo` — thin bash shims only; harness stays in `.ps1`.
+
+**Out of scope:** iOS/mobile CLI harness (git, Docker, LanceDB, hooks require desktop/server).
+
+**Install markers:** repo root contains `install.sh` and/or `install.ps1`; both resolve `OCTO_CLUSTER`.

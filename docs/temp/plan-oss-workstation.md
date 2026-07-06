@@ -1,5 +1,7 @@
 # /model — Workstation OSS + modelo local mínimo (prompt temporário)
 
+> **Absorbed:** operational steps live in [oss-workstation-setup.md](../guides/oss-workstation-setup.md) and [onboarding.md](../guides/onboarding.md). This file remains as historical model prompt only.
+
 **Modo:** Plan only — sem código, sem commits, sem instalar nada até aprovar o plano.
 
 **Projeto ativo:** octo-cluster — harness com Dev Container (`.devcontainer/`), context-engine (Bun + LanceDB), pipeline `pwsh octo.ps1`.

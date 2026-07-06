@@ -65,16 +65,26 @@ Add-Result -Id 'octo_cmd_discover' -Label 'octo.cmd scan discover' -Check {
 }
 
 Add-Result -Id 'allsigned_blocks_ps1' -Label 'AllSigned blocks direct octo.ps1' -Check {
+    $probe = Join-Path $env:TEMP ("octo-unsigned-probe-{0}.ps1" -f [guid]::NewGuid().ToString('n'))
+    Set-Content -LiteralPath $probe -Value 'Write-Output PROBE_OK' -Encoding UTF8
     $octoPs1 = Join-Path $root 'octo.ps1'
     $prevEap = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
     try {
+        $probeOut = & powershell -NoProfile -ExecutionPolicy AllSigned -File $probe 2>&1 | Out-String
         $out = & powershell -NoProfile -ExecutionPolicy AllSigned -File $octoPs1 -Pipeline scan -Action discover 2>&1 | Out-String
         $exit = $LASTEXITCODE
     } finally {
+        Remove-Item -LiteralPath $probe -Force -ErrorAction SilentlyContinue
         $ErrorActionPreference = $prevEap
     }
-    $blocked = ($exit -ne 0) -or ($out -match 'running scripts is disabled|cannot be loaded|not digitally signed|UnauthorizedAccess|n.o pode ser carregado|n.o est. assinado|assinado digitalmente|ErrodeSeguran')
+    $blockedPattern = 'running scripts is disabled|cannot be loaded|not digitally signed|UnauthorizedAccess|n.o pode ser carregado|n.o est. assinado|assinado digitalmente|ErrodeSeguran'
+    $hostEnforces = ($probeOut -notmatch 'PROBE_OK')
+    if (-not $hostEnforces) {
+        # Dev/CI hosts allow unsigned scripts under AllSigned scope — corporate Windows uses .cmd Bypass.
+        return $true
+    }
+    $blocked = ($exit -ne 0) -or ($out -match $blockedPattern)
     if (-not $blocked) { throw "expected AllSigned to block unsigned octo.ps1; exit=$exit" }
     $true
 }

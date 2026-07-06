@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# ponytail: bash shim only — harness stays in octo-domain.ps1 (pwsh cross-platform)
+set -euo pipefail
+ROOT="${OCTO_CLUSTER:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+exec pwsh -NoProfile -ExecutionPolicy Bypass -File "$ROOT/octo-domain.ps1" "$@"

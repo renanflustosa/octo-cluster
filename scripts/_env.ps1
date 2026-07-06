@@ -3,7 +3,8 @@
 function Test-OctoClusterRoot {
     param([string]$Path)
     if (-not $Path) { return $false }
-    return Test-Path -LiteralPath (Join-Path $Path 'install.ps1')
+    return (Test-Path -LiteralPath (Join-Path $Path 'install.ps1')) -or
+        (Test-Path -LiteralPath (Join-Path $Path 'install.sh'))
 }
 
 function Get-OctoClusterEnvVar {
@@ -76,13 +77,12 @@ function Get-OctoClusterRootErrorMessage {
 OCTO_CLUSTER could not be resolved.
 
 Remediation (choose one):
-  1. Run install.ps1 from your clone root (recommended — sets persistent User-level OCTO_CLUSTER):
-       powershell -NoProfile -ExecutionPolicy Bypass -File "<clone-root>\install.ps1"
-  2. Open octo-cluster.code-workspace in your IDE (sets session OCTO_CLUSTER for integrated terminals).
-  3. Invoke a self-locating entry script with a full -File path (no env required):
-       powershell -NoProfile -ExecutionPolicy Bypass -File "<clone-root>\octo.ps1" -Pipeline scan -Action discover
+  1. Dev Container (recommended — all desktop hosts): Reopen in Container; OCTO_CLUSTER is set automatically.
+  2. Linux/macOS native: ./install.sh from clone root (or export OCTO_CLUSTER and run ./scripts/octo).
+  3. Windows host optional: pwsh -File "<clone-root>/install.ps1" (sets User-level OCTO_CLUSTER).
+  4. Self-locating entry (no env): pwsh -File "<clone-root>/octo.ps1" -Pipeline scan -Action discover
 
-install.ps1 runs once per machine. Workspace-only usage covers integrated terminals; agents and external shells rely on the User env var or a full -File path to octo.ps1.
+Install runs once per machine. Dev Container covers integrated terminals; native shells use OCTO_CLUSTER or ./scripts/octo.
 "@
 }
 

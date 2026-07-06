@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { mkdtemp, rm, stat } from "node:fs/promises";
+import { mkdtemp, rm, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { ensureProfileSeed, fixtureProfileRoot } from "./ensure-profile-seed.ts";
@@ -12,6 +12,7 @@ describe("ensureProfileSeed", () => {
   beforeEach(async () => {
     previousOctoCluster = process.env.OCTO_CLUSTER;
     tempRoot = await mkdtemp(join(tmpdir(), "octo-cluster-seed-"));
+    await writeFile(join(tempRoot, "install.sh"), "# test marker\n");
     process.env.OCTO_CLUSTER = tempRoot;
   });
 

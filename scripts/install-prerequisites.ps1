@@ -139,6 +139,12 @@ function Install-Ollama {
 function Install-PlatformPrerequisites {
     param([switch]$SkipOptional)
 
+    if ($IsLinux -or $IsMacOS) {
+        Write-Host '[prereq] Linux/macOS detected — use ./install.sh (native) or Dev Container.' -ForegroundColor Yellow
+        Write-Host '[prereq] install-prerequisites.ps1 is Windows-only; skipping Windows zip installers.' -ForegroundColor DarkGray
+        return
+    }
+
     Write-Host '== platform prerequisites (direct download, no winget) ==' -ForegroundColor Cyan
 
     $runtime = Join-Path $PSScriptRoot 'context-engine-runtime.ps1'
