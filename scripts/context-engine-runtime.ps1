@@ -8,6 +8,12 @@ function Test-BunNpmShimPath {
     return ($normalized -match '\\npm\\' -or $normalized -match 'node_modules[\\/]\.bin')
 }
 
+function Get-BunHomeBin {
+    if ($env:HOME) { return (Join-Path $env:HOME '.bun/bin') }
+    if ($env:USERPROFILE) { return (Join-Path $env:USERPROFILE '.bun\bin') }
+    return $null
+}
+
 function Get-BunExecutable {
     $cmd = Get-Command bun -ErrorAction SilentlyContinue
     if ($cmd -and $cmd.Source) {
@@ -17,11 +23,17 @@ function Get-BunExecutable {
         }
     }
 
-    $candidates = @(
-        (Join-Path $env:USERPROFILE ".bun\bin\bun.exe"),
-        (Join-Path $env:LOCALAPPDATA "bun\bin\bun.exe"),
-        "C:\Program Files\bun\bin\bun.exe"
-    )
+    $candidates = @()
+    $bunBin = Get-BunHomeBin
+    if ($bunBin) {
+        $candidates += (Join-Path $bunBin 'bun')
+        $candidates += (Join-Path $bunBin 'bun.exe')
+    }
+    if ($env:LOCALAPPDATA) {
+        $candidates += (Join-Path $env:LOCALAPPDATA 'bun\bin\bun.exe')
+    }
+    $candidates += 'C:\Program Files\bun\bin\bun.exe'
+
     foreach ($path in $candidates) {
         if ($path -and (Test-Path $path)) { return (Resolve-Path $path).Path }
     }
@@ -33,15 +45,26 @@ function Install-BunRuntime {
 
     Write-Host "[context-engine] Bun not found; installing via bun.sh..." -ForegroundColor Yellow
     try {
-        Invoke-Expression (Invoke-RestMethod -Uri "https://bun.sh/install.ps1" -UseBasicParsing)
+        if ($IsLinux -or $IsMacOS) {
+            $bash = Get-Command bash -ErrorAction SilentlyContinue
+            if ($bash) {
+                & $bash.Source -lc 'curl -fsSL https://bun.sh/install | bash'
+            } else {
+                throw 'bash required for bun install on Unix'
+            }
+        } else {
+            Invoke-Expression (Invoke-RestMethod -Uri "https://bun.sh/install.ps1" -UseBasicParsing)
+        }
     } catch {
         Write-Host "[context-engine] bun.sh install failed: $($_.Exception.Message)" -ForegroundColor Yellow
     }
 
-    $env:PATH = "$(Join-Path $env:USERPROFILE '.bun\bin');$env:PATH"
+    $bunBin = Get-BunHomeBin
+    if ($bunBin) { $env:PATH = "$bunBin$([IO.Path]::PathSeparator)$env:PATH" }
     if (Get-BunExecutable) { return $true }
 
-    Write-Host "[context-engine] Bun install failed. Run: irm bun.sh/install.ps1 | iex" -ForegroundColor Red
+    $hint = if ($IsLinux -or $IsMacOS) { 'curl -fsSL https://bun.sh/install | bash' } else { 'irm bun.sh/install.ps1 | iex' }
+    Write-Host "[context-engine] Bun install failed. Run: $hint" -ForegroundColor Red
     return $false
 }
 

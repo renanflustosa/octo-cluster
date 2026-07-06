@@ -5,15 +5,15 @@ Morning bootstrap (~30s–2min). Run **once** when opening the day.
 **Discover (once per thread):**
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline start-workspace -Action discover
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipeline start-workspace -Action discover
 ```
 
 **Run:**
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline start-workspace -Action run
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline start-workspace -Action run -SkipIndex
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline start-workspace -Action run -WithStack
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipeline start-workspace -Action run
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipeline start-workspace -Action run -SkipIndex
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipeline start-workspace -Action run -WithStack
 ```
 
 Optional flags use flat switches (`-SkipIndex`, `-WithStack`), not `-ScriptArgs @{ ... }`.

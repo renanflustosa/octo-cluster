@@ -4,6 +4,16 @@ Full setup guide. Quick start: [README.md](../../README.md).
 
 Read [EOS](../governance/eos.md) for project conventions.
 
+## Portability
+
+| Supported | Not supported |
+|-----------|---------------|
+| Linux (Ubuntu 24.04 official), macOS, Windows | iOS / mobile CLI harness |
+| Dev Container (canonical on all hosts) | Rewriting harness in bash |
+| Native Linux via `./install.sh` + `pwsh` | |
+
+Harness orchestration runs on **PowerShell 7 (`pwsh`)** everywhere. Context engine runs on **Bun**. Bash shims (`scripts/octo`) are optional ergonomics only.
+
 ## Dev Container (all platforms)
 
 One path for **Windows, macOS, and Linux**: Docker on the host, Ubuntu inside the container.
@@ -52,6 +62,25 @@ Env is set automatically:
 | Health check | `pwsh scripts/productivity-audit.ps1` |
 
 Optional: copy `octo-cluster.code-workspace.example` → `octo-cluster.code-workspace` and add sibling folders (your app, local gitignored vault).
+
+## Linux/macOS native (optional)
+
+When not using Dev Container, install prerequisites then bootstrap once:
+
+```bash
+# Ubuntu example — see docs/guides/oss-workstation-setup.md
+sudo apt install -y git curl ripgrep
+# pwsh: https://learn.microsoft.com/powershell/scripting/install/install-ubuntu
+# bun: curl -fsSL https://bun.sh/install | bash
+# gh: https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+
+git clone https://github.com/renanflustosa/octo-cluster.git
+cd octo-cluster
+chmod +x install.sh scripts/octo scripts/octo-domain
+./install.sh
+export OCTO_CLUSTER="$(pwd)"   # add to ~/.bashrc for persistence
+./scripts/octo -Pipeline scan -Action discover
+```
 
 ## Workspace
 

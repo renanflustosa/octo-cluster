@@ -34,6 +34,8 @@ Most teams stitch token savings piecemeal: grep rules here, a RAG script there, 
 
 ## Quick start
 
+**Official dev setup:** Ubuntu 24.04 inside **Dev Container** (same flow on Windows, macOS, or Linux host). **iOS is out of scope** — desktop CLI harness only.
+
 **Prerequisites:** [Git](https://git-scm.com/downloads) and [Docker](https://docs.docker.com/get-docker/) (Desktop on Windows/macOS, Engine on Linux). [Cursor](https://cursor.com) or VS Code with the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 
 ```bash
@@ -52,6 +54,10 @@ cd engine/context-engine && bun run validate octo-cluster
 ```
 
 Full guide: [onboarding](./docs/guides/onboarding.md).
+
+**Linux/macOS native (optional, no container):** install `git`, `pwsh`, `bun`, `gh`, `rg`, then `./install.sh`. Use `./scripts/octo` as entry point.
+
+**Windows host bootstrap (optional):** `pwsh -File install.ps1` — sets User-level `OCTO_CLUSTER` without Dev Container.
 
 Copy [`octo-cluster.code-workspace.example`](./octo-cluster.code-workspace.example) → `octo-cluster.code-workspace` if you open the workspace file directly. Env vars are set by the dev container; the workspace file covers local terminals when not in a container.
 
@@ -103,12 +109,15 @@ pwsh octo.ps1 -Pipeline scan -Action discover
 | [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) | Community standards |
 | [THIRD_PARTY.md](./THIRD_PARTY.md) | Attributions |
 
-## Install helpers (optional, inside dev container)
+## Install helpers (optional)
 
-Most tools are pre-installed by [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json). Optional extras:
+Most tools are pre-installed by [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json).
 
 | Script | Purpose |
 |--------|---------|
+| [`install.sh`](./install.sh) | Linux/macOS native bootstrap (delegates to `pwsh`) |
+| [`install.ps1`](./install.ps1) | Windows host bootstrap (optional) |
+| [`scripts/octo`](./scripts/octo) | Bash shim → `octo.ps1` on Unix |
 | `scripts/install-go.ps1` | Go via [go.dev](https://go.dev/dl/) MSI or zip |
 | `scripts/install-ollama.ps1` | Ollama via official install script |
 | `scripts/productivity-audit.ps1` | Local harness health check |

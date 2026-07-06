@@ -5,7 +5,7 @@
 **Discover (once per thread):**
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline close -Action discover
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipeline close -Action discover
 ```
 
 Read `PIPELINE_SKILL` once.
@@ -13,8 +13,8 @@ Read `PIPELINE_SKILL` once.
 **Run:**
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline close -Action run
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline close -Action run -Ticket "<optional>"
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipeline close -Action run
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipeline close -Action run -Ticket "<optional>"
 ```
 
 Ticket defaults from `current_task.md` CARD when `-Ticket` is omitted.
@@ -36,7 +36,7 @@ Close runs `measure-card-lite.ps1` → SQLite `state/metrics/metrics.db` (tokens
 Manual override:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo-run.ps1" -RelativePath eval\metrics\measure-card-lite.ps1 -Ticket "<ticket>" -RepoRoot "<git-root>" -Arm ponytail-lite -ShipVerdict READY
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo-run.ps1" -RelativePath eval/metrics/measure-card-lite.ps1 -Ticket "<ticket>" -RepoRoot "<git-root>" -Arm ponytail-lite -ShipVerdict READY
 ```
 
 **Playbook:** resolve `PIPELINE_SKILL` from discover output.

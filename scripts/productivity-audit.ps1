@@ -50,7 +50,7 @@ $results += @(
     (Test-Tool -Id "git" -Label "Git" -InstallHint "https://git-scm.com" -Check {
         $null -ne (Get-Command git -ErrorAction SilentlyContinue)
     })
-    (Test-Tool -Id "pwsh" -Label "PowerShell 7+ (pwsh)" -InstallHint ".\install.ps1" -Check {
+    (Test-Tool -Id "pwsh" -Label "PowerShell 7+ (pwsh)" -InstallHint "./install.sh or Dev Container" -Check {
         if (Get-Command Get-PwshExecutable -ErrorAction SilentlyContinue) {
             $exe = Get-PwshExecutable
             if (-not $exe) { return $false }
@@ -62,16 +62,21 @@ $results += @(
         $ver = & $cmd.Source -NoProfile -Command '$PSVersionTable.PSVersion.Major'
         [int]$ver -ge 7
     })
-    (Test-Tool -Id "gh" -Label "GitHub CLI" -InstallHint ".\install.ps1" -Check {
+    (Test-Tool -Id "gh" -Label "GitHub CLI" -InstallHint "./install.sh or apt/curl" -Check {
         if (Get-Command Get-GhExecutable -ErrorAction SilentlyContinue) { return [bool](Get-GhExecutable) }
         $null -ne (Get-Command gh -ErrorAction SilentlyContinue)
     })
-    (Test-Tool -Id "bun" -Label "Bun" -InstallHint "irm bun.sh/install.ps1 | iex" -Check {
+    (Test-Tool -Id "bun" -Label "Bun" -InstallHint "curl -fsSL https://bun.sh/install | bash" -Check {
         if (Get-Command Get-BunExecutable -ErrorAction SilentlyContinue) {
             return [bool](Get-BunExecutable)
         }
-        $bunPath = Join-Path $env:USERPROFILE ".bun\bin\bun.exe"
-        return (Test-Path $bunPath) -or ($null -ne (Get-Command bun -ErrorAction SilentlyContinue))
+        $homeDir = if ($env:HOME) { $env:HOME } elseif ($env:USERPROFILE) { $env:USERPROFILE } else { $null }
+        if ($homeDir) {
+            $unixBun = Join-Path $homeDir '.bun/bin/bun'
+            $winBun = Join-Path $homeDir '.bun\bin\bun.exe'
+            if ((Test-Path $unixBun) -or (Test-Path $winBun)) { return $true }
+        }
+        return $null -ne (Get-Command bun -ErrorAction SilentlyContinue)
     })
     (Test-Tool -Id "node" -Label "Node.js (optional)" -InstallHint "https://nodejs.org" -Check {
         if ($null -eq (Get-Command node -ErrorAction SilentlyContinue)) { throw "missing" }
@@ -81,7 +86,7 @@ $results += @(
         if ($null -eq (Get-Command rg -ErrorAction SilentlyContinue)) { throw "missing" }
         $true
     })
-    (Test-Tool -Id "context_engine" -Label "LanceDB context-engine" -InstallHint ".\install.ps1" -Check {
+    (Test-Tool -Id "context_engine" -Label "LanceDB context-engine" -InstallHint "./install.sh or Dev Container" -Check {
         Test-Path (Join-Path $root "engine\context-engine\node_modules\@lancedb\lancedb")
     })
     (Test-Tool -Id "memory_index" -Label "Memory vector index" -InstallHint "bun run index-incremental octo-cluster --kind memory" -Check {
@@ -95,8 +100,15 @@ $results += @(
 # gh auth (WARN if missing)
 $ghEntry = $results | Where-Object { $_.id -eq "gh" } | Select-Object -First 1
 if ($ghEntry.status -eq "OK") {
-    cmd /c "gh auth status >nul 2>nul"
-    if ($LASTEXITCODE -ne 0) {
+    $ghAuthOk = $false
+    if ($IsLinux -or $IsMacOS) {
+        gh auth status 2>$null | Out-Null
+        $ghAuthOk = ($LASTEXITCODE -eq 0)
+    } else {
+        cmd /c "gh auth status >nul 2>nul"
+        $ghAuthOk = ($LASTEXITCODE -eq 0)
+    }
+    if (-not $ghAuthOk) {
         $results += [ordered]@{ id = "gh_auth"; label = "gh auth"; status = "WARN"; hint = "gh auth login" }
     } else {
         $results += [ordered]@{ id = "gh_auth"; label = "gh auth"; status = "OK"; hint = "" }
@@ -162,17 +174,26 @@ if ($Workstation) {
         $results += [ordered]@{ id = "wsl"; label = "WSL2 Ubuntu (optional)"; status = "WARN"; hint = ".\scripts\install-wsl.ps1" }
     }
     try {
-        $dockerCli = Join-Path $env:LOCALAPPDATA "Programs\DockerDesktop\resources\bin\docker.exe"
-        if (-not (Test-Path $dockerCli)) {
-            $dockerCli = Join-Path $env:ProgramFiles "Docker\Docker\resources\bin\docker.exe"
+        $dockerOk = $false
+        if ($null -ne (Get-Command docker -ErrorAction SilentlyContinue)) {
+            docker version 2>$null | Out-Null
+            $dockerOk = ($LASTEXITCODE -eq 0)
         }
-        if (Test-Path $dockerCli) {
+        if (-not $dockerOk -and $env:LOCALAPPDATA) {
+            $dockerCli = Join-Path $env:LOCALAPPDATA "Programs\DockerDesktop\resources\bin\docker.exe"
+            if (-not (Test-Path $dockerCli)) {
+                $dockerCli = Join-Path $env:ProgramFiles "Docker\Docker\resources\bin\docker.exe"
+            }
+            if (Test-Path $dockerCli) { $dockerOk = $true }
+        }
+        if ($dockerOk) {
             $results += [ordered]@{ id = "docker"; label = "Docker (optional)"; status = "OK"; hint = "" }
         } else {
-            $results += [ordered]@{ id = "docker"; label = "Docker (optional)"; status = "WARN"; hint = ".\scripts\install-docker.ps1" }
+            $dockerHint = if ($IsLinux -or $IsMacOS) { "Docker Engine — see docs/guides/onboarding.md" } else { ".\scripts\install-docker.ps1" }
+            $results += [ordered]@{ id = "docker"; label = "Docker (optional)"; status = "WARN"; hint = $dockerHint }
         }
     } catch {
-        $results += [ordered]@{ id = "docker"; label = "Docker (optional)"; status = "WARN"; hint = ".\scripts\install-docker.ps1" }
+        $results += [ordered]@{ id = "docker"; label = "Docker (optional)"; status = "WARN"; hint = "Docker Engine or Desktop" }
     }
 }
 

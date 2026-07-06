@@ -7,7 +7,7 @@
 **Discover (once per thread):**
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline scan -Action discover
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipeline scan -Action discover
 ```
 
 Read `PIPELINE_SKILL` once.
@@ -15,24 +15,24 @@ Read `PIPELINE_SKILL` once.
 **Harness (run):**
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo.ps1" -Pipeline scan -Action run
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipeline scan -Action run
 ```
 
 Then as needed:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo-domain.ps1" -Name context-search
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo-domain.ps1" -Name read-gate -Path "<file>"
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo-domain.ps1" -Name context-search -ScriptArgsJson '{"Query":"<terms>"}'
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo-domain.ps1" -Name read-gate -Path "<file>"
 ```
 
-Use flat `-Path` (not `-ScriptArgs @{ Path = ... }`) when calling via `powershell -File`.
+On Linux/macOS you may use `./scripts/octo` instead of `pwsh ... octo.ps1` when `OCTO_CLUSTER` is set.
 
 Update `state/memory/<profile>/current_task.md` (≤200 tokens).
 
 **Usage baseline (best-effort, for token metrics at `/close`):**
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$([Environment]::GetEnvironmentVariable('OCTO_CLUSTER','User'))\octo-run.ps1" -RelativePath eval\metrics\stamp-usage-baseline.ps1 -Ticket "<TICKET>" -Profile "<profile>"
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo-run.ps1" -RelativePath eval/metrics/stamp-usage-baseline.ps1 -Ticket "<TICKET>" -Profile "<profile>"
 ```
 
 **Output:** Objective, Scope, Git, Risks, Next — **≤6 bullets**.

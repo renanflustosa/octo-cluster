@@ -1,7 +1,7 @@
 git:
   strategy: feature-branch
-  base_branch: develop
-  protected_branches: main,develop
+  base_branch: main
+  protected_branches: main
   pull_request: true
   sync_remote_before_pr: true
 

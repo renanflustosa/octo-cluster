@@ -26,18 +26,28 @@ export const IGNORE_DIRS = new Set([
   "migrations",
 ]);
 
-function walkToInstallPs1(start: string): string | null {
+function isInstallMarker(dir: string): boolean {
+  try {
+    accessSync(join(dir, "install.ps1"));
+    return true;
+  } catch {
+    try {
+      accessSync(join(dir, "install.sh"));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
+function walkToInstallMarker(start: string): string | null {
   let here = start.replace(/[\\/]+$/, "");
   for (let depth = 0; depth < 32; depth++) {
-    try {
-      accessSync(join(here, "install.ps1"));
-      return here;
-    } catch {
-      const parent = join(here, "..");
-      const normalized = parent.replace(/[\\/]+$/, "");
-      if (normalized === here) break;
-      here = normalized;
-    }
+    if (isInstallMarker(here)) return here;
+    const parent = join(here, "..");
+    const normalized = parent.replace(/[\\/]+$/, "");
+    if (normalized === here) break;
+    here = normalized;
   }
   return null;
 }
@@ -45,29 +55,17 @@ function walkToInstallPs1(start: string): string | null {
 /** octo-cluster root (git source of truth). */
 export function octoClusterRoot(): string {
   const fromEnv = process.env.OCTO_CLUSTER?.replace(/[\\/]+$/, "");
-  if (fromEnv) {
-    try {
-      accessSync(join(fromEnv, "install.ps1"));
-      return fromEnv;
-    } catch {
-      try {
-        accessSync(fromEnv);
-        return fromEnv;
-      } catch {
-        /* fall through */
-      }
-    }
-  }
+  if (fromEnv && isInstallMarker(fromEnv)) return fromEnv;
 
-  const fromScript = walkToInstallPs1(join(import.meta.dir, "..", "..", ".."));
+  const fromScript = walkToInstallMarker(join(import.meta.dir, "..", "..", ".."));
   if (fromScript) return fromScript;
 
   const cwd = process.cwd().replace(/[\\/]+$/, "");
-  const fromCwd = walkToInstallPs1(cwd);
+  const fromCwd = walkToInstallMarker(cwd);
   if (fromCwd) return fromCwd;
 
   throw new Error(
-    "OCTO_CLUSTER not resolved. Run install.ps1 from your clone root or set User-level OCTO_CLUSTER.",
+    "OCTO_CLUSTER not resolved. Run install.sh or install.ps1 from clone root, or use Dev Container.",
   );
 }
 
