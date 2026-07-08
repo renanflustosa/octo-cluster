@@ -153,6 +153,10 @@ function Get-ContextEngineRoot {
     Join-Path (Get-OctoClusterRoot) "engine\context-engine"
 }
 
+function Get-ExecutionContextDir {
+    Join-Path (Get-OctoClusterRoot) "contexts\runtime"
+}
+
 function Get-MemoryRoot {
     param([string]$Profile)
     Join-Path (Get-OctoClusterRoot) "state\memory\$Profile"
@@ -162,7 +166,7 @@ function Get-PackDocsRoot {
     param([Parameter(Mandatory = $true)][string]$PackId)
     $octo = Get-OctoClusterRoot
     foreach ($ctxFile in @("$PackId.local.json", "$PackId.json")) {
-        $ctxPath = Join-Path $octo "contexts\$ctxFile"
+        $ctxPath = Join-Path (Get-ExecutionContextDir) $ctxFile
         if (-not (Test-Path $ctxPath)) { continue }
         try {
             $ctx = Get-Content $ctxPath -Raw | ConvertFrom-Json
@@ -204,7 +208,7 @@ function Get-CoreScriptPath {
 function Get-DefaultMemoryProfile {
     param([string]$Name)
     if ($Name) {
-        $ctxPath = Join-Path (Get-OctoClusterRoot) "contexts\$Name.json"
+        $ctxPath = Join-Path (Get-ExecutionContextDir) "$Name.json"
         if (Test-Path $ctxPath) {
             try {
                 $ctx = Get-Content $ctxPath -Raw | ConvertFrom-Json

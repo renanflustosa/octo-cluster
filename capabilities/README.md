@@ -10,7 +10,7 @@
 Setup for a private consumer pack:
 
 1. Copy `registry.local.yaml.example` → `registry.local.yaml` and register your pack.
-2. Copy `contexts/consumer-pack.example.json` → `contexts/<pack-id>.local.json` and adjust env vars.
+2. Copy `contexts/runtime/consumer-pack.example.json` → `contexts/runtime/<pack-id>.local.json` and adjust env vars.
 3. Scaffold `capabilities/_private/<pack>/` and `domains/_private/<pack>/` locally — see [add-child-context.md](../docs/guides/add-child-context.md).
 4. Run `sync-cursor.ps1 -Domain <pack>` — do **not** commit generated `.cursor/` child rules to the public repo.
 

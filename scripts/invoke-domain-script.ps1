@@ -19,7 +19,7 @@ function Get-PackScriptPrefix {
 
     if (-not $DomainName) { return $null }
 
-    $ctxPath = Join-Path (Get-OctoClusterRoot) "contexts\$DomainName.json"
+    $ctxPath = Join-Path (Get-ExecutionContextDir) "$DomainName.json"
     if (Test-Path $ctxPath) {
         try {
             $ctx = Get-Content $ctxPath -Raw | ConvertFrom-Json

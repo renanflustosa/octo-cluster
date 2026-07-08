@@ -30,8 +30,8 @@ workspaces/*
 !workspaces/company*-workspace.code-workspace
 
 # Local overlays (generic — no consumer identifiers)
-contexts/*.local.json
-contexts/*.private.json
+contexts/runtime/*.local.json
+contexts/runtime/*.private.json
 capabilities/registry.local.yaml
 repo-policies/*.private.yaml
 repo-policies/*.local.yaml

@@ -193,7 +193,7 @@ function Get-LegacyDomainGateProviders {
     }
 
     $prefix = $PackId
-    $ctxPath = Join-Path $WorkspaceRoot "contexts\$PackId.json"
+    $ctxPath = Join-Path $WorkspaceRoot "contexts\runtime\$PackId.json"
     if (Test-Path $ctxPath) {
         try {
             $ctx = Get-Content $ctxPath -Raw | ConvertFrom-Json

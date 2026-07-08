@@ -229,7 +229,7 @@ This keeps “did we prove it?” and “did we deliver it?” in one deliberate
 
 ### Capability packs
 
-Private or public packs implement the loop via `contexts/<pack>.json`, `capabilities/<pack>/`, and your issue tracker. That is **one pack**, not the definition of the loop. See [add-child-context.md](./add-child-context.md).
+Private or public packs implement the loop via `contexts/runtime/<pack>.json`, `capabilities/<pack>/`, and your issue tracker. That is **one pack**, not the definition of the loop. See [add-child-context.md](./add-child-context.md).
 
 ---
 
@@ -348,7 +348,7 @@ Context-engine resolves paths via `OCTO_CLUSTER`; memory never lives in product 
 | ChromaDB / Qdrant | LanceDB + FTS5 hybrid |
 | LiteLLM / Ollama | Deprioritized — Cursor Agent for Execute; opt-in via domain policy |
 
-**Dispatch:** `scripts/invoke-pipeline.ps1 -Pipeline <phase> -Action discover|run` resolves pack skills and providers. `scripts/invoke-domain-script.ps1 -Name <gate>` resolves pack scripts via `contexts/<pack>.json` → `script_prefix`.
+**Dispatch:** `scripts/invoke-pipeline.ps1 -Pipeline <phase> -Action discover|run` resolves pack skills and providers. `scripts/invoke-domain-script.ps1 -Name <gate>` resolves pack scripts via `contexts/runtime/<pack>.json` → `script_prefix`.
 
 **DuckDB log template (optional `/ship` for batch/sync cards):**
 

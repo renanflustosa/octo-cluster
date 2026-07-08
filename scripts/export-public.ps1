@@ -96,20 +96,20 @@ foreach ($r in $remove) {
     }
 }
 
-$ctxExtra = Join-Path $Dest 'contexts'
-if (Test-Path $ctxExtra) {
-    Get-ChildItem $ctxExtra -Filter '*.local.json' -ErrorAction SilentlyContinue | ForEach-Object {
+$ctxRuntime = Join-Path $Dest 'contexts\runtime'
+if (Test-Path $ctxRuntime) {
+    Get-ChildItem $ctxRuntime -Filter '*.local.json' -ErrorAction SilentlyContinue | ForEach-Object {
         Remove-Item $_.FullName -Force
-        Write-Host "[remove] contexts/$($_.Name)" -ForegroundColor Yellow
+        Write-Host "[remove] contexts/runtime/$($_.Name)" -ForegroundColor Yellow
     }
-    Get-ChildItem $ctxExtra -Filter '*.private.json' -ErrorAction SilentlyContinue | ForEach-Object {
+    Get-ChildItem $ctxRuntime -Filter '*.private.json' -ErrorAction SilentlyContinue | ForEach-Object {
         Remove-Item $_.FullName -Force
-        Write-Host "[remove] contexts/$($_.Name)" -ForegroundColor Yellow
+        Write-Host "[remove] contexts/runtime/$($_.Name)" -ForegroundColor Yellow
     }
 }
 
-# contexts/platform.json — generic public example
-$ctxDir = Join-Path $Dest 'contexts'
+# contexts/runtime/platform.json — generic public example
+$ctxDir = Join-Path $Dest 'contexts\runtime'
 New-Item -ItemType Directory -Force -Path $ctxDir | Out-Null
 @{
     id                       = 'platform'
@@ -118,7 +118,7 @@ New-Item -ItemType Directory -Force -Path $ctxDir | Out-Null
     memory_profile           = 'octo-cluster'
     ship_repositories        = @('octo-cluster')
 } | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $ctxDir 'platform.json') -Encoding UTF8
-Write-Host '[write] contexts/platform.json (public)' -ForegroundColor Green
+Write-Host '[write] contexts/runtime/platform.json (public)' -ForegroundColor Green
 
 # capabilities/registry.yaml — core only
 $regDir = Join-Path $Dest 'capabilities'
@@ -133,7 +133,7 @@ Add-Content (Join-Path $regDir 'registry.yaml') '' -Encoding UTF8
 Write-Host '[write] capabilities/registry.yaml (core only)' -ForegroundColor Green
 
 foreach ($exampleFile in @(
-    'contexts/consumer-pack.example.json',
+    'contexts/runtime/consumer-pack.example.json',
     'capabilities/registry.local.yaml.example'
 )) {
     Copy-File $exampleFile

@@ -18,7 +18,7 @@ This repository is a **tool-agnostic AI workspace platform** with a Cursor adapt
 |-------|------|------|
 | **Core** | `domains/core/` | Generic commands, rules, synced skills, harness scripts |
 | **Capabilities** | `capabilities/<pack>/` | Pipeline manifests, `skill.md`, ship providers |
-| **Contexts** | `contexts/*.json` | Enabled packs, `ship_repositories`, `docs_root`, `script_prefix` |
+| **Contexts** | `contexts/runtime/*.json` | Enabled packs, `ship_repositories`, `docs_root`, `script_prefix` |
 | **Child domain** | `domains/<pack>/` | Rules, hooks, pack scripts, docs |
 | **Adapter** | `scripts/sync-cursor.ps1` | Generates `.cursor/` (core commands/skills + child rules/hooks) |
 | **Tools** | `engine/`, `state/`, `eval/` | Context engine, memory, promptfoo |
@@ -27,7 +27,7 @@ This repository is a **tool-agnostic AI workspace platform** with a Cursor adapt
 ## Runtime dispatch
 
 ```text
-AI_EXECUTION_CONTEXT → contexts/<id>.json
+AI_EXECUTION_CONTEXT → contexts/runtime/<id>.json
   → invoke-pipeline.ps1 -Action discover → PIPELINE_SKILL (capabilities/.../skill.md)
   → invoke-pipeline.ps1 -Action run       → providers (discover-capabilities.ps1)
   → invoke-domain-script.ps1              → domains/<pack>/scripts/<prefix>-*.ps1

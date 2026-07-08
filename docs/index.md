@@ -34,8 +34,19 @@ Pipeline skills resolve at runtime via [`scripts/invoke-pipeline.ps1`](../script
 
 | Context | File | Workspace |
 |---------|------|-----------|
-| **Platform** (default) | [`contexts/platform.json`](../contexts/platform.json) | [`octo-cluster.code-workspace.example`](../octo-cluster.code-workspace.example) |
-| **Company scaffolds** | add `contexts/companyN.json` | [`workspaces/`](../workspaces/) |
+| **Platform** (default) | [`contexts/runtime/platform.json`](../contexts/runtime/platform.json) | [`octo-cluster.code-workspace.example`](../octo-cluster.code-workspace.example) |
+| **Company scaffolds** | add `contexts/runtime/companyN.json` | [`workspaces/`](../workspaces/) |
+
+## Agent context hierarchy
+
+| Tier | Path | Purpose |
+|------|------|---------|
+| Hub | [`contexts/README.md`](../contexts/README.md) | Priority map for agents |
+| Permanent | [`contexts/permanent/`](../contexts/permanent/) | Stable framework summary |
+| Operational | [`contexts/operational/`](../contexts/operational/) + [`contexts/runtime/`](../contexts/runtime/) | Active loop and runtime config |
+| Temporary | [`contexts/temporary/`](../contexts/temporary/) | Discardable drafts |
+
+Rules and skills source of truth: `domains/core/` (synced to `.cursor/`).
 
 Private capability packs live in **your fork** — see [CONTRIBUTING.md](../CONTRIBUTING.md).
 
@@ -43,7 +54,7 @@ Private capability packs live in **your fork** — see [CONTRIBUTING.md](../CONT
 
 ```text
 octo-cluster/
-  contexts/           # execution context (packs, repos, docs_root)
+  contexts/           # agent context tiers + runtime JSON (contexts/runtime/)
   capabilities/       # pack manifests + skill.md + providers
   domains/core/       # parent — any-project rules, skills, commands
   domains/companyN/   # optional child scaffolds

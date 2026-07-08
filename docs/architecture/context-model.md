@@ -11,7 +11,7 @@
 | **Core** | `domains/core/` | Rules, skills, commands usable in any workspace |
 | **Capability packs** | `capabilities/core/`, `capabilities/my-company/`, … | Pipeline manifests + providers |
 | **Legacy child** | `domains/my-company/`, … | Domain rules, hooks, pack scripts |
-| **Execution context** | `contexts/*.json` | Enabled packs, memory profile, repo ownership |
+| **Execution context** | `contexts/runtime/*.json` | Enabled packs, memory profile, repo ownership |
 | **Generated** | `.cursor/` | IDE output — **never edit by hand** |
 | **Shared infra** | `engine/`, `state/`, `scripts/` | Context-engine, memory, sync |
 
@@ -36,7 +36,7 @@
 | **Override** | `.\scripts\sync-cursor.ps1 -Domain my-company` (rules/hooks) |
 | **Manifest** | `.cursor/domain.manifest.json` |
 
-Context files: `contexts/platform.json`, `contexts/my-company.json`, …
+Context files: `contexts/runtime/platform.json`, `contexts/runtime/my-company.json`, …
 
 ---
 

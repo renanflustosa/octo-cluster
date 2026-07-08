@@ -2,4 +2,4 @@
 
 - Core: domains/core, capabilities/, scripts/
 - Context engine: engine/context-engine
-- Execution context: contexts/platform.json
+- Execution context: contexts/runtime/platform.json

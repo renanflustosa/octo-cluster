@@ -24,7 +24,7 @@ export function contextIdFromProfile(profile: string): string {
 }
 
 function readContextFile(ctxId: string): ExecutionContextConfig | null {
-  const dir = join(octoClusterRoot(), "contexts");
+  const dir = join(octoClusterRoot(), "contexts", "runtime");
   for (const fileName of [`${ctxId}.local.json`, `${ctxId}.json`]) {
     try {
       const raw = readFileSync(join(dir, fileName), "utf8");
@@ -102,7 +102,7 @@ export function resolveWorkspaceRoot(profile: string): string {
     );
   }
   throw new Error(
-    `No workspace_root_env in contexts/${contextIdFromProfile(profile)}.json for profile "${profile}"`,
+    `No workspace_root_env in contexts/runtime/${contextIdFromProfile(profile)}.json for profile "${profile}"`,
   );
 }
 

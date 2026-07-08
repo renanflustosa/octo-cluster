@@ -41,7 +41,7 @@ Consumer workspace (private, multi-root)
 Octo Cluster (public framework)
   ├── domains/core/           universal harness
   ├── capabilities/core/      public pipeline pack
-  ├── contexts/platform.json  default execution context
+  ├── contexts/runtime/platform.json  default execution context
   ├── engine/                 context-engine (profile-driven)
   ├── scripts/                sync, invoke-pipeline, install
   └── state/                  gitignored runtime (memory, indexes)
@@ -86,11 +86,11 @@ Consumers integrate exclusively through:
 | Interface | Purpose |
 |-----------|---------|
 | `OCTO_CLUSTER` | Absolute path to framework clone |
-| `AI_EXECUTION_CONTEXT` | Selects `contexts/<id>.json` |
+| `AI_EXECUTION_CONTEXT` | Selects `contexts/runtime/<id>.json` |
 | Multi-root workspace folder | Links framework without copying it |
 | Optional env vars declared in **consumer context JSON** | e.g. workspace root, docs root — never hardcoded in engine |
 | `capabilities/registry.local.yaml` | **Local, gitignored** pack registration |
-| `contexts/*.local.json` | **Local, gitignored** context overrides |
+| `contexts/runtime/*.local.json` | **Local, gitignored** context overrides |
 
 Consumers must not fork framework internals into product repositories (`.agents/`, `.cursor/`, harness scripts, memory systems, RAG implementation).
 
@@ -125,11 +125,11 @@ Plans must prefer: grep, scoped reads, `invoke-pipeline.ps1`, repo-policy gates,
 |-------|-------------|----------------------------------|
 | `domains/core/` | yes | — |
 | `capabilities/core/` | yes | — |
-| `contexts/platform.json` | yes | — |
+| `contexts/runtime/platform.json` | yes | — |
 | `capabilities/registry.yaml` | **core only** | — |
 | `capabilities/registry.local.yaml` | example only | actual registration |
 | `domains/<pack>/`, `capabilities/<pack>/` | generic scaffolds (`company2`, `_template`) | real consumer packs |
-| `contexts/<consumer>.json` | `.example` templates only | live context files |
+| `contexts/runtime/<consumer>.json` | `.example` templates only | live context files |
 | `repo-policies/` | generic samples (`default`, self-verify, optional demo) | product-specific policies |
 | `engine/context-engine` | profile-driven, no consumer hardcoding | — |
 
@@ -148,7 +148,7 @@ Framework code must not:
 - index named product repositories unless driven by **execution context JSON + env vars** supplied at runtime
 - ship error messages, logs, or comments that cite consumer-specific script names from legacy systems
 
-Refactors must move special cases into **context fields** (e.g. `index_repositories`, `workspace_root_env`, `ship_repositories`) read from `contexts/*.json`, never from constants in `engine/`.
+Refactors must move special cases into **context fields** (e.g. `index_repositories`, `workspace_root_env`, `ship_repositories`) read from `contexts/runtime/*.json`, never from constants in `engine/`.
 
 ### Rule 2 — Registry split
 
@@ -156,7 +156,7 @@ Refactors must move special cases into **context fields** (e.g. `index_repositor
 - **`capabilities/registry.local.yaml`** (gitignored): optional local pack paths; merged at runtime by `discover-capabilities.ps1`.
 - Never add private pack ids to the tracked registry for convenience.
 
-Provide **generic** tracked examples: `registry.local.yaml.example`, `contexts/consumer-pack.example.json`.
+Provide **generic** tracked examples: `registry.local.yaml.example`, `contexts/runtime/consumer-pack.example.json`.
 
 ### Rule 3 — Gitignore must use generic patterns only
 
@@ -177,8 +177,8 @@ workspaces/*
 !workspaces/company*-workspace.code-workspace
 
 # Local overlays (generic)
-contexts/*.local.json
-contexts/*.private.json
+contexts/runtime/*.local.json
+contexts/runtime/*.private.json
 capabilities/registry.local.yaml
 repo-policies/*.private.yaml
 repo-policies/*.local.yaml
@@ -195,7 +195,7 @@ contexts/_private/
 # BAD — reveals consumer identity
 domains/acme-corp/
 capabilities/client-x/
-contexts/bigbank.json
+contexts/runtime/bigbank.json
 repo-policies/product-api.yaml
 ```
 
@@ -286,10 +286,10 @@ Document the end state:
 Public octo-cluster/          Private (never pushed to public)
 ├── domains/core/             ├── domains/_private/<pack>/
 ├── capabilities/core/        ├── capabilities/_private/<pack>/
-├── contexts/platform.json    ├── contexts/<pack>.json (local)
+├── contexts/runtime/platform.json    ├── contexts/runtime/<pack>.json (local)
 ├── registry.yaml (core)      ├── registry.local.yaml
 ├── registry.local.yaml.example
-├── contexts/*.example.json
+├── contexts/runtime/*.example.json
 ├── export-public.ps1         └── consumer workspace + product repos
 └── engine/ (context-driven)
 ```
@@ -330,7 +330,7 @@ When planning consumer workspace integration (private side), recommend:
 - Keep product AI artifacts out of product repos (`.agents/`, local `.cursor/`)
 - Aggressive `.cursorignore` on read-only or binary-heavy roots
 - `search.exclude` / `files.watcherExclude` for `state/memory/**`, build outputs, vendor trees
-- Single execution context per workspace file; variant contexts via separate `contexts/*.json`, not duplicated framework
+- Single execution context per workspace file; variant contexts via separate `contexts/runtime/*.json`, not duplicated framework
 - `@` ≤ 3, Read ≤ 300 lines, grep before semantic search (align with core rules)
 
 ---
@@ -369,5 +369,5 @@ The public repository is boundary-compliant only when **all** are true:
 - **Plan only** unless the user explicitly authorizes implementation.
 - Do not paste secrets or vault contents.
 - Do not recommend committing runtime state, generated adapters from private sync, or local workspace files with private repo paths.
-- Prefer existing Octo patterns (`invoke-pipeline.ps1`, capability packs, `contexts/*.json`, `export-public.ps1`) over new mechanisms.
+- Prefer existing Octo patterns (`invoke-pipeline.ps1`, capability packs, `contexts/runtime/*.json`, `export-public.ps1`) over new mechanisms.
 - When in doubt, **generalize or remove** — never embed consumer identity into the public framework.

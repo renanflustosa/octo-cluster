@@ -15,7 +15,7 @@ Split the repository into:
 - **CORE** (`domains/core/`, `capabilities/core/`) — agnostic loop, rules, scripts, RAG patterns
 - **Capability packs** (`capabilities/<pack>/`, `contexts/`) — domain-specific routing, repos, providers
 - **Adapters** (`adapters/`) — IDE-specific sync (Cursor validated first)
-- **Execution context** (`contexts/*.json`) — runtime dispatch via `AI_EXECUTION_CONTEXT`
+- **Execution context** (`contexts/runtime/*.json`) — runtime dispatch via `AI_EXECUTION_CONTEXT`
 
 Promotion rule: behavior needed by two or more packs moves to CORE; product-specific logic stays in packs.
 

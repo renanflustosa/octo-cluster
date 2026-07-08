@@ -14,6 +14,8 @@
 
 Octo Cluster follows the [Engineering Operating System (EOS)](./docs/governance/eos.md) — governance, delivery, quality, and AI-agent operations. Planned work is tracked in [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues); see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
+**Agents:** start at [`AGENTS.md`](./AGENTS.md) and [`contexts/context-index.yaml`](./contexts/context-index.yaml).
+
 ## Why Octo Cluster?
 
 Most teams stitch token savings piecemeal: grep rules here, a RAG script there, ad-hoc hooks, separate eval harnesses. Octo Cluster **bundles the full stack** so cheap layers run first and expensive LLM calls are the exception.
@@ -69,12 +71,14 @@ Add your product repos or a **local gitignored** secrets vault as sibling folder
 octo-cluster/          ← drop this folder into any multi-root workspace
   domains/core/        rules, skills, commands, harness scripts (IDE-agnostic source)
   capabilities/        pack manifests + pipeline providers
-  contexts/            execution context JSON (enabled packs, ship repos)
+  contexts/            agent context tiers + runtime JSON (contexts/runtime/)
   engine/              context-engine (Bun + LanceDB)
   scripts/             sync adapters, invoke-pipeline, install helpers
   adapters/            IDE/tooling adapter scaffolding
   .cursor/             generated for Cursor — edit domains/, then sync
 ```
+
+Agent context hub: [`contexts/README.md`](./contexts/README.md). Docs index: [`docs/index.md`](./docs/index.md).
 
 See [context model](./docs/architecture/context-model.md) and [add a capability pack](./docs/guides/add-child-context.md).
 
@@ -96,7 +100,9 @@ pwsh octo.ps1 -Pipeline scan -Action discover
 
 | Doc | Content |
 |-----|---------|
-| [EOS](./docs/governance/eos.md) | Engineering Operating System (canonical) |
+| [`contexts/README.md`](./contexts/README.md) | Agent context hierarchy (start here for AI) |
+| [`docs/index.md`](./docs/index.md) | Full documentation index |
+| [governance/eos.md](./docs/governance/eos.md) | Engineering Operating System (canonical) |
 | [onboarding](./docs/guides/onboarding.md) | Full setup |
 | [oss-workstation-setup](./docs/guides/oss-workstation-setup.md) | Ubuntu + VSCodium + Continue + Ollama |
 | [productivity-tools](./docs/guides/productivity-tools.md) | Harness design, token layers |

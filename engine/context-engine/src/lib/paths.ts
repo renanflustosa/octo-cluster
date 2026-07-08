@@ -169,13 +169,13 @@ export function apiSummaryPath(profile: string): string {
 }
 
 
-/** Ship repos from execution context JSON (platform profile -> contexts/platform.json). */
+/** Ship repos from execution context JSON (platform profile -> contexts/runtime/platform.json). */
 export function resolveShipRepositoryRoots(profile: string): Array<{ name: string; root: string }> {
   const ctxId = contextIdFromProfile(profile);
   let repos: string[] = [];
 
   try {
-    const ctx = JSON.parse(readFileSync(join(octoClusterRoot(), "contexts", `${ctxId}.json`), "utf8")) as {
+    const ctx = JSON.parse(readFileSync(join(octoClusterRoot(), "contexts", "runtime", `${ctxId}.json`), "utf8")) as {
       ship_repositories?: string[];
     };
     repos = ctx.ship_repositories ?? [];

@@ -1,4 +1,4 @@
-# Canonical: .aiignore — keep sections in sync
+# AI index exclusions — canonical source (mirror in .cursorignore)
 
 # === RUNTIME STATE ===
 state/

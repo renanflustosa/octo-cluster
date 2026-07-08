@@ -11,7 +11,7 @@ How the **platform** context stays isolated from optional capability packs.
 | `install.ps1` | Platform onboarding |
 | `validate.ts` / code index | Profile `octo-cluster`, scoped cap 80 files |
 | `sync-cursor.ps1` | Core commands/skills; optional `-Domain` for child rules/hooks |
-| Private pack paths | Not loaded when pack disabled in `contexts/*.json` |
+| Private pack paths | Not loaded when pack disabled in `contexts/runtime/*.json` |
 
 ## Capability discovery
 
@@ -26,7 +26,7 @@ How the **platform** context stays isolated from optional capability packs.
 |-----------|----------|
 | `collectCodeSources` | Scoped dirs under octo-cluster, max 80 files |
 | `validate.ts` default profile | `octo-cluster` |
-| `resolveShipRepositoryRoots` | Reads `contexts/platform.json` |
+| `resolveShipRepositoryRoots` | Reads `contexts/runtime/platform.json` |
 
 ## Repository policies
 

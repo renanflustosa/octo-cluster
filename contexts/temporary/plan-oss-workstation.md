@@ -6,7 +6,7 @@
 
 **Projeto ativo:** octo-cluster — harness com Dev Container (`.devcontainer/`), context-engine (Bun + LanceDB), pipeline `pwsh octo.ps1`.
 
-**Uso:** colar no chat com `/model` ou `@docs/temp/plan-oss-workstation.md`.
+**Uso:** colar no chat com `/model` ou `@contexts/temporary/plan-oss-workstation.md`.
 
 ---
 

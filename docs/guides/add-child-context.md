@@ -6,7 +6,7 @@ Step-by-step guide for adding a company or project to `octo-cluster`.
 
 ## 1. Execution context
 
-Add `contexts/my-company.json`:
+Add `contexts/runtime/my-company.json`:
 
 ```json
 {
@@ -150,7 +150,7 @@ Verify:
 
 ## 7. Checklist
 
-- [ ] `contexts/<id>.json` with unique `id`
+- [ ] `contexts/runtime/<id>.json` with unique `id`
 - [ ] Pack registered in `capabilities/registry.yaml`
 - [ ] Pipeline manifests + `skill.md` under `capabilities/<pack>/`
 - [ ] Workspace sets `AI_EXECUTION_CONTEXT`
@@ -164,6 +164,6 @@ Verify:
 ## Rename a scaffold
 
 1. Rename `domains/company2/` → `domains/my-company/`
-2. Rename `capabilities/` pack if created; update `contexts/*.json` and registry
+2. Rename `capabilities/` pack if created; update `contexts/runtime/*.json` and registry
 3. Rename workspace file; set `AI_EXECUTION_CONTEXT`
 4. Run sync with the new id

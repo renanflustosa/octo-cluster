@@ -5,6 +5,10 @@ param()
 
 $ErrorActionPreference = "Stop"
 
+function Get-ExecutionContextDir {
+    Join-Path (Get-OctoClusterRoot) "contexts\runtime"
+}
+
 function Get-ContextConfigPath {
     param([Parameter(Mandatory = $true)][string]$ContextId)
 
@@ -21,15 +25,16 @@ function Get-ContextConfigPath {
         return (Resolve-Path $candidate).Path
     }
 
-    $path = Join-Path $workspace "contexts\$ContextId.json"
-    $localPath = Join-Path $workspace "contexts\$ContextId.local.json"
+    $runtimeDir = Get-ExecutionContextDir
+    $path = Join-Path $runtimeDir "$ContextId.json"
+    $localPath = Join-Path $runtimeDir "$ContextId.local.json"
     if (Test-Path $localPath) {
         return (Resolve-Path $localPath).Path
     }
     if (Test-Path $path) {
         return (Resolve-Path $path).Path
     }
-    throw "Execution context not found: contexts/$ContextId.local.json or contexts/$ContextId.json"
+    throw "Execution context not found: contexts/runtime/$ContextId.local.json or contexts/runtime/$ContextId.json"
 }
 
 function Resolve-ExecutionContextId {

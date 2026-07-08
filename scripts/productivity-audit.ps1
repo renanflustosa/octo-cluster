@@ -92,8 +92,8 @@ $results += @(
     (Test-Tool -Id "memory_index" -Label "Memory vector index" -InstallHint "bun run index-incremental octo-cluster --kind memory" -Check {
         Test-Path (Join-Path $root "state\memory\octo-cluster\vector\lancedb")
     })
-    (Test-Tool -Id "platform_context" -Label "Platform execution context" -InstallHint "contexts/platform.json" -Check {
-        Test-Path (Join-Path $root "contexts\platform.json")
+    (Test-Tool -Id "platform_context" -Label "Platform execution context" -InstallHint "contexts/runtime/platform.json" -Check {
+        Test-Path (Join-Path $root "contexts\runtime\platform.json")
     })
 )
 
