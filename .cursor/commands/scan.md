@@ -12,11 +12,15 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipe
 
 Read `PIPELINE_SKILL` once.
 
-**Harness (run):**
+**Harness (run)** — pass ticket id so pack providers can resolve the card (tracker-agnostic):
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipeline scan -Action run
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipeline scan -Action run -Ticket "<TICKET>"
 ```
+
+Optional: `-TicketUrl "<https://…/ISSUE-123/…>"` for slug title when the pack provider has no API key.
+
+If harness prints `TICKET_CARD=<path>`, read that JSON before scoping (title, description, url). If no providers / no card file, use the user message only.
 
 Then as needed:
 

@@ -19,6 +19,7 @@ param(
     [string]$Domain,
     [string]$RepoPath,
     [string]$Ticket,
+    [string]$TicketUrl,
     [string]$Profile,
     [string]$CommitMessage,
     [string]$FeatureBranch,
@@ -36,6 +37,7 @@ $ErrorActionPreference = 'Stop'
 
 $mergedArgs = Merge-OctoScriptArgs -Base $ScriptArgs -ScriptArgsJson $ScriptArgsJson -Flat @{
     Ticket    = $Ticket
+    TicketUrl = $TicketUrl
     Profile   = $Profile
     SkipIndex = $SkipIndex
     WithStack = $WithStack
