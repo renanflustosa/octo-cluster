@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5](https://github.com/renanflustosa/octo-cluster/compare/v0.1.4...v0.1.5) (2026-07-09)
+
+
+### Features
+
+* add /prompt command and harden scan bootstrap ([bebe6c1](https://github.com/renanflustosa/octo-cluster/commit/bebe6c14da0076de7ba93a624200240f62cead5f))
+* add /prompt command and harden scan bootstrap ([e32dfaf](https://github.com/renanflustosa/octo-cluster/commit/e32dfaf625040ddcc3afe5ca3a2f767b2d3671d7))
+
 ## [0.1.4](https://github.com/renanflustosa/octo-cluster/compare/v0.1.3...v0.1.4) (2026-07-06)
 
 
