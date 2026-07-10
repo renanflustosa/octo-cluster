@@ -1,13 +1,13 @@
 ---
 name: ponytail-lite
-description: Minimal implementation ladder before writing code. Apply on Execute plan; question over-scope on scan/model. Complements caveman (prose) and simplify (clarity post-edit). Inspired by DietrichGebert/ponytail (MIT).
+description: Minimal implementation ladder before writing code. Apply on Execute plan; question over-scope on scan/model. Complements caveman (prose). Inspired by DietrichGebert/ponytail (MIT).
 ---
 
 # Ponytail-lite — minimal implementation
 
 > Adapted from [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) (MIT). See [THIRD_PARTY.md](../../../../THIRD_PARTY.md).
 
-Lazy means efficient, not careless. Complements **caveman** (shorter replies) and **simplify** (clearer code after the solution is chosen). This skill governs **what** to implement, not how to phrase status updates.
+Lazy means efficient, not careless. Complements **caveman** (shorter replies). This skill governs **what** to implement, not how to phrase status updates.
 
 ## The ladder
 
@@ -67,7 +67,7 @@ Names the ceiling and the upgrade path so "later" does not become "never".
 | `/scan` | Question over-scope; cite rung if ticket asks for a new library |
 | `/model` (Plan) | Rejected alternatives cite rung; plan must not violate carve-outs |
 | **Execute plan** | **Ladder active before each file edit** |
-| `/ship` | Optional: `/minimal-review` if diff is large |
+| `/ship` | Prefer smallest diff that passes gates |
 | `/close` | List pending `ponytail:` comments |
 
 ## Pack overrides
@@ -77,8 +77,7 @@ Capability packs may override rungs 4–5 via auxiliary skills (e.g. parity rule
 ## Does NOT replace
 
 - **caveman** — prose compression on status turns
-- **simplify** — clarity within the chosen solution (runs after edits)
-- **token-economy** — structural caps (@≤3, Read≤300, single-card)
+- **token-economy** — structural caps (@≤3, Read≤300, single-card) when a pack enables them
 - **systematic-debugging** — reproduce before fix; ponytail-lite applies after root cause is understood
 
 Trigger: active when `core/rules/ponytail-lite.mdc` applies.
