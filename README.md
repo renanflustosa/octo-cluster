@@ -34,6 +34,16 @@ Most teams stitch token savings piecemeal: grep rules here, a RAG script there, 
 [COST HIGH]  plan · execute · ship when harness cannot finish alone
 ```
 
+## Early measurement (directional)
+
+We benchmark Octo against Cursor SDK defaults with a **reproducible paired protocol** — not a marketing percentage.
+
+**Latest run (2026-07-10, n=5 paired cards, `composer-2.5`):** Octo-Full showed **lower attributed token usage** in our synthetic suite (median paired Δ −9k tokens/run; bootstrap IC95% −27k to −2k, excludes 0). Task pass rate was **5/5** for both arms. The lightweight score proxy is **inconclusive** at this sample size (IC crosses 0); only 2/5 cards agreed on both score and tokens.
+
+This is **evidence-informed, not a production savings guarantee.** Full method, per-card tables, limitations, and reproduce commands:
+
+**[→ Report: AS-IS vs Octo-Full (2026-07-10)](./eval/agentic/benchmarks/results/2026-07-10-asis-vs-full.md)** · [eval harness](./eval/agentic/README.md#agentic-measurement-directional) · [protocol](./eval/agentic/protocol/combination-bakeoff.md)
+
 ## Quick start
 
 **Official dev setup:** Ubuntu 24.04 inside **Dev Container** (same flow on Windows, macOS, or Linux host). **iOS is out of scope** — desktop CLI harness only.
@@ -110,6 +120,7 @@ pwsh octo.ps1 -Pipeline scan -Action discover
 | [path-resolution](./docs/architecture/path-resolution.md) | Installation root discovery |
 | [add-child-context](./docs/guides/add-child-context.md) | Scaffold a capability pack |
 | [public-framework-boundary](./docs/guides/public-framework-boundary.md) | Public vs private overlay audit |
+| [agentic benchmark (2026-07-10)](./eval/agentic/benchmarks/results/2026-07-10-asis-vs-full.md) | AS-IS vs Octo-Full paired measurement (directional) |
 | [ROADMAP.md](./ROADMAP.md) | Planned work and semver ladder |
 | [CHANGELOG.md](./CHANGELOG.md) | Release history |
 | [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) | Community standards |

@@ -9,6 +9,7 @@ Pipeline skills resolve at runtime via [`scripts/invoke-pipeline.ps1`](../script
 | Document | Content |
 |----------|---------|
 | [governance/eos.md](./governance/eos.md) | Engineering Operating System (canonical) |
+| [governance/agent-pre-push.md](./governance/agent-pre-push.md) | Agent pre-push checklist |
 | [assets/branding/](../assets/branding/) | Logos, app icon, favicon, GitHub avatar |
 | [adr/](./adr/) | Architecture decision records |
 
@@ -20,6 +21,9 @@ Pipeline skills resolve at runtime via [`scripts/invoke-pipeline.ps1`](../script
 | [guides/productivity-tools.md](./guides/productivity-tools.md) | Design goals, harness, token layers |
 | [guides/add-child-context.md](./guides/add-child-context.md) | Scaffold a capability pack |
 | [guides/token-metrics-baseline.md](./guides/token-metrics-baseline.md) | Token metrics baseline |
+| [guides/harness-tool-cluster.md](./guides/harness-tool-cluster.md) | Harness tool catalog + bakeoff |
+| [guides/v1-harness-readiness.md](./guides/v1-harness-readiness.md) | V1 config stack certainty (10 layers) |
+| [adr/ADR-006-harness-tool-cluster.md](./adr/ADR-006-harness-tool-cluster.md) | Catalog + experiment protocol |
 
 ## Architecture
 

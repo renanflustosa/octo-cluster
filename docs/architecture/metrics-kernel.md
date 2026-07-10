@@ -40,5 +40,8 @@ Never commit API tokens. Store session cookies in a **local gitignored** file if
 
 - New rule/skill: measurable drop in `diff_added` or tokens without gate regressions
 - Harness change: `harness_score` stable or up after CORE edit
+- Tool combination: rank via `report.ps1 -CompareCombinations` (ADR-006); require ≥3 cards per `combination_id`
 
-See [`eval/metrics/README.md`](../eval/metrics/README.md).
+Schema v2 adds `combination_id`, measured/estimated token buckets, and per-card `harness_score`.
+
+See [`eval/metrics/README.md`](../eval/metrics/README.md) and [`guides/harness-tool-cluster.md`](../guides/harness-tool-cluster.md).

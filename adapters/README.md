@@ -7,6 +7,7 @@ Tool-specific adapter scaffolding. Each adapter consumes `domains/core/` (and op
 | Adapter | Path | Status |
 |---------|------|--------|
 | **Cursor** | [`cursor/`](cursor/) | Active — syncs to `.cursor/` via `scripts/sync-cursor.ps1` |
+| **Claude Code** | [`claude/`](claude/) | Stub — Ubuntu + Claude contract (ADR-006 phase 3) |
 | **Continue** | [`continue/`](continue/) | Scaffold |
 | **Roo Code** | [`roocode/`](roocode/) | Scaffold |
 

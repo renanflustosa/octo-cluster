@@ -3,6 +3,14 @@
   "workspace_id": "my-company-main",
   "enabled_capability_packs": ["core", "my-company"],
   "memory_profile": "my-company",
+  "combination_id": "baseline",
+  "harness_tools": {
+    "lancedb": true,
+    "caveman": true,
+    "ponytail": true,
+    "okf_index": false,
+    "session_hooks": false
+  },
   "docs_root": "domains/_private/my-company/docs",
   "script_prefix": "my-company",
   "workspace_root_env": "MY_COMPANY_WORKSPACE_ROOT",

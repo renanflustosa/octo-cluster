@@ -11,6 +11,45 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+CARD_COLS = [
+    "recorded_at",
+    "ticket",
+    "arm",
+    "combination_id",
+    "repo",
+    "tokens_input",
+    "tokens_output",
+    "tokens_cache_read",
+    "tokens_total",
+    "tokens_input_measured",
+    "tokens_output_measured",
+    "tokens_input_estimated",
+    "tokens_output_estimated",
+    "cost_usd",
+    "usage_events",
+    "usage_source",
+    "diff_added",
+    "diff_deleted",
+    "diff_net",
+    "files_changed",
+    "gates_pass",
+    "context_budget_alerts",
+    "commands_lines",
+    "skills_lines",
+    "harness_score",
+    "ship_verdict",
+    "notes",
+]
+
+V2_COLUMNS = {
+    "combination_id": "TEXT DEFAULT 'baseline'",
+    "tokens_input_measured": "INTEGER",
+    "tokens_output_measured": "INTEGER",
+    "tokens_input_estimated": "INTEGER",
+    "tokens_output_estimated": "INTEGER",
+    "harness_score": "INTEGER",
+}
+
 
 def default_db_path() -> Path:
     root = Path(__file__).resolve().parents[2]
@@ -28,41 +67,36 @@ def connect(db_path: Path) -> sqlite3.Connection:
     return conn
 
 
+def ensure_v2(conn: sqlite3.Connection) -> None:
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(cards)").fetchall()}
+    for name, decl in V2_COLUMNS.items():
+        if name not in cols:
+            conn.execute(f"ALTER TABLE cards ADD COLUMN {name} {decl}")
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_cards_combination ON cards(combination_id)"
+    )
+    conn.execute("DELETE FROM schema_version")
+    conn.execute("INSERT INTO schema_version (version) VALUES (2)")
+    conn.commit()
+
+
 def init_db(db_path: Path) -> None:
     sql = schema_path().read_text(encoding="utf-8")
     with connect(db_path) as conn:
         conn.executescript(sql)
+        ensure_v2(conn)
         conn.commit()
 
 
 def insert_card(db_path: Path, row: dict) -> int:
-    cols = [
-        "recorded_at",
-        "ticket",
-        "arm",
-        "repo",
-        "tokens_input",
-        "tokens_output",
-        "tokens_cache_read",
-        "tokens_total",
-        "cost_usd",
-        "usage_events",
-        "usage_source",
-        "diff_added",
-        "diff_deleted",
-        "diff_net",
-        "files_changed",
-        "gates_pass",
-        "context_budget_alerts",
-        "commands_lines",
-        "skills_lines",
-        "ship_verdict",
-        "notes",
-    ]
-    values = [row.get(c) for c in cols]
+    init_db(db_path)
+    if not row.get("combination_id"):
+        row["combination_id"] = row.get("arm") or "baseline"
+    values = [row.get(c) for c in CARD_COLS]
     with connect(db_path) as conn:
+        ensure_v2(conn)
         cur = conn.execute(
-            f"INSERT INTO cards ({', '.join(cols)}) VALUES ({', '.join('?' * len(cols))})",
+            f"INSERT INTO cards ({', '.join(CARD_COLS)}) VALUES ({', '.join('?' * len(CARD_COLS))})",
             values,
         )
         conn.commit()
@@ -104,9 +138,11 @@ def migrate_csv(db_path: Path, workspace: Path) -> dict:
                 insert_card(
                     db_path,
                     {
-                        "recorded_at": r.get("recorded_at") or datetime.now(timezone.utc).isoformat(),
+                        "recorded_at": r.get("recorded_at")
+                        or datetime.now(timezone.utc).isoformat(),
                         "ticket": r.get("ticket", "unknown"),
                         "arm": r.get("arm", "default"),
+                        "combination_id": r.get("combination_id") or r.get("arm") or "baseline",
                         "repo": r.get("repo"),
                         "tokens_input": _int(r.get("tokens_input")),
                         "tokens_output": _int(r.get("tokens_output")),
@@ -123,6 +159,7 @@ def migrate_csv(db_path: Path, workspace: Path) -> dict:
                         "context_budget_alerts": _int(r.get("context_budget_alerts")),
                         "commands_lines": _int(r.get("commands_lines")),
                         "skills_lines": _int(r.get("skills_lines")),
+                        "harness_score": _int(r.get("harness_score")),
                         "ship_verdict": r.get("ship_verdict"),
                         "notes": r.get("notes"),
                     },
@@ -156,13 +193,15 @@ def migrate_csv(db_path: Path, workspace: Path) -> dict:
 def trends(db_path: Path, last: int = 10, arm: str | None = None) -> dict:
     init_db(db_path)
     with connect(db_path) as conn:
+        ensure_v2(conn)
         arm_filter = " AND arm = ?" if arm and arm != "all" else ""
         params: list = [arm] if arm and arm != "all" else []
         params.append(last)
 
         cards = conn.execute(
             f"""
-            SELECT ticket, arm, tokens_total, cost_usd, diff_added, diff_net, gates_pass, recorded_at
+            SELECT ticket, arm, combination_id, tokens_total, cost_usd, diff_added,
+                   diff_net, gates_pass, harness_score, recorded_at
             FROM cards
             WHERE 1=1{arm_filter}
             ORDER BY id DESC LIMIT ?
@@ -175,7 +214,8 @@ def trends(db_path: Path, last: int = 10, arm: str | None = None) -> dict:
             SELECT arm, COUNT(*) AS n,
                    AVG(diff_added) AS avg_diff_added,
                    AVG(tokens_total) AS avg_tokens,
-                   AVG(cost_usd) AS avg_cost
+                   AVG(cost_usd) AS avg_cost,
+                   AVG(harness_score) AS avg_harness_score
             FROM cards
             GROUP BY arm
             """
@@ -194,6 +234,37 @@ def trends(db_path: Path, last: int = 10, arm: str | None = None) -> dict:
         "by_arm": [dict(r) for r in by_arm],
         "harness_snapshots": [dict(r) for r in harness],
     }
+
+
+def compare_combinations(db_path: Path, last: int = 50) -> dict:
+    """Rank combination_id arms by mean harness_score (ADR-006)."""
+    init_db(db_path)
+    with connect(db_path) as conn:
+        ensure_v2(conn)
+        rows = conn.execute(
+            """
+            SELECT
+              COALESCE(combination_id, arm, 'baseline') AS combination_id,
+              COUNT(*) AS n,
+              AVG(harness_score) AS avg_harness_score,
+              AVG(tokens_total) AS avg_tokens,
+              AVG(ABS(COALESCE(diff_net, 0))) AS avg_abs_diff_net,
+              AVG(gates_pass) AS avg_gate_pass,
+              AVG(context_budget_alerts) AS avg_budget_alerts,
+              SUM(CASE WHEN usage_source = 'api' THEN 1 ELSE 0 END) AS n_measured,
+              SUM(CASE WHEN usage_source IS NULL OR usage_source != 'api' THEN 1 ELSE 0 END) AS n_estimated_or_skipped
+            FROM cards
+            WHERE id IN (SELECT id FROM cards ORDER BY id DESC LIMIT ?)
+            GROUP BY COALESCE(combination_id, arm, 'baseline')
+            ORDER BY (avg_harness_score IS NULL), avg_harness_score DESC,
+                     (avg_tokens IS NULL), avg_tokens ASC
+            """,
+            [last],
+        ).fetchall()
+
+    ranked = [dict(r) for r in rows]
+    winner = ranked[0]["combination_id"] if ranked else None
+    return {"last": last, "winner": winner, "by_combination": ranked}
 
 
 def _int(v) -> int | None:
@@ -231,6 +302,8 @@ def main() -> int:
     p_tr = sub.add_parser("trends")
     p_tr.add_argument("--last", type=int, default=10)
     p_tr.add_argument("--arm", default="all")
+    p_cmp = sub.add_parser("compare-combinations")
+    p_cmp.add_argument("--last", type=int, default=50)
 
     args = parser.parse_args()
     db = args.db or default_db_path()
@@ -269,6 +342,9 @@ def main() -> int:
         return 0
     if args.cmd == "trends":
         print(json.dumps(trends(db, args.last, args.arm), indent=2))
+        return 0
+    if args.cmd == "compare-combinations":
+        print(json.dumps(compare_combinations(db, args.last), indent=2))
         return 0
     return 2
 

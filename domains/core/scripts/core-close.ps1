@@ -54,7 +54,34 @@ if (-not $SkipMetrics) {
                 '-ShipVerdict', $ShipVerdict, '-BaseRef', $BaseRef
             )
             if ($RepoRoot) { $liteParams += @('-RepoRoot', $RepoRoot) }
-            & powershell @liteParams 2>&1 | Out-Null
+            $liteOut = & powershell @liteParams 2>&1 | Out-String
+            $combo = $null
+            $score = $null
+            # Prefer JSON line from measure-card-lite
+            foreach ($line in ($liteOut -split "`r?`n")) {
+                $t = $line.Trim()
+                if ($t.StartsWith('{') -and $t.Contains('combination_id')) {
+                    try {
+                        $row = $t | ConvertFrom-Json
+                        $combo = [string]$row.combination_id
+                        $score = $row.harness_score
+                    } catch { }
+                }
+                if ($t -match '\[measure-card-lite\]') {
+                    Write-Host $t -ForegroundColor Green
+                }
+            }
+            if (-not $combo) {
+                try {
+                    . (Join-Path (Get-OctoClusterRoot) 'domains\core\scripts\resolve-execution-context.ps1')
+                    $ctx = Get-ShipExecutionContext
+                    if ($ctx.combination_id) { $combo = [string]$ctx.combination_id }
+                } catch { }
+            }
+            if (-not $combo) { $combo = 'baseline' }
+            $scoreText = if ($null -ne $score -and "$score" -ne '') { "$score" } else { 'n/a' }
+            Write-Host "[close] metrics combo=$combo harness_score=$scoreText" -ForegroundColor Cyan
+            Write-Host "[close] rank arms: pwsh eval/metrics/report.ps1 -CompareCombinations -Last 50" -ForegroundColor DarkGray
         } catch {
             Write-Host "WARN: measure-card-lite skipped - $($_.Exception.Message)" -ForegroundColor Yellow
         }

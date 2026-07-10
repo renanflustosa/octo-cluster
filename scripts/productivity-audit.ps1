@@ -86,6 +86,12 @@ $results += @(
         if ($null -eq (Get-Command rg -ErrorAction SilentlyContinue)) { throw "missing" }
         $true
     })
+    (Test-Tool -Id "python" -Label "Python 3 (metrics store)" -InstallHint "https://www.python.org or winget install Python.Python.3.12" -Check {
+        $py = Get-Command python -ErrorAction SilentlyContinue
+        if (-not $py) { $py = Get-Command python3 -ErrorAction SilentlyContinue }
+        if (-not $py) { throw "missing" }
+        $true
+    })
     (Test-Tool -Id "context_engine" -Label "LanceDB context-engine" -InstallHint "./install.sh or Dev Container" -Check {
         Test-Path (Join-Path $root "engine\context-engine\node_modules\@lancedb\lancedb")
     })
@@ -94,6 +100,26 @@ $results += @(
     })
     (Test-Tool -Id "platform_context" -Label "Platform execution context" -InstallHint "contexts/runtime/platform.json" -Check {
         Test-Path (Join-Path $root "contexts\runtime\platform.json")
+    })
+    (Test-Tool -Id "harness_combo_fields" -Label "Runtime combination_id + harness_tools" -InstallHint "contexts/runtime/platform.json (ADR-006)" -Check {
+        $p = Join-Path $root "contexts\runtime\platform.json"
+        if (-not (Test-Path $p)) { return $false }
+        $j = Get-Content -LiteralPath $p -Raw -Encoding UTF8 | ConvertFrom-Json
+        return [bool]($j.combination_id -and $j.harness_tools)
+    })
+    (Test-Tool -Id "metrics_report" -Label "Metrics report + schema" -InstallHint "eval/metrics/report.ps1 + engine/metrics/schema.sql" -Check {
+        (Test-Path (Join-Path $root "eval\metrics\report.ps1")) -and
+        (Test-Path (Join-Path $root "engine\metrics\schema.sql")) -and
+        (Test-Path (Join-Path $root "engine\metrics\metrics_db.py"))
+    })
+    (Test-Tool -Id "sync_cursor_script" -Label "sync-cursor.ps1" -InstallHint "scripts/sync-cursor.ps1" -Check {
+        Test-Path (Join-Path $root "scripts\sync-cursor.ps1")
+    })
+    (Test-Tool -Id "core_hooks_source" -Label "Platform hooks source" -InstallHint "domains/core/hooks/hooks.platform.json" -Check {
+        Test-Path (Join-Path $root "domains\core\hooks\hooks.platform.json")
+    })
+    (Test-Tool -Id "v1_readiness_doc" -Label "V1 harness readiness doc" -InstallHint "docs/guides/v1-harness-readiness.md" -Check {
+        Test-Path (Join-Path $root "docs\guides\v1-harness-readiness.md")
     })
 )
 
@@ -189,7 +215,7 @@ if ($Workstation) {
         if ($dockerOk) {
             $results += [ordered]@{ id = "docker"; label = "Docker (optional)"; status = "OK"; hint = "" }
         } else {
-            $dockerHint = if ($IsLinux -or $IsMacOS) { "Docker Engine — see docs/guides/onboarding.md" } else { ".\scripts\install-docker.ps1" }
+            $dockerHint = if ($IsLinux -or $IsMacOS) { "Docker Engine - see docs/guides/onboarding.md" } else { ".\scripts\install-docker.ps1" }
             $results += [ordered]@{ id = "docker"; label = "Docker (optional)"; status = "WARN"; hint = $dockerHint }
         }
     } catch {

@@ -68,6 +68,8 @@ function Get-ShipExecutionContext {
             enabled_capability_packs   = @($json.enabled_capability_packs)
             memory_profile             = if ($json.memory_profile) { [string]$json.memory_profile } else { [string]$json.id }
             ship_repositories          = if ($json.ship_repositories) { @($json.ship_repositories) } else { @() }
+            combination_id             = if ($json.combination_id) { [string]$json.combination_id } else { 'baseline' }
+            harness_tools              = if ($json.harness_tools) { $json.harness_tools } else { $null }
             active_repo                = $activeRepo
             active_repo_path           = $RepoPath
             _config_path               = $configPath
@@ -85,6 +87,8 @@ function Get-ShipExecutionContext {
             enabled_capability_packs = @($packs | Select-Object -Unique)
             memory_profile           = $contextId
             ship_repositories        = @()
+            combination_id           = 'baseline'
+            harness_tools            = $null
             active_repo              = $activeRepo
             active_repo_path         = $RepoPath
             _config_path             = $null
