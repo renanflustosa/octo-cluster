@@ -4,6 +4,10 @@ Modular catalog of **free/local** harness and cost tools, plus an experiment pro
 
 Canonical decision: [ADR-006](../adr/ADR-006-harness-tool-cluster.md). Inventory: [harness-catalog.yaml](../architecture/harness-catalog.yaml). V1 certainty checklist: [v1-harness-readiness.md](./v1-harness-readiness.md). Pre-push: [agent-pre-push.md](../governance/agent-pre-push.md).
 
+## Tool Impact Protocol (external tools)
+
+For MCP servers, IDE extensions, CLIs, and other **third-party** tools: [tool-impact-protocol.md](./tool-impact-protocol.md) (paired A/B, promote/reject before catalog changes).
+
 ## 4-way bakeoff (harness + token consumption)
 
 Protocol: [combination-bakeoff.md](../../eval/agentic/protocol/combination-bakeoff.md) (arms: `nada` / `baseline` / `compress-on` / `octo-full`).
@@ -61,6 +65,7 @@ pwsh scripts/boundary-audit.ps1
 
 ## Related
 
+- [tool-impact-protocol.md](./tool-impact-protocol.md)
 - [metrics-kernel.md](../architecture/metrics-kernel.md)
 - [token-metrics-baseline.md](./token-metrics-baseline.md)
 - [opensre-analysis.md](./opensre-analysis.md)
