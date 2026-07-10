@@ -10,6 +10,8 @@ Phase commands are **optional** — routine edits do not require them.
 /start-workspace  →  /scan  →  /model  →  Execute plan  →  /ship  →  /close
 ```
 
+Meta (no pipeline): `/prompt` — rewrite only, never execute. Also: `/review`, `/debug`.
+
 One chat ≈ one work item.
 
 ## CLI entry points

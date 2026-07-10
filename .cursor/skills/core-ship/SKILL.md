@@ -30,8 +30,6 @@ Read `SHIP_SKILL` once per thread.
 
 Run scoped checks from the /model validation plan plus repo-policies/<repo>.yaml verify commands (provider repo-policy-verify).
 
-**Optional (non-blocking):** on large diffs (~100+ added lines), run `/minimal-review` or read `minimal-review` skill for a delete-list before verify — does not replace gates.
-
 **Verdict (≤40 lines):** `READY` | `NEEDS FIXES` | `BLOCKED`
 
 | Verdict | Action |

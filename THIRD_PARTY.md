@@ -59,7 +59,7 @@ These are **external CLI/runtime dependencies** of the harness, not derived sour
 
 The following are original work © Renan Lustosa under the project MIT license, unless noted above:
 
-- Skills: `caveman`, `core-adaptive-loop`, `core-ship`, `minimal-review`, `simplify`, `find-skills`, `code-review`
+- Skills: `caveman`, `core-adaptive-loop`, `core-ship`, `code-review`, `systematic-debugging`, `ponytail-lite`
 - Rules, commands, and harness scripts under `domains/core/`, `scripts/`, `capabilities/core/`
 - Context engine (`engine/context-engine/`) — original TypeScript; uses npm deps listed above
 - Ship pipeline, repo policies, metrics scaffold (`eval/metrics/`)

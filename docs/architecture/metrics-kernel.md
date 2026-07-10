@@ -30,7 +30,7 @@ flowchart LR
 |-------|--------|
 | `/scan` | `stamp-usage-baseline.ps1` |
 | `/close` | `measure-card-lite.ps1` |
-| ad hoc | `report.ps1`, `/metrics` command |
+| ad hoc | `report.ps1` (eval/metrics; no Cursor command) |
 
 ## Secrets
 

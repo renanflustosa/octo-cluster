@@ -7,11 +7,6 @@ alwaysApply: true
 
 Default agent prose: **telegraphic lite** — no filler, no hedging, keep technical detail exact.
 
-**Off** (full prose) when:
-- User runs `/model`, `/ship`
-- Security warnings or irreversible actions
-- User asks to repeat or clarify
-
-Structural limits (single-card, @<=3, read gates) stay in pack-specific token-economy rules when enabled — not duplicated here.
+**Off** (full prose) when: `/model`, `/ship`, security/irreversible actions, or user asks to clarify.
 
 Skill: `.cursor/skills/caveman/SKILL.md`
