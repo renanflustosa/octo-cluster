@@ -1,6 +1,6 @@
 # PowerShell wrapper for engine/metrics/metrics_db.py (Octo Cluster metrics kernel).
 param(
-    [ValidateSet('init', 'insert-card', 'insert-harness', 'migrate-csv', 'trends')]
+    [ValidateSet('init', 'insert-card', 'insert-harness', 'migrate-csv', 'trends', 'compare-combinations')]
     [string]$StoreAction,
 
     [string]$JsonPayload = '',
@@ -35,6 +35,9 @@ switch ($StoreAction) {
     }
     'trends' {
         $argsList += @('--last', [string]$Last, '--arm', $Arm)
+    }
+    'compare-combinations' {
+        $argsList += @('--last', [string]$Last)
     }
 }
 

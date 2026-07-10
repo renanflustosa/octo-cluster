@@ -30,11 +30,20 @@ Test: `cursor-session.ps1 -Json -Redact`
 # Scan — stamp baseline
 stamp-usage-baseline.ps1 -Ticket ISSUE-123
 
-# Close — automatic lite metrics
+# Close — automatic lite metrics (reads combination_id from runtime JSON)
 
 # Report
 report.ps1 -Last 20 -Arm ponytail-lite
+report.ps1 -CompareCombinations -Last 50
+```
 
+## Combination bakeoff (ADR-006)
+
+Set `combination_id` + `harness_tools` in `contexts/runtime/*.json` (or `.local.json`). Each `/close` persists `combination_id`, measured/estimated token buckets when usage API works, and `harness_score`. Rank arms with `-CompareCombinations`.
+
+See [`docs/guides/harness-tool-cluster.md`](../../docs/guides/harness-tool-cluster.md).
+
+```powershell
 # DB admin
 engine/metrics/metrics-store.ps1 -StoreAction init
 engine/metrics/metrics-store.ps1 -StoreAction migrate-csv

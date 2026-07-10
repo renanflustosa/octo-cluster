@@ -11,8 +11,10 @@ param(
 
     [string]$HeadRef = 'HEAD',
 
-    [ValidateSet('baseline', 'ponytail-lite', 'caveman-only', 'yagni-oneliner', 'default')]
+    [ValidateSet('baseline', 'ponytail-lite', 'caveman-only', 'yagni-oneliner', 'default', 'nada', 'compress-on', 'octo-full')]
     [string]$Arm = 'default',
+
+    [string]$CombinationId = '',
 
     [ValidateSet('READY', 'NEEDS FIXES', 'BLOCKED', 'unknown')]
     [string]$ShipVerdict = 'unknown',
@@ -26,11 +28,24 @@ param(
 
 $ErrorActionPreference = 'Continue'
 . (Join-Path $PSScriptRoot '..\..\scripts\_load-env.ps1')
+. (Join-Path $PSScriptRoot '..\..\domains\core\scripts\resolve-execution-context.ps1')
 
 $root = Get-OctoClusterRoot
+$ctx = $null
+try { $ctx = Get-ShipExecutionContext } catch { }
+
 if (-not $Profile) {
-    $ctx = Get-ShipExecutionContext
-    $Profile = if ($ctx.memory_profile) { [string]$ctx.memory_profile } else { 'octo-cluster' }
+    $Profile = if ($ctx -and $ctx.memory_profile) { [string]$ctx.memory_profile } else { 'octo-cluster' }
+}
+
+if (-not $CombinationId) {
+    if ($ctx -and $ctx.combination_id) { $CombinationId = [string]$ctx.combination_id }
+    else { $CombinationId = 'baseline' }
+}
+
+# Keep arm aligned with combination for legacy report grouping when still default
+if ($Arm -eq 'default' -and $CombinationId -and $CombinationId -ne 'baseline') {
+    $Arm = $CombinationId
 }
 
 if (-not $RepoRoot) {
@@ -48,6 +63,10 @@ $tokensInput = $null
 $tokensOutput = $null
 $tokensCache = $null
 $tokensTotal = $null
+$tokensInMeasured = $null
+$tokensOutMeasured = $null
+$tokensInEstimated = $null
+$tokensOutEstimated = $null
 $costUsd = $null
 $usageEvents = $null
 $usageSource = 'skipped'
@@ -68,6 +87,8 @@ if (-not $SkipUsage -and (Test-Path $baselinePath)) {
                 $costUsd = [double]$usage.cost_usd
                 $usageEvents = [int]$usage.events
                 $usageSource = 'api'
+                $tokensInMeasured = $tokensInput
+                $tokensOutMeasured = $tokensOutput
             }
         }
     } catch {
@@ -123,28 +144,52 @@ if (Test-Path $gateStamp) {
     }
 }
 
+# --- harness_score (ADR-006 weights, lite approximation) ---
+$score = 0
+$score += (30 * $gatesPass)
+if ($usageSource -eq 'api' -and $null -ne $tokensTotal) {
+    $tokScore = [math]::Max(0, 20 - [math]::Min(20, [math]::Floor($tokensTotal / 5000)))
+    $score += $tokScore
+} else {
+    $locPenalty = [math]::Min(20, [math]::Abs($diffNet) / 50)
+    $score += [math]::Max(0, 20 - $locPenalty)
+}
+$diffPenalty = [math]::Min(15, [math]::Abs($diffNet) / 40)
+$score += [math]::Max(0, 15 - $diffPenalty)
+$alertPenalty = [math]::Min(15, $budgetAlerts * 5)
+$score += [math]::Max(0, 15 - $alertPenalty)
+$score += 5  # phase_shape placeholder
+$score += 5  # bootstrap placeholder
+$harnessScore = [int][math]::Round([math]::Min(100, $score))
+
 $row = [ordered]@{
-    recorded_at             = (Get-Date).ToUniversalTime().ToString('o')
-    ticket                  = $Ticket
-    arm                     = $Arm
-    repo                    = (Split-Path $RepoRoot -Leaf)
-    tokens_input            = $tokensInput
-    tokens_output           = $tokensOutput
-    tokens_cache_read       = $tokensCache
-    tokens_total            = $tokensTotal
-    cost_usd                = $costUsd
-    usage_events            = $usageEvents
-    usage_source            = $usageSource
-    diff_added              = $diffAdded
-    diff_deleted            = $diffDeleted
-    diff_net                = $diffNet
-    files_changed           = $filesChanged
-    gates_pass              = $gatesPass
-    context_budget_alerts   = $budgetAlerts
-    commands_lines          = $commandsLines
-    skills_lines            = $skillsLines
-    ship_verdict            = $ShipVerdict
-    notes                   = $Notes
+    recorded_at               = (Get-Date).ToUniversalTime().ToString('o')
+    ticket                    = $Ticket
+    arm                       = $Arm
+    combination_id            = $CombinationId
+    repo                      = (Split-Path $RepoRoot -Leaf)
+    tokens_input              = $tokensInput
+    tokens_output             = $tokensOutput
+    tokens_cache_read         = $tokensCache
+    tokens_total              = $tokensTotal
+    tokens_input_measured     = $tokensInMeasured
+    tokens_output_measured    = $tokensOutMeasured
+    tokens_input_estimated    = $tokensInEstimated
+    tokens_output_estimated   = $tokensOutEstimated
+    cost_usd                  = $costUsd
+    usage_events              = $usageEvents
+    usage_source              = $usageSource
+    diff_added                = $diffAdded
+    diff_deleted              = $diffDeleted
+    diff_net                  = $diffNet
+    files_changed             = $filesChanged
+    gates_pass                = $gatesPass
+    context_budget_alerts     = $budgetAlerts
+    commands_lines            = $commandsLines
+    skills_lines              = $skillsLines
+    harness_score             = $harnessScore
+    ship_verdict              = $ShipVerdict
+    notes                     = $Notes
 }
 
 $pyScript = Join-Path $root 'engine\metrics\metrics_db.py'
@@ -169,7 +214,7 @@ if (Test-Path $baselinePath) {
     Remove-Item $baselinePath -Force -ErrorAction SilentlyContinue
 }
 
-$summary = "ticket=$Ticket tokens=$tokensTotal cost=`$$costUsd diff_added=$diffAdded source=$usageSource"
+$summary = "ticket=$Ticket combo=$CombinationId score=$harnessScore tokens=$tokensTotal cost=`$$costUsd diff_added=$diffAdded source=$usageSource"
 Write-Host "[measure-card-lite] $summary" -ForegroundColor Green
 Write-Output ($row | ConvertTo-Json -Compress)
 exit 0

@@ -41,3 +41,7 @@ domains/_private/
 capabilities/_private/
 contexts/_private/
 docs/_private/
+
+# Bakeoff / SDK local artifacts
+eval/agentic/results/
+eval/agentic/fixtures/_sdk-runner/
