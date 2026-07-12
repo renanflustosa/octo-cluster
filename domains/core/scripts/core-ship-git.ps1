@@ -362,7 +362,7 @@ function Remove-ShipBranch {
             try {
                 Invoke-Git @('branch', '-d', $BranchName) | Out-Null
             } catch {
-                Write-Host "`[ship-git] branch -d failed (squash merge?) — force delete local $BranchName" -ForegroundColor Yellow
+                Write-Host "`[ship-git] branch -d failed (squash merge?) - force delete local $BranchName" -ForegroundColor Yellow
                 Invoke-Git @('branch', '-D', $BranchName) | Out-Null
             }
         }
@@ -580,7 +580,7 @@ try {
             } catch { }
         }
         if ($prMerged) {
-            Write-Host "`[ship-git] PR merged remotely — restoring clean base before exit" -ForegroundColor Yellow
+            Write-Host "`[ship-git] PR merged remotely - restoring clean base before exit" -ForegroundColor Yellow
             Restore-CleanBaseBranch -BaseBranch $baseBranch -GitPolicy $gitPolicy
             @{
                 strategy    = [string]$gitPolicy.strategy
