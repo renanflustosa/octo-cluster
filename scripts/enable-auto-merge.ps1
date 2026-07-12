@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Enable GitHub auto-merge on a repository (idempotent; also invoked by /ship when auto_merge policy is set).
+  Enable GitHub auto-merge and delete-branch-on-merge on a repository (idempotent; also invoked by /ship when auto_merge policy is set).
 .PARAMETER Repo
   owner/name (default: inferred from origin remote).
 #>
@@ -21,6 +21,35 @@ function Get-GhRepoSlugForAutoMerge {
     throw "Cannot parse GitHub slug from origin: $url"
 }
 
+function Set-RepoFlagIfNeeded {
+    param(
+        [Parameter(Mandatory = $true)][string]$Slug,
+        [Parameter(Mandatory = $true)][string]$Field,
+        [Parameter(Mandatory = $true)][string]$Label,
+        [switch]$WhatIf
+    )
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $raw = gh api "repos/$Slug" --jq ".$Field" 2>$null
+        if ($LASTEXITCODE -eq 0 -and ($raw | Out-String).Trim() -eq 'true') {
+            Write-Host "[enable-auto-merge] $Label already enabled on $Slug" -ForegroundColor DarkGray
+            return
+        }
+        if ($WhatIf) {
+            Write-Host "[enable-auto-merge] WhatIf: would set $Field on $Slug" -ForegroundColor Yellow
+            return
+        }
+        gh api "repos/$Slug" -X PATCH -f "${Field}=true" | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to enable $Field on $Slug (admin repo permission required)"
+        }
+        Write-Host "[ok] $Label enabled on $Slug" -ForegroundColor Green
+    } finally {
+        $ErrorActionPreference = $prevEap
+    }
+}
+
 function Enable-GitHubAutoMergeSetting {
     param(
         [string]$Repo = '',
@@ -31,26 +60,12 @@ function Enable-GitHubAutoMergeSetting {
     }
     $slug = if ($Repo) { $Repo } else { Get-GhRepoSlugForAutoMerge }
     if ($WhatIf) {
-        Write-Host "[enable-auto-merge] WhatIf: would set allow_auto_merge on $slug" -ForegroundColor Yellow
+        Write-Host "[enable-auto-merge] WhatIf: would set allow_auto_merge and delete_branch_on_merge on $slug" -ForegroundColor Yellow
         return $slug
     }
-    $prevEap = $ErrorActionPreference
-    $ErrorActionPreference = 'Continue'
-    try {
-        $raw = gh api "repos/$slug" --jq '.allow_auto_merge' 2>$null
-        if ($LASTEXITCODE -eq 0 -and ($raw | Out-String).Trim() -eq 'true') {
-            Write-Host "[enable-auto-merge] already enabled on $slug" -ForegroundColor DarkGray
-            return $slug
-        }
-        gh api "repos/$slug" -X PATCH -f allow_auto_merge=true | Out-Null
-        if ($LASTEXITCODE -ne 0) {
-            throw "Failed to enable allow_auto_merge on $slug (admin repo permission required)"
-        }
-        Write-Host "[ok] allow_auto_merge enabled on $slug" -ForegroundColor Green
-        return $slug
-    } finally {
-        $ErrorActionPreference = $prevEap
-    }
+    Set-RepoFlagIfNeeded -Slug $slug -Field 'allow_auto_merge' -Label 'allow_auto_merge'
+    Set-RepoFlagIfNeeded -Slug $slug -Field 'delete_branch_on_merge' -Label 'delete_branch_on_merge'
+    return $slug
 }
 
 if ($MyInvocation.InvocationName -ne '.') {

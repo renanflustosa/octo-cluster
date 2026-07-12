@@ -62,11 +62,22 @@ Git phase uses `repo-policies/default.yaml` merged with `repo-policies/<repo>.ya
 When `git.auto_merge: true` (see repo policy), the git phase also:
 
 1. Creates/checks out feature branch (or derives from `CARD:` in `current_task.md` when `auto_branch_from_ticket: true`)
-2. Commits, pushes, opens PR against `base_branch`
-3. Ensures GitHub `allow_auto_merge` on the repo (idempotent), enables `gh pr merge --auto`, and waits for CI (timeout from `ci_wait_timeout_minutes`)
-4. On merge: deletes remote + local branch, checks out `base_branch`
+2. Commits all tracked/untracked changes (`git add -A`); aborts if anything remains uncommitted after commit
+3. Pushes, opens PR against `base_branch`
+4. Ensures GitHub `allow_auto_merge` and `delete_branch_on_merge` on the repo (idempotent via `scripts/enable-auto-merge.ps1`), enables `gh pr merge --auto`, and waits for CI (timeout from `ci_wait_timeout_minutes`)
+5. On merge: best-effort remote/local branch cleanup; local `-d` with `-D` fallback after squash merge
+6. When `checkout_main_after_merge` or `reset_worktree_after_ship`: restores clean `base_branch` (`git reset --hard origin/<base>` + `git clean -fd`) — only after push started; abort before push preserves local work
 
-Release-please PRs auto-merge via `.github/workflows/auto-merge.yml` (bot PRs only). Standalone utility: `pwsh scripts/enable-auto-merge.ps1`.
+**Clean worktree contract:** after a ship with push, the operator must be on `base_branch` with empty `git status --porcelain`. Uncommitted changes never left behind on `base_branch`.
+
+Release-please PRs auto-merge via `.github/workflows/auto-merge.yml`:
+
+- Triggers on bot PRs (`user.type == Bot`) for `opened`, `synchronize`, `ready_for_review`, and `check_suite.completed`
+- Sets `GH_REPO` so `gh` works without checkout; waits for green checks via `gh pr checks --watch` before `gh pr merge --auto --squash`
+- Skips conflicting PRs and PRs with failing CI (fail-safe)
+- Remote branch cleanup relies on repo `delete_branch_on_merge` (enabled idempotently by ship)
+
+Standalone utility: `pwsh scripts/enable-auto-merge.ps1`.
 
 **Git JSON fields (when auto_merge enabled):** `pr_url`, `merged`, `merge_state`, `branch_deleted`, `main_sha`
 
@@ -78,6 +89,12 @@ When `git.auto_close_after_ship: true` and `CARD:` is set in `current_task.md`, 
 Skip auto-close when git success criteria fail (e.g. `merged=false` with `auto_merge`). Manual `/close` remains available.
 
 **Output (≤8 lines):** verify verdict + PR URL + merged + auto-close status + residual risk
+
+## E2E validation (maintainer)
+
+1. `/ship` a trivial change on a feature branch → PR auto-merges when CI passes → local `main` clean
+2. Push lands on `main` → release-please opens `chore(main): release X` bot PR
+3. Bot PR auto-merges when CI green (no manual approve/delete) → tag published on GitHub Releases
 
 ## Customization
 
