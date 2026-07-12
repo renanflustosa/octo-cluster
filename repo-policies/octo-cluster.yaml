@@ -8,6 +8,7 @@ git:
   merge_method: squash
   delete_branch_after_merge: true
   checkout_main_after_merge: true
+  reset_worktree_after_ship: true
   wait_for_ci: true
   ci_wait_timeout_minutes: 20
   auto_branch_from_ticket: true

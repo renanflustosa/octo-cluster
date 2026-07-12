@@ -8,6 +8,9 @@ on:
       - opened
       - synchronize
       - ready_for_review
+  check_suite:
+    types:
+      - completed
 
 permissions:
   contents: write
@@ -15,19 +18,86 @@ permissions:
 
 jobs:
   auto-merge:
-    if: github.event.pull_request.user.login == 'github-actions[bot]'
     runs-on: ubuntu-latest
+    concurrency:
+      group: auto-merge-${{ github.event.pull_request.number || github.event.check_suite.pull_requests[0].number || github.run_id }}
+      cancel-in-progress: true
     steps:
-      - name: Enable auto-merge for release PR
+      - name: Resolve bot PR
+        id: pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          PR="${{ github.event.pull_request.number }}"
-          MERGEABLE="${{ github.event.pull_request.mergeable }}"
-          if [ "$MERGEABLE" = "false" ]; then
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            if [ "${{ github.event.pull_request.user.type }}" != "Bot" ]; then
+              echo "Human PR — skip"
+              exit 0
+            fi
+            echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PR=$(echo '${{ toJson(github.event.check_suite.pull_requests) }}' | jq -r '.[0].number // empty')
+          if [ -z "$PR" ]; then
+            echo "No PR in check_suite — skip"
+            exit 0
+          fi
+
+          IS_BOT=$(gh pr view "$PR" --json author --jq '.author.is_bot')
+          if [ "$IS_BOT" != "true" ]; then
+            echo "PR #$PR is not from a bot — skip"
+            exit 0
+          fi
+
+          BASE=$(gh pr view "$PR" --json baseRefName --jq -r '.baseRefName')
+          if [ "$BASE" != "main" ]; then
+            echo "PR #$PR base is $BASE — skip"
+            exit 0
+          fi
+
+          echo "number=$PR" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for checks and enable auto-merge
+        if: steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          PR="${{ steps.pr.outputs.number }}"
+
+          read -r PR_STATE MERGEABLE HAS_AUTO <<< "$(gh pr view "$PR" \
+            --json state,mergeable,autoMergeRequest \
+            --jq '[.state, .mergeable, (.autoMergeRequest != null)] | @tsv')"
+
+          if [ "$PR_STATE" = "MERGED" ] || [ "$PR_STATE" = "CLOSED" ]; then
+            echo "PR #$PR already $PR_STATE — skip"
+            exit 0
+          fi
+
+          if [ "$HAS_AUTO" = "true" ]; then
+            echo "Auto-merge already enabled on PR #$PR — skip"
+            exit 0
+          fi
+
+          if [ "$MERGEABLE" = "CONFLICTING" ]; then
             echo "PR #$PR has conflicts — skip auto-merge"
             exit 0
           fi
+
+          echo "Waiting for checks on PR #$PR..."
+          if ! gh pr checks "$PR" --watch --interval 15; then
+            echo "Checks failed on PR #$PR — skip auto-merge"
+            exit 1
+          fi
+
+          MERGEABLE=$(gh pr view "$PR" --json mergeable --jq -r '.mergeable')
+          if [ "$MERGEABLE" = "CONFLICTING" ]; then
+            echo "PR #$PR has conflicts after checks — skip auto-merge"
+            exit 0
+          fi
+
           gh pr merge "$PR" --auto --squash
           echo "Auto-merge enabled for PR #$PR"
