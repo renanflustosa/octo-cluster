@@ -1,13 +1,14 @@
 -- Octo Cluster metrics kernel — portable schema (SQLite)
 -- Consumed by octo-cluster; embed the same schema in consumer repos when needed.
 -- schema_version 2: combination_id, harness_score, measured/estimated token buckets (ADR-006)
+-- schema_version 3: experiment_id, tool_slug, experiment_arm (TIP)
 
 PRAGMA journal_mode = WAL;
 
 CREATE TABLE IF NOT EXISTS schema_version (
   version INTEGER NOT NULL
 );
-INSERT OR IGNORE INTO schema_version (version) VALUES (2);
+INSERT OR IGNORE INTO schema_version (version) VALUES (3);
 
 CREATE TABLE IF NOT EXISTS cards (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,7 +38,10 @@ CREATE TABLE IF NOT EXISTS cards (
   skills_lines INTEGER,
   harness_score INTEGER,
   ship_verdict TEXT,
-  notes TEXT
+  notes TEXT,
+  experiment_id TEXT,
+  tool_slug TEXT,
+  experiment_arm TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_cards_ticket ON cards(ticket);
