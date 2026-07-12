@@ -6,12 +6,14 @@ phases:
   - gates
   - git
   - reviews
+  - close
 
 providers:
   verification: discovered
   gates: discovered
   reviews: discovered
   git: repository-policy
+  close: discovered
 
 verdicts:
   - READY

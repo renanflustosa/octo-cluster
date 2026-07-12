@@ -1,15 +1,15 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Apply GitHub rulesets: main/develop merge only via PR (no direct push).
+  Apply GitHub rulesets: protected branches merge only via PR (no direct push).
 .PARAMETER Repo
   owner/name (default: inferred from origin remote).
 .PARAMETER Branches
-  Comma-separated branch names (default: main,develop).
+  Comma-separated branch names (default: main).
 #>
 param(
     [string]$Repo = '',
-    [string]$Branches = 'main,develop',
+    [string]$Branches = 'main',
     [switch]$WhatIf
 )
 

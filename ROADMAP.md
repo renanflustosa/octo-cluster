@@ -7,11 +7,11 @@ Tracked via [GitHub Issues and Milestones](https://github.com/renanflustosa/octo
 ## Shipped (v0.1.x)
 
 - [x] Public repo split, MIT license, CONTRIBUTING / SECURITY
-- [x] PR-only flow: `feature` → `develop` → `main`
+- [x] PR-only flow: feature branch → `main` (trunk-based)
 - [x] THIRD_PARTY attributions for adapted skills
 - [x] CI on every PR (`bun run validate octo-cluster`)
 - [x] EOS governance docs, ADRs, CODE_OF_CONDUCT
-- [x] First merge `develop` → `main` with release-please tag `v0.1.0`
+- [x] First release on `main` with release-please tag `v0.1.0`
 - [x] Public framework boundary hardening — tagged **`v0.1.1`** (2026-06-30)
 
 **Current release:** `v0.1.1` on `main`. **Next semver target:** `v0.2.x` (credibility milestone below).
@@ -22,7 +22,7 @@ Tracked via [GitHub Issues and Milestones](https://github.com/renanflustosa/octo
 
 2. **Harness maturity score** — shareable report from [`scripts/productivity-audit.ps1`](./scripts/productivity-audit.ps1).
 
-3. **Expanded CI** — done: harness smoke (`productivity-audit -CiSmoke` in CI); Dependabot enabled.
+3. **Expanded CI** — harness smoke (`productivity-audit -CiSmoke` on Windows); Ubuntu matrix deferred. Dependabot enabled.
 
 ## Later — reach (0.x → 1.0.0)
 
@@ -49,4 +49,4 @@ Tracked via [GitHub Issues and Milestones](https://github.com/renanflustosa/octo
 
 ## How to suggest changes
 
-Open a [GitHub issue](https://github.com/renanflustosa/octo-cluster/issues/new/choose) or a small PR against `develop`. Follow [CONTRIBUTING.md](./CONTRIBUTING.md).
+Open a [GitHub issue](https://github.com/renanflustosa/octo-cluster/issues/new/choose) or a small PR against `main`. Follow [CONTRIBUTING.md](./CONTRIBUTING.md).

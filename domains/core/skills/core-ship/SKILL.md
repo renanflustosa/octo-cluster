@@ -59,7 +59,25 @@ powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline ship -A
 
 Git phase uses `repo-policies/default.yaml` merged with `repo-policies/<repo>.yaml` only — providers never override git policy.
 
-**Output (≤8 lines):** verify verdict + branch/PR URL + gate result + residual risk
+When `git.auto_merge: true` (see repo policy), the git phase also:
+
+1. Creates/checks out feature branch (or derives from `CARD:` in `current_task.md` when `auto_branch_from_ticket: true`)
+2. Commits, pushes, opens PR against `base_branch`
+3. Ensures GitHub `allow_auto_merge` on the repo (idempotent), enables `gh pr merge --auto`, and waits for CI (timeout from `ci_wait_timeout_minutes`)
+4. On merge: deletes remote + local branch, checks out `base_branch`
+
+Release-please PRs auto-merge via `.github/workflows/auto-merge.yml` (bot PRs only). Standalone utility: `pwsh scripts/enable-auto-merge.ps1`.
+
+**Git JSON fields (when auto_merge enabled):** `pr_url`, `merged`, `merge_state`, `branch_deleted`, `main_sha`
+
+When `git.auto_close_after_ship: true` and `CARD:` is set in `current_task.md`, successful git delivery also:
+
+1. Runs discovered **ship phase `close`** providers (e.g. private tracker mark Done)
+2. Invokes `core-close.ps1` (memory archive, metrics, wipe `current_task.md`)
+
+Skip auto-close when git success criteria fail (e.g. `merged=false` with `auto_merge`). Manual `/close` remains available.
+
+**Output (≤8 lines):** verify verdict + PR URL + merged + auto-close status + residual risk
 
 ## Customization
 
