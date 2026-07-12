@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6](https://github.com/renanflustosa/octo-cluster/compare/v0.1.5...v0.1.6) (2026-07-12)
+
+
+### Features
+
+* **metrics:** add TIP experiment metadata to card-lite schema ([b9e6ad5](https://github.com/renanflustosa/octo-cluster/commit/b9e6ad523f0c4d7f992ed8c26277fad364a40302))
+* **metrics:** add TIP experiment metadata to card-lite schema ([2449706](https://github.com/renanflustosa/octo-cluster/commit/2449706bc95670b1d2dc1fc616165c0a995fc5cd))
+* **ship:** zero-touch delivery with auto-merge and auto-close ([#47](https://github.com/renanflustosa/octo-cluster/issues/47)) ([d78f7b5](https://github.com/renanflustosa/octo-cluster/commit/d78f7b5ae0363f9401adec0a7a0a4588e94340cf))
+
 ## [0.1.5](https://github.com/renanflustosa/octo-cluster/compare/v0.1.4...v0.1.5) (2026-07-10)
 
 
