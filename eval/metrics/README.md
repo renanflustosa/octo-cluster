@@ -43,6 +43,23 @@ Set `combination_id` + `harness_tools` in `contexts/runtime/*.json` (or `.local.
 
 See [`docs/guides/harness-tool-cluster.md`](../../docs/guides/harness-tool-cluster.md).
 
+## TIP stamp (experiment metadata)
+
+Optional columns on each card (schema v3): `experiment_id`, `tool_slug`, `experiment_arm` (`baseline` | `treatment`). Omit them for normal `/close` — backward compatible.
+
+```powershell
+# Direct measure
+pwsh eval/metrics/measure-card-lite.ps1 -Ticket TIP-ast-grep-1 `
+  -ExperimentId TIP-ast-grep-20260711 -ToolSlug ast-grep -ExperimentArm treatment
+
+# Or set env before /close (core-close → measure-card-lite reads these)
+$env:OCTO_EXPERIMENT_ID  = 'TIP-ast-grep-20260711'
+$env:OCTO_TOOL_SLUG      = 'ast-grep'
+$env:OCTO_EXPERIMENT_ARM = 'baseline'   # or treatment
+```
+
+Guide: [`docs/guides/tool-impact-protocol.md`](../../docs/guides/tool-impact-protocol.md).
+
 ```powershell
 # DB admin
 engine/metrics/metrics-store.ps1 -StoreAction init

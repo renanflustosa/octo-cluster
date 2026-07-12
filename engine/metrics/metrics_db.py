@@ -39,6 +39,9 @@ CARD_COLS = [
     "harness_score",
     "ship_verdict",
     "notes",
+    "experiment_id",
+    "tool_slug",
+    "experiment_arm",
 ]
 
 V2_COLUMNS = {
@@ -48,6 +51,12 @@ V2_COLUMNS = {
     "tokens_input_estimated": "INTEGER",
     "tokens_output_estimated": "INTEGER",
     "harness_score": "INTEGER",
+}
+
+V3_COLUMNS = {
+    "experiment_id": "TEXT",
+    "tool_slug": "TEXT",
+    "experiment_arm": "TEXT",
 }
 
 
@@ -80,11 +89,22 @@ def ensure_v2(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 
+def ensure_v3(conn: sqlite3.Connection) -> None:
+    ensure_v2(conn)
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(cards)").fetchall()}
+    for name, decl in V3_COLUMNS.items():
+        if name not in cols:
+            conn.execute(f"ALTER TABLE cards ADD COLUMN {name} {decl}")
+    conn.execute("DELETE FROM schema_version")
+    conn.execute("INSERT INTO schema_version (version) VALUES (3)")
+    conn.commit()
+
+
 def init_db(db_path: Path) -> None:
     sql = schema_path().read_text(encoding="utf-8")
     with connect(db_path) as conn:
         conn.executescript(sql)
-        ensure_v2(conn)
+        ensure_v3(conn)
         conn.commit()
 
 
@@ -94,7 +114,7 @@ def insert_card(db_path: Path, row: dict) -> int:
         row["combination_id"] = row.get("arm") or "baseline"
     values = [row.get(c) for c in CARD_COLS]
     with connect(db_path) as conn:
-        ensure_v2(conn)
+        ensure_v3(conn)
         cur = conn.execute(
             f"INSERT INTO cards ({', '.join(CARD_COLS)}) VALUES ({', '.join('?' * len(CARD_COLS))})",
             values,

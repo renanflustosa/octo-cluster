@@ -23,7 +23,14 @@ param(
 
     [string]$Notes = '',
 
-    [switch]$SkipUsage
+    [switch]$SkipUsage,
+
+    [string]$ExperimentId = '',
+
+    [string]$ToolSlug = '',
+
+    [ValidateSet('', 'baseline', 'treatment')]
+    [string]$ExperimentArm = ''
 )
 
 $ErrorActionPreference = 'Continue'
@@ -46,6 +53,14 @@ if (-not $CombinationId) {
 # Keep arm aligned with combination for legacy report grouping when still default
 if ($Arm -eq 'default' -and $CombinationId -and $CombinationId -ne 'baseline') {
     $Arm = $CombinationId
+}
+
+if (-not $ExperimentId) { $ExperimentId = [string]$env:OCTO_EXPERIMENT_ID }
+if (-not $ToolSlug) { $ToolSlug = [string]$env:OCTO_TOOL_SLUG }
+if (-not $ExperimentArm) { $ExperimentArm = [string]$env:OCTO_EXPERIMENT_ARM }
+if ($ExperimentArm -and $ExperimentArm -notin @('baseline', 'treatment')) {
+    Write-Host "[measure-card-lite] invalid ExperimentArm='$ExperimentArm' (use baseline|treatment); omitting" -ForegroundColor Yellow
+    $ExperimentArm = ''
 }
 
 if (-not $RepoRoot) {
@@ -190,6 +205,9 @@ $row = [ordered]@{
     harness_score             = $harnessScore
     ship_verdict              = $ShipVerdict
     notes                     = $Notes
+    experiment_id             = $(if ($ExperimentId) { $ExperimentId } else { $null })
+    tool_slug                 = $(if ($ToolSlug) { $ToolSlug } else { $null })
+    experiment_arm            = $(if ($ExperimentArm) { $ExperimentArm } else { $null })
 }
 
 $pyScript = Join-Path $root 'engine\metrics\metrics_db.py'

@@ -57,7 +57,7 @@ Every TIP run compares **the same Octo baseline** with exactly **one** variable 
 
 - Primary: SQLite `state/metrics/metrics.db` (gitignored)
 - Optional: `eval/agentic/results/TIP-<tool-slug>-<date>.md` (gitignored; redact secrets)
-- Future: `experiment_id` / `tool_slug` columns on card-lite (see backlog below)
+- Persisted: `experiment_id` / `tool_slug` / `experiment_arm` via `measure-card-lite.ps1` (schema v3; params or `OCTO_EXPERIMENT_*` env)
 
 ---
 
@@ -117,7 +117,7 @@ Never commit `mcp.json` or tokens to the public tree.
 
 1. Define **equivalent task** (same acceptance criteria as a BC card).
 2. Baseline: Octo phase loop through `/close` with card-lite.
-3. Treatment: CLI completes same task; manually invoke `measure-card-lite.ps1` with same `combination_id` + note `tool_slug` in ticket metadata until schema exists.
+3. Treatment: CLI completes same task; manually invoke `measure-card-lite.ps1` with same `combination_id` plus `-ToolSlug` / `-ExperimentArm` (or `OCTO_EXPERIMENT_*` env).
 
 ### Eval library (core)
 
