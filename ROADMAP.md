@@ -22,7 +22,7 @@ Tracked via [GitHub Issues and Milestones](https://github.com/renanflustosa/octo
 
 2. **Harness maturity score** — shareable report from [`scripts/productivity-audit.ps1`](./scripts/productivity-audit.ps1).
 
-3. **Expanded CI** — harness smoke tests, Dependabot enabled.
+3. **Expanded CI** — done: harness smoke (`productivity-audit -CiSmoke` in CI); Dependabot enabled.
 
 ## Later — reach (0.x → 1.0.0)
 

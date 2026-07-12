@@ -48,6 +48,10 @@ jobs:
         shell: pwsh
         run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-audit.ps1
 
+      - name: Harness productivity-audit smoke
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/productivity-audit.ps1 -CiSmoke
+
       - name: Scan pipeline discover
         shell: pwsh
         run: |
@@ -94,6 +98,10 @@ jobs:
       - name: Public framework boundary audit
         shell: pwsh
         run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-audit.ps1
+
+      - name: Harness productivity-audit smoke
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/productivity-audit.ps1 -CiSmoke
 
       - name: Scan pipeline discover
         shell: pwsh

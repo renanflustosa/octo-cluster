@@ -64,7 +64,7 @@ Target `develop` for features and fixes; `main` only for release merges from `de
 3. One concern per PR when possible.
 4. Run local verify before opening:
    - `bun run validate octo-cluster` (context-engine)
-   - `.\scripts\productivity-audit.ps1` (optional smoke)
+   - `.\scripts\productivity-audit.ps1` (optional smoke); CI runs `-CiSmoke` on Win + Ubuntu
 5. Do not commit secrets, `.env`, or `state/memory/` contents.
 6. Edit **source** under `domains/` / `capabilities/` — not generated `.cursor/` (run `.\scripts\sync-cursor.ps1` after domain edits).
 7. Adapted skills must stay attributed — see [THIRD_PARTY.md](./THIRD_PARTY.md).
