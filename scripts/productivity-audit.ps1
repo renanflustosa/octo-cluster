@@ -1,10 +1,12 @@
 #Requires -Version 5.1
 # COST 0 productivity harness audit (8CL-158 F6).
-# Usage: .\scripts\productivity-audit.ps1 [-Json] [-Workstation]
+# Usage: .\scripts\productivity-audit.ps1 [-Json] [-Workstation] [-CiSmoke]
+# -CiSmoke: CI fresh-clone gate — demotes memory_index MISSING→WARN (no LanceDB in fixtures).
 
 param(
     [switch]$Json,
-    [switch]$Workstation
+    [switch]$Workstation,
+    [switch]$CiSmoke
 )
 
 $ErrorActionPreference = "Continue"
@@ -220,6 +222,15 @@ if ($Workstation) {
         }
     } catch {
         $results += [ordered]@{ id = "docker"; label = "Docker (optional)"; status = "WARN"; hint = "Docker Engine or Desktop" }
+    }
+}
+
+if ($CiSmoke) {
+    foreach ($r in $results) {
+        if ($r.id -eq 'memory_index' -and $r.status -eq 'MISSING') {
+            $r.status = 'WARN'
+            $r.hint = 'CI smoke: reindex locally — bun run index-incremental octo-cluster --kind memory'
+        }
     }
 }
 
