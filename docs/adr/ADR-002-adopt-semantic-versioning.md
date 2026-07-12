@@ -21,6 +21,6 @@ Adopt [SemVer 2.0.0](https://semver.org/) for all releases.
 
 ## Consequences
 
-- `develop` integrates features; `main` receives release PRs with tags `v0.x.x`
+- Feature branches merge to `main` via PR; release-please opens version bump PRs on `main` with tags `v0.x.x`
 - Breaking changes require explicit footer and major bump
 - GitHub Milestone EOS v1.0.0 is strategic; semver tags track actual releases

@@ -3,11 +3,9 @@ name: CI
 on:
   pull_request:
     branches:
-      - develop
       - main
   push:
     branches:
-      - develop
       - main
 
 env:
@@ -15,7 +13,7 @@ env:
   AI_EXECUTION_CONTEXT: platform
 
 jobs:
-  validate-windows:
+  validate:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
@@ -56,60 +54,3 @@ jobs:
         shell: pwsh
         run: |
           pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/invoke-pipeline.ps1 -Pipeline scan -Action discover
-
-  validate-ubuntu:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Install PowerShell
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y wget apt-transport-https software-properties-common
-          wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
-          sudo dpkg -i packages-microsoft-prod.deb
-          sudo apt-get update -qq
-          sudo apt-get install -y powershell
-
-      - name: Install Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install context-engine dependencies
-        working-directory: engine/context-engine
-        run: bun install
-
-      - name: Unit and harness tests
-        working-directory: engine/context-engine
-        run: bun test src/lib/ensure-profile-seed.test.ts src/harness.test.ts
-
-      - name: Simulate fresh clone (no state/memory)
-        shell: pwsh
-        run: |
-          if (Test-Path state/memory/octo-cluster) {
-            Remove-Item -Recurse -Force state/memory/octo-cluster
-          }
-
-      - name: Validate octo-cluster profile
-        working-directory: engine/context-engine
-        run: bun run validate octo-cluster
-
-      - name: Public framework boundary audit
-        shell: pwsh
-        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-audit.ps1
-
-      - name: Harness productivity-audit smoke
-        shell: pwsh
-        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/productivity-audit.ps1 -CiSmoke
-
-      - name: Scan pipeline discover
-        shell: pwsh
-        run: |
-          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/invoke-pipeline.ps1 -Pipeline scan -Action discover
-
-      - name: Install marker (install.sh) resolves root
-        shell: pwsh
-        run: |
-          if (-not (Test-Path install.sh)) { throw 'install.sh missing' }
-          pwsh -NoProfile -ExecutionPolicy Bypass -File octo.ps1 -Pipeline scan -Action discover

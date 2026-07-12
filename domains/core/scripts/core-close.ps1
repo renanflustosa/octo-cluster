@@ -9,24 +9,19 @@ param(
     [string]$Debt = "",
     [string]$Future = "",
     [string]$RepoRoot = "",
-    [string]$BaseRef = "develop",
+    [string]$BaseRef = "main",
     [string]$Arm = "default",
     [string]$ShipVerdict = "unknown",
     [switch]$SkipMetrics
 )
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot '..\..\..\scripts\_load-env.ps1')
+. (Join-Path $PSScriptRoot 'core-task-memory.ps1')
 $mem = Get-MemoryRoot -Profile $Profile
 $taskFile = Join-Path $mem "current_task.md"
-if (-not $Ticket -and (Test-Path $taskFile)) {
-    $raw = Get-Content $taskFile -Raw
-    if ($raw -match "CARD:\s*(\S+)") { $Ticket = $Matches[1].Trim() }
-}
+if (-not $Ticket) { $Ticket = Get-TicketFromCurrentTask -Profile $Profile }
 if (-not $Ticket) { Write-Error "Missing -Ticket (or CARD: in current_task.md)"; exit 1 }
-if (-not $Goal -and (Test-Path $taskFile)) {
-    $raw = Get-Content $taskFile -Raw
-    if ($raw -match "GOAL:\s*(.+)") { $Goal = $Matches[1].Trim() }
-}
+if (-not $Goal) { $Goal = Get-GoalFromCurrentTask -Profile $Profile }
 $ce = Get-ContextEngineRoot
 $exitCode = Invoke-ContextEngine run --cwd $ce memory-compact $Profile
 if ($null -ne $exitCode -and $exitCode -ne 0) { exit $exitCode }

@@ -55,7 +55,9 @@ fix/201-fix-rag-cache
 docs/45-update-onboarding
 ```
 
-Target `develop` for features and fixes; `main` only for release merges from `develop`.
+Target `main` for features and fixes via pull request. Direct push to `main` is blocked by branch rulesets.
+
+Maintainer `/ship` with zero-touch policy: feature branch → PR → auto-merge when CI passes → release-please bump on `main`.
 
 ## Pull requests
 
@@ -64,7 +66,7 @@ Target `develop` for features and fixes; `main` only for release merges from `de
 3. One concern per PR when possible.
 4. Run local verify before opening:
    - `bun run validate octo-cluster` (context-engine)
-   - `.\scripts\productivity-audit.ps1` (optional smoke); CI runs `-CiSmoke` on Win + Ubuntu
+   - `.\scripts\productivity-audit.ps1` (optional smoke); CI runs `-CiSmoke` on Windows only
 5. Do not commit secrets, `.env`, or `state/memory/` contents.
 6. Edit **source** under `domains/` / `capabilities/` — not generated `.cursor/` (run `.\scripts\sync-cursor.ps1` after domain edits).
 7. Adapted skills must stay attributed — see [THIRD_PARTY.md](./THIRD_PARTY.md).
@@ -73,7 +75,7 @@ Target `develop` for features and fixes; `main` only for release merges from `de
 
 - **Commits:** Conventional Commits in English (`fix(memory): null-safe exit codes`).
 - **CHANGELOG:** [Keep a Changelog](https://keepachangelog.com/) in [CHANGELOG.md](./CHANGELOG.md); release-please updates it on `main`.
-- **Branches:** `develop` = integration; `main` = stable tags (`v0.x.x`) via PR only.
+- **Branches:** `main` = integration and stable tags (`v0.x.x`) via PR only (trunk-based).
 - **Releases:** SemVer 2.0.0 via release-please — see [ADR-002](./docs/adr/ADR-002-adopt-semantic-versioning.md).
 
 ## Code style

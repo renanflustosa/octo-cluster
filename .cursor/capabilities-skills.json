@@ -1,8 +1,9 @@
 ﻿{
-    "generatedAt":  "2026-07-10T02:23:59.1448315Z",
+    "generatedAt":  "2026-07-12T23:30:20.7154200Z",
     "executionContext":  "platform",
     "capabilityPacks":  [
-                            "core"
+                            "core",
+                            "maintainer"
                         ],
     "pipelines":  [
                       {

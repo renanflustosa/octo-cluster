@@ -17,6 +17,7 @@ param(
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot '..\..\..\scripts\_load-env.ps1')
 . (Join-Path $PSScriptRoot 'get-repo-policy.ps1')
+. (Join-Path $PSScriptRoot '..\..\..\scripts\enable-auto-merge.ps1')
 
 function Get-ProtectedBranches {
     param([hashtable]$GitPolicy)
@@ -142,6 +143,7 @@ function Get-ExistingPullRequestUrl {
 function New-PullRequest {
     param(
         [Parameter(Mandatory = $true)][string]$BaseBranch,
+        [string]$HeadBranch,
         [string]$Title,
         [string]$BodyFile
     )
@@ -149,8 +151,11 @@ function New-PullRequest {
         Write-Host '`[ship-git] skip pull request' -ForegroundColor Yellow
         return $null
     }
-    $head = (Invoke-Git @('branch', '--show-current')).Trim()
-    $existing = Get-ExistingPullRequestUrl -HeadBranch $head -BaseBranch $BaseBranch
+    if (-not $HeadBranch) {
+        $HeadBranch = (Invoke-Git @('branch', '--show-current')).Trim()
+    }
+    if (-not $HeadBranch) { throw 'HeadBranch is required for pull request.' }
+    $existing = Get-ExistingPullRequestUrl -HeadBranch $HeadBranch -BaseBranch $BaseBranch
     if ($existing) {
         Write-Host "`[ship-git] PR already exists: $existing" -ForegroundColor Green
         return $existing
@@ -175,6 +180,179 @@ function New-PullRequest {
     }
     Write-Host $out -ForegroundColor Green
     return ($out | Select-Object -Last 1)
+}
+
+function Invoke-Gh {
+    param([Parameter(Mandatory = $true)][string[]]$Args)
+    if ($WhatIf) {
+        Write-Host "gh $($Args -join ' ')" -ForegroundColor DarkGray
+        return ""
+    }
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $out = gh @Args 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            throw "gh $($Args -join ' ') failed: $out"
+        }
+        return $out
+    } finally {
+        $ErrorActionPreference = $prevEap
+    }
+}
+
+function Resolve-PrNumber {
+    param(
+        [string]$PrUrl,
+        [Parameter(Mandatory = $true)][string]$HeadBranch,
+        [Parameter(Mandatory = $true)][string]$BaseBranch
+    )
+    if ($PrUrl -match '/pull/(\d+)') { return [int]$Matches[1] }
+    if ($WhatIf) { return 0 }
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $out = gh pr view --head $HeadBranch --base $BaseBranch --json number --jq '.number' 2>$null
+        if ($LASTEXITCODE -ne 0) { throw "Could not resolve PR number for head=$HeadBranch base=$BaseBranch" }
+        $num = [int](($out | Out-String).Trim())
+        if ($num -le 0) { throw "Could not resolve PR number for head=$HeadBranch base=$BaseBranch" }
+        return $num
+    } finally {
+        $ErrorActionPreference = $prevEap
+    }
+}
+
+function Get-MergeMethodArgs {
+    param([hashtable]$GitPolicy)
+    switch ([string]$GitPolicy.merge_method) {
+        'merge' { return @('--merge') }
+        'rebase' { return @('--rebase') }
+        default { return @('--squash') }
+    }
+}
+
+function Enable-PrAutoMerge {
+    param(
+        [Parameter(Mandatory = $true)][int]$PrNumber,
+        [Parameter(Mandatory = $true)][hashtable]$GitPolicy
+    )
+    $args = @('pr', 'merge', [string]$PrNumber, '--auto') + (Get-MergeMethodArgs -GitPolicy $GitPolicy)
+    Write-Host "`[ship-git] enabling auto-merge on PR #$PrNumber" -ForegroundColor Cyan
+    Invoke-Gh -Args $args | Out-Null
+}
+
+function Get-PrStatus {
+    param([Parameter(Mandatory = $true)][int]$PrNumber)
+    if ($WhatIf) {
+        return [pscustomobject]@{ state = 'OPEN'; mergeable = 'MERGEABLE'; checks_failed = $false; checks_pending = $true }
+    }
+    $json = Invoke-Gh -Args @('pr', 'view', [string]$PrNumber, '--json', 'state,mergeable,statusCheckRollup')
+    $view = ($json | Out-String).Trim() | ConvertFrom-Json
+    $failed = $false
+    $pending = $false
+    foreach ($check in @($view.statusCheckRollup)) {
+        if ($check.state -eq 'FAILURE' -or $check.conclusion -eq 'FAILURE') { $failed = $true }
+        if ($check.state -eq 'PENDING' -or $check.status -eq 'IN_PROGRESS') { $pending = $true }
+        if ($check.conclusion -eq 'SUCCESS' -or $check.state -eq 'SUCCESS') { continue }
+        if ($check.conclusion -and $check.conclusion -notin @('SUCCESS', 'NEUTRAL', 'SKIPPED')) { $failed = $true }
+    }
+    return [pscustomobject]@{
+        state          = [string]$view.state
+        mergeable      = [string]$view.mergeable
+        checks_failed  = $failed
+        checks_pending = $pending
+    }
+}
+
+function Wait-ForPrMerged {
+    param(
+        [Parameter(Mandatory = $true)][int]$PrNumber,
+        [Parameter(Mandatory = $true)][hashtable]$GitPolicy
+    )
+    $timeoutMin = 20
+    if ($GitPolicy.ci_wait_timeout_minutes) {
+        $timeoutMin = [int]$GitPolicy.ci_wait_timeout_minutes
+    }
+    $waitForCi = $true
+    if ($null -ne $GitPolicy.wait_for_ci) { $waitForCi = [bool]$GitPolicy.wait_for_ci }
+    $deadline = (Get-Date).AddMinutes($timeoutMin)
+    Write-Host "`[ship-git] waiting for PR #$PrNumber merge (timeout ${timeoutMin}m)" -ForegroundColor Cyan
+
+    while ((Get-Date) -lt $deadline) {
+        $status = Get-PrStatus -PrNumber $PrNumber
+        if ($status.state -eq 'MERGED') {
+            return @{ merge_state = 'MERGED'; merged = $true }
+        }
+        if ($status.state -eq 'CLOSED') {
+            return @{ merge_state = 'CLOSED'; merged = $false }
+        }
+        if ($waitForCi -and $status.checks_failed) {
+            return @{ merge_state = 'failed'; merged = $false }
+        }
+        if ($status.mergeable -eq 'CONFLICTING') {
+            return @{ merge_state = 'conflict'; merged = $false }
+        }
+        Start-Sleep -Seconds 15
+    }
+    return @{ merge_state = 'waiting'; merged = $false }
+}
+
+function Remove-ShipBranch {
+    param(
+        [Parameter(Mandatory = $true)][string]$BranchName,
+        [Parameter(Mandatory = $true)][string]$BaseBranch,
+        [Parameter(Mandatory = $true)][hashtable]$GitPolicy
+    )
+    if ($GitPolicy.delete_branch_after_merge) {
+        Write-Host "`[ship-git] deleting remote branch origin/$BranchName" -ForegroundColor Cyan
+        Invoke-Git @('push', 'origin', '--delete', $BranchName) | Out-Null
+    }
+    if ($GitPolicy.checkout_main_after_merge) {
+        Write-Host "`[ship-git] checkout $BaseBranch" -ForegroundColor Cyan
+        Invoke-Git @('checkout', $BaseBranch) | Out-Null
+        Invoke-Git @('pull', '--ff-only', 'origin', $BaseBranch) | Out-Null
+    }
+    if ($GitPolicy.delete_branch_after_merge) {
+        Invoke-Git @('branch', '-d', $BranchName) | Out-Null
+    }
+}
+
+function Invoke-PostPullRequestAutomation {
+    param(
+        [Parameter(Mandatory = $true)][string]$PrUrl,
+        [Parameter(Mandatory = $true)][string]$BranchName,
+        [Parameter(Mandatory = $true)][string]$BaseBranch,
+        [Parameter(Mandatory = $true)][hashtable]$GitPolicy,
+        [bool]$RevalidateNeeded
+    )
+
+    if (-not $GitPolicy.auto_merge) { return @{} }
+    if ($WhatIf) {
+        Write-Host "`[ship-git] WhatIf: would auto-merge and cleanup branch $BranchName" -ForegroundColor Yellow
+        return @{ merged = $false; merge_state = 'whatif'; branch_deleted = $false }
+    }
+
+    Enable-GitHubAutoMergeSetting -WhatIf:$WhatIf | Out-Null
+    $prNumber = Resolve-PrNumber -PrUrl $PrUrl -HeadBranch $BranchName -BaseBranch $BaseBranch
+    Enable-PrAutoMerge -PrNumber $prNumber -GitPolicy $GitPolicy
+    $wait = Wait-ForPrMerged -PrNumber $prNumber -GitPolicy $GitPolicy
+
+    $branchDeleted = $false
+    $mainSha = $null
+    if ($wait.merged) {
+        Remove-ShipBranch -BranchName $BranchName -BaseBranch $BaseBranch -GitPolicy $GitPolicy
+        $branchDeleted = [bool]$GitPolicy.delete_branch_after_merge
+        $mainSha = (Invoke-Git @('rev-parse', 'HEAD')).Trim()
+    } elseif ($RevalidateNeeded) {
+        Write-Host "`[ship-git] revalidate recommended after rebase (revalidate_after_rebase)" -ForegroundColor Yellow
+    }
+
+    return @{
+        merged         = [bool]$wait.merged
+        merge_state    = [string]$wait.merge_state
+        branch_deleted = $branchDeleted
+        main_sha       = $mainSha
+    }
 }
 
 function Invoke-DirectStrategy {
@@ -256,7 +434,18 @@ function Invoke-FeatureBranchStrategy {
 
     $prUrl = $null
     if ($GitPolicy.pull_request) {
-        $prUrl = New-PullRequest -BaseBranch $base -Title $PrTitle -BodyFile $PrBodyFile
+        $prUrl = New-PullRequest -BaseBranch $base -HeadBranch $BranchName -Title $PrTitle -BodyFile $PrBodyFile
+    }
+
+    $revalidateNeeded = [bool]$GitPolicy.revalidate_after_rebase -and $rebased
+    $automation = @{}
+    if ($prUrl -and $GitPolicy.auto_merge) {
+        $automation = Invoke-PostPullRequestAutomation `
+            -PrUrl $prUrl `
+            -BranchName $BranchName `
+            -BaseBranch $base `
+            -GitPolicy $GitPolicy `
+            -RevalidateNeeded $revalidateNeeded
     }
 
     return [ordered]@{
@@ -264,8 +453,12 @@ function Invoke-FeatureBranchStrategy {
         branch            = $BranchName
         base_branch       = $base
         rebased           = $rebased
-        revalidate_needed = [bool]$GitPolicy.revalidate_after_rebase -and $rebased
+        revalidate_needed = $revalidateNeeded
         pr_url            = $prUrl
+        merged            = $automation.merged
+        merge_state       = $automation.merge_state
+        branch_deleted    = $automation.branch_deleted
+        main_sha          = $automation.main_sha
     }
 }
 
