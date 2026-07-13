@@ -100,7 +100,7 @@ Optional legacy shims: `domains/my-company/skills/*/SKILL.md` redirecting to `ca
 
 ## 4. Workspace file
 
-Add `workspaces/my-company-workspace.code-workspace`:
+Create a `.code-workspace` in your **consumer-managed** location (local vault, product mono-repo, etc.) — not in this repository:
 
 ```json
 {
@@ -117,7 +117,7 @@ Add `workspaces/my-company-workspace.code-workspace`:
 }
 ```
 
-Document the mapping in [`workspaces/README.md`](../workspaces/README.md) and [`docs/index.md`](./index.md).
+Document the mapping in your consumer docs and [`docs/index.md`](./index.md) (context JSON only — no workspace paths in this repo).
 
 ---
 
@@ -157,7 +157,7 @@ Verify:
 - [ ] No duplication of `domains/core/` assets
 - [ ] Global docs remain company-agnostic
 - [ ] Sync run; `capabilities-skills.json` updated
-- [ ] Entry in `workspaces/README.md` and `docs/index.md`
+- [ ] Entry in [`docs/index.md`](./index.md) (runtime context only)
 
 ---
 

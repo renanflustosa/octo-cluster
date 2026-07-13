@@ -19,7 +19,7 @@ Statuses: **OK** (automated green) · **WARN** (manual or optional) · **GAP** (
 | # | Layer | Expected | How to verify |
 |---|-------|----------|---------------|
 | 1 | OS / tools / env | OK | `productivity-audit.ps1 -Workstation` — git, pwsh 7+, Bun, Python, ripgrep, `OCTO_CLUSTER`, `AI_EXECUTION_CONTEXT=platform` |
-| 2 | Workspace folders | WARN | Multi-root: octo-cluster ± private vault. Never index or commit `secrets/`. Prefer [octo-cluster.code-workspace.example](../../octo-cluster.code-workspace.example) |
+| 2 | Workspace folders | WARN | Multi-root: octo-cluster ± private vault. Never index or commit `secrets/`. Workspace files are consumer-managed (outside this repo) |
 | 3 | Cursor settings | WARN | User/workspace: project hooks enabled; do not disable `.cursor/hooks.json`. Avoid token-heavy always-on features without bakeoff evidence |
 | 4 | Extensions | OK | [`.vscode/extensions.json`](../../.vscode/extensions.json) — PowerShell + YAML only (keep noise low) |
 | 5 | MCP servers | WARN | Local Cursor MCP config (not in public tree). Enable only needed servers; auth OK; no secrets in prompts. Private trackers via pack/MCP, not core |

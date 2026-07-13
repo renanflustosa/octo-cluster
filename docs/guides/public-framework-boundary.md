@@ -170,12 +170,6 @@ generated/
 .env
 .env.*
 
-# Local IDE workspace copies
-octo-cluster.code-workspace
-workspaces/*
-!workspaces/README.md
-!workspaces/company*-workspace.code-workspace
-
 # Local overlays (generic)
 contexts/runtime/*.local.json
 contexts/runtime/*.private.json

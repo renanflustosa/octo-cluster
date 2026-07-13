@@ -12,7 +12,7 @@ powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 ...
 
 The **outer shell** expands `$env:OCTO_CLUSTER` before PowerShell runs `-File`. When the session variable is empty — common in Cursor agent shells, external tools, and fresh terminals before workspace env loads — the path collapsed to `\scripts\invoke-pipeline.ps1` and failed.
 
-Integrated terminals opened from `octo-cluster.code-workspace` worked because `terminal.integrated.env.windows` sets session `OCTO_CLUSTER`. Agent execution and non-IDE shells did not inherit that.
+Integrated terminals opened from a consumer-managed IDE workspace worked when `terminal.integrated.env.windows` sets session `OCTO_CLUSTER`. Agent execution and non-IDE shells did not inherit that.
 
 ## Architecture
 
@@ -46,7 +46,7 @@ Integrated terminals opened from `octo-cluster.code-workspace` worked because `t
 | Dev Container (recommended) | set automatically | optional | yes |
 | `install.sh` (Linux/macOS native) | set in shell | optional | yes with `export OCTO_CLUSTER` |
 | `install.ps1` (Windows host optional) | optional | set | yes |
-| `octo-cluster.code-workspace` only | set in IDE terminal | may be unset | no — run install once |
+| Consumer IDE workspace only | set in IDE terminal | may be unset | no — run install once |
 | Full `-File` path to `octo.ps1` | not required | not required | yes (self-locating) |
 
 Dev Container or `./install.sh` / `install.ps1` is the bootstrap step for reliable agent + external shell usage.
@@ -96,7 +96,7 @@ When resolution fails, scripts throw:
 OCTO_CLUSTER could not be resolved.
 Remediation:
   1. Run install.ps1 from your clone root
-  2. Open octo-cluster.code-workspace (integrated terminals)
+  2. Open your consumer-managed IDE workspace (integrated terminals)
   3. Invoke octo.ps1 with a full -File path
 ```
 

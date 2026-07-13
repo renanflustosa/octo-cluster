@@ -71,9 +71,9 @@ Full guide: [onboarding](./docs/guides/onboarding.md).
 
 **Windows host bootstrap (optional):** `pwsh -File install.ps1` — sets User-level `OCTO_CLUSTER` without Dev Container.
 
-Copy [`octo-cluster.code-workspace.example`](./octo-cluster.code-workspace.example) → `octo-cluster.code-workspace` if you open the workspace file directly. Env vars are set by the dev container; the workspace file covers local terminals when not in a container.
+Env vars are set by the dev container; a consumer-managed IDE workspace covers local terminals when not in a container.
 
-Add your product repos or a **local gitignored** secrets vault as sibling folders in your workspace copy — never commit those paths to this repo.
+Add this folder as a root in your **local** multi-root workspace (vault, product repos, etc.) — never commit workspace files to this repo.
 
 ## Layout
 

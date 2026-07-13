@@ -61,7 +61,7 @@ Env is set automatically:
 | Sync adapters after editing `domains/` | `pwsh scripts/sync-cursor.ps1` |
 | Health check | `pwsh scripts/productivity-audit.ps1` |
 
-Optional: copy `octo-cluster.code-workspace.example` → `octo-cluster.code-workspace` and add sibling folders (your app, local gitignored vault).
+Optional: add this clone as a root in your consumer-managed IDE workspace (local vault, product repos, etc.).
 
 ## Linux/macOS native (optional)
 
@@ -84,9 +84,7 @@ export OCTO_CLUSTER="$(pwd)"   # add to ~/.bashrc for persistence
 
 ## Workspace
 
-`octo-cluster.code-workspace` — single-root with the CORE harness (seeded from `.example`; gitignored).
-
-Optional: add sibling folders (your app, local gitignored vault) in your local workspace copy.
+IDE workspace files (`.code-workspace`) are **consumer-managed** — outside this repository. Set `OCTO_CLUSTER` and `AI_EXECUTION_CONTEXT` in `terminal.integrated.env.windows` when opening integrated terminals without Dev Container.
 
 Terminal env (when not using Dev Container — local shell only):
 

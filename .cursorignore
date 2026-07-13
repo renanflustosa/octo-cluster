@@ -27,7 +27,3 @@ docs/temp/
 **/*.pyc
 eval/**/__pycache__/
 
-# === LOCAL WORKSPACES ===
-workspaces/*
-!workspaces/README.md
-!workspaces/company*-workspace.code-workspace
