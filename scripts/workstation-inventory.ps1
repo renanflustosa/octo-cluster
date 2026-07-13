@@ -111,11 +111,18 @@ $inv.os = [ordered]@{
 }
 
 # Environment / workspace
+$coreWorkspacePath = $null
+$pvRoot = [Environment]::GetEnvironmentVariable('PERSONAL_VAULT_ROOT', 'User')
+if ($pvRoot) {
+    $candidate = Join-Path $pvRoot 'workspaces\octo-cluster.code-workspace'
+    if (Test-Path -LiteralPath $candidate) { $coreWorkspacePath = $candidate }
+}
+
 $inv.workspace = [ordered]@{
     octoCluster         = $env:OCTO_CLUSTER
     aiExecutionContext  = $env:AI_EXECUTION_CONTEXT
     platformContextPath = Join-Path $root "contexts\runtime\platform.json"
-    coreWorkspacePath   = Join-Path $root "octo-cluster.code-workspace"
+    coreWorkspacePath   = $coreWorkspacePath
     githubRoot          = if (Test-Path "C:\GitHub") { "C:\GitHub" } else { $null }
     repos = @(
         @{ name = "octo-cluster"; path = $root; exists = $true }

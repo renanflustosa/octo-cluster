@@ -37,10 +37,10 @@ Pipeline skills resolve at runtime via [`scripts/invoke-pipeline.ps1`](../script
 
 ## Execution contexts
 
-| Context | File | Workspace |
-|---------|------|-----------|
-| **Platform** (default) | [`contexts/runtime/platform.json`](../contexts/runtime/platform.json) | [`octo-cluster.code-workspace.example`](../octo-cluster.code-workspace.example) |
-| **Company scaffolds** | add `contexts/runtime/companyN.json` | [`workspaces/`](../workspaces/) |
+| Context | File | IDE workspace |
+|---------|------|---------------|
+| **Platform** (default) | [`contexts/runtime/platform.json`](../contexts/runtime/platform.json) | Consumer-managed (outside this repo) |
+| **Company scaffolds** | add `contexts/runtime/companyN.json` | Consumer-managed |
 
 ## Agent context hierarchy
 
@@ -66,7 +66,6 @@ octo-cluster/
   adapters/           # IDE adapter scaffolding
   engine/             # context-engine (LanceDB)
   state/              # local memory indexes (gitignored)
-  workspaces/         # multi-root entry points
   scripts/            # sync-cursor, invoke-pipeline
   docs/
     governance/       # EOS
@@ -76,6 +75,6 @@ octo-cluster/
     api/
 ```
 
-Copy [`octo-cluster.code-workspace.example`](../octo-cluster.code-workspace.example) to `octo-cluster.code-workspace` (gitignored) for platform work, or run `.\install.ps1`. After switching workspace, run sync once.
+Open this harness as a folder root inside your **consumer-managed** IDE workspace. After switching workspace, run sync once.
 
 Work tracker: [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues).

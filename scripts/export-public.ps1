@@ -57,7 +57,6 @@ $copyPaths = @(
     'eval',
     'adapters',
     'docs',
-    'workspaces',
     'repo-policies',
     '.vscode',
     '.github'
@@ -148,27 +147,6 @@ if (Test-Path $rp) {
     }
 }
 
-# octo-cluster.code-workspace.example — single root (copy locally; gitignored)
-@'
-{
-	"folders": [
-		{ "path": ".", "name": "octo-cluster" }
-	],
-	"settings": {
-		"terminal.integrated.env.windows": {
-			"OCTO_CLUSTER": "${workspaceFolder:octo-cluster}",
-			"AI_EXECUTION_CONTEXT": "platform"
-		}
-	},
-	"extensions": {
-		"recommendations": [
-			"ms-vscode.powershell",
-			"redhat.vscode-yaml"
-		]
-	}
-}
-'@ | Set-Content (Join-Path $Dest 'octo-cluster.code-workspace.example') -Encoding UTF8
-Write-Host '[write] octo-cluster.code-workspace.example' -ForegroundColor Green
 
 # .gitignore — ensure state is ignored
 $gitignore = Join-Path $Dest '.gitignore'

@@ -55,5 +55,4 @@ invoke-pipeline.ps1 -Pipeline scan|model|ship|... -Action discover|run
 ## Related docs
 
 - [`add-child-context.md`](./add-child-context.md)
-- [`workspaces/README.md`](../workspaces/README.md)
 - [`productivity-tools.md`](./productivity-tools.md)

@@ -39,14 +39,6 @@ if (Test-Path $hooks) {
     & powershell -NoProfile -ExecutionPolicy Bypass -File $hooks
 }
 
-# Seed local workspace from public template (gitignored; may add private folders)
-$wsExample = Join-Path $env:OCTO_CLUSTER 'octo-cluster.code-workspace.example'
-$wsLocal = Join-Path $env:OCTO_CLUSTER 'octo-cluster.code-workspace'
-if ((Test-Path $wsExample) -and -not (Test-Path $wsLocal)) {
-    Copy-Item -LiteralPath $wsExample -Destination $wsLocal
-    Write-Host 'Created octo-cluster.code-workspace from .example' -ForegroundColor DarkGray
-}
-
 $validateHooks = Join-Path $PSScriptRoot "scripts\validate-cursor-hooks.ps1"
 if (Test-Path $validateHooks) {
     & powershell -NoProfile -ExecutionPolicy Bypass -File $validateHooks
@@ -85,7 +77,7 @@ Write-Host @"
 
 Done. Next steps:
   1. OCTO_CLUSTER is set at User scope (persists across terminals and agent shells).
-     Open octo-cluster.code-workspace for session env in integrated terminals.
+     Open your consumer-managed IDE workspace for session env in integrated terminals.
   2. gh auth login   (once, for PRs/issues)
   3. New chat -> /scan <TICKET> description
 
