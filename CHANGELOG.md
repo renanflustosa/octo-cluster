@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8](https://github.com/renanflustosa/octo-cluster/compare/v0.1.7...v0.1.8) (2026-07-13)
+
+
+### Features
+
+* **linkedin:** bilingual drafts, images, and semi-auto publish via private API ([#52](https://github.com/renanflustosa/octo-cluster/issues/52)) ([67e2475](https://github.com/renanflustosa/octo-cluster/commit/67e2475438b69e9f3306399b1260a5a197c71acc))
+
 ## [0.1.7](https://github.com/renanflustosa/octo-cluster/compare/v0.1.6...v0.1.7) (2026-07-12)
 
 
