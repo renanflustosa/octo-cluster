@@ -73,8 +73,8 @@ When `git.auto_merge: true` (see repo policy), the git phase also:
 Release-please PRs auto-merge via `.github/workflows/auto-merge.yml`:
 
 - Triggers on bot PRs (`user.type == Bot`) for `opened`, `synchronize`, `ready_for_review`, and `check_suite.completed`
-- Sets `GH_REPO` so `gh` works without checkout; waits for green checks via `gh pr checks --watch` before `gh pr merge --auto --squash`
-- Skips conflicting PRs and PRs with failing CI (fail-safe)
+- Sets `GH_REPO` so `gh` works without checkout; enables `gh pr merge --auto --squash` immediately — GitHub queues merge until required checks pass (no `gh pr checks --watch`; avoids self-referential deadlock)
+- Skips conflicting PRs, PRs with failing CI, and PRs that already have auto-merge enabled (fail-safe)
 - Remote branch cleanup relies on repo `delete_branch_on_merge` (enabled idempotently by ship)
 
 Standalone utility: `pwsh scripts/enable-auto-merge.ps1`.

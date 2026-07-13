@@ -3,94 +3,131 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$ManifestPath,
 
-    [Parameter(Mandatory = $true)]
     [ValidateSet('en', 'pt')]
     [string]$Locale,
 
-    [switch]$Confirm
+    [switch]$AllLocales,
+
+    [switch]$Confirm,
+
+    [switch]$PreflightOnly
 )
 
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot '..\..\..\scripts\_load-env.ps1')
 . (Join-Path $PSScriptRoot 'discover-capabilities.ps1')
 . (Join-Path $PSScriptRoot 'resolve-execution-context.ps1')
+. (Join-Path $PSScriptRoot 'linkedin-publish-common.ps1')
+
+function Write-PublishResult {
+    param(
+        $Manifest,
+        [string]$ManifestPath,
+        [hashtable]$Result
+    )
+
+    $draftDir = Split-Path $ManifestPath -Parent
+    $ticket = if ($Manifest.ticket) { [string]$Manifest.ticket } else { 'draft' }
+    $ts = if ($Manifest.timestamp) { [string]$Manifest.timestamp } else { (Get-Date).ToString('yyyyMMdd-HHmm') }
+    $outPath = Join-Path $draftDir "$ticket-$ts-publish-result.json"
+
+    $payload = [ordered]@{
+        ticket    = $ticket
+        timestamp = $ts
+        manifest  = $ManifestPath
+        results   = $Result
+    }
+
+    $json = $payload | ConvertTo-Json -Depth 6
+    Set-Content -Path $outPath -Value $json -Encoding UTF8
+    Write-Host "PUBLISH_RESULT=$outPath" -ForegroundColor Green
+    Write-Host $json
+}
 
 $root = Get-OctoClusterRoot
-$manifestPathResolved = if ([System.IO.Path]::IsPathRooted($ManifestPath)) {
-    $ManifestPath
-} else {
-    Join-Path $root ($ManifestPath -replace '/', '\')
-}
+$manifestPathResolved = Resolve-LinkedInManifestPath -ManifestPath $ManifestPath -Root $root
 
 if (-not (Test-Path $manifestPathResolved)) {
     Write-Error "Manifest not found: $manifestPathResolved"
     exit 1
 }
 
-if (-not $Confirm) {
-    Write-Error 'Publishing requires -Confirm (user confirmed in preview).'
+$manifest = Get-Content -Path $manifestPathResolved -Raw -Encoding UTF8 | ConvertFrom-Json
+$repoPath = $root
+$shipCtx = Get-ShipExecutionContext -RepoPath $repoPath
+$preflight = Get-LinkedInPublishPreflight -WorkspaceRoot $root -RepoPath $repoPath -ShipContext $shipCtx
+
+if ($PreflightOnly) {
+    if ($preflight.ok) {
+        Write-Host '[linkedin-publish] preflight OK' -ForegroundColor Green
+        Write-Host "PROVIDER=$($preflight.providerId)"
+        exit 0
+    }
+    Write-Host "[linkedin-publish] preflight failed: $($preflight.reason)" -ForegroundColor Yellow
+    Write-Host "PROVIDER=$($preflight.providerId)"
     exit 1
 }
 
-$repoPath = $root
-$shipCtx = Get-ShipExecutionContext -RepoPath $repoPath
+if (-not $Confirm) {
+    Write-Error 'Publishing requires -Confirm (user confirmed in chat preview).'
+    exit 1
+}
 
-function Get-LinkedInPublishProviders {
-    param([string]$WorkspaceRoot, [string]$RepoPath, [hashtable]$ShipContext)
+if ($AllLocales -and $Locale) {
+    Write-Error 'Use -AllLocales or -Locale, not both.'
+    exit 1
+}
 
-    $providers = @(Get-DiscoveredCapabilities -Pipeline linkedin -Phase publish -RepoPath $RepoPath -ShipContext $ShipContext)
-    if ($providers.Count -gt 0) { return $providers }
+if (-not $AllLocales -and -not $Locale) {
+    Write-Error 'Specify -Locale (en|pt) or -AllLocales.'
+    exit 1
+}
 
-    $privateRoot = Join-Path $WorkspaceRoot 'capabilities\_private'
-    if (-not (Test-Path $privateRoot)) { return @() }
+$locales = if ($AllLocales) { @('en', 'pt') } else { @($Locale) }
 
-    $seen = @{}
-    $found = New-Object System.Collections.ArrayList
-    $activeRepoName = if ($ShipContext.active_repo) { [string]$ShipContext.active_repo } else { 'octo-cluster' }
-
-    foreach ($packDir in Get-ChildItem -Path $privateRoot -Directory -ErrorAction SilentlyContinue) {
-        $packId = $packDir.Name
-        $manifestFile = Join-Path $packDir.FullName 'linkedin\manifest.yaml'
-        if (-not (Test-Path $manifestFile)) { continue }
-
-        $target = New-Object System.Collections.ArrayList
-        Add-CapabilityManifestProviders -PackId $packId -Pipeline linkedin -Phase publish `
-            -RepoPath $RepoPath -ShipContext $ShipContext -ActiveRepoName $activeRepoName `
-            -WorkspaceRoot $WorkspaceRoot -SeenIds $seen -TargetList $target
-        foreach ($p in $target) { [void]$found.Add($p) }
+if (-not $preflight.ok) {
+    $result = [ordered]@{}
+    foreach ($loc in $locales) {
+        $result[$loc] = [ordered]@{
+            ok       = $false
+            error    = [string]$preflight.reason
+            provider = [string]$preflight.providerId
+        }
     }
-
-    return @($found)
+    Write-PublishResult -Manifest $manifest -ManifestPath $manifestPathResolved -Result $result
+    if ($preflight.reason -eq 'no publish provider found') { exit 2 }
+    exit 1
 }
 
 $providers = @(Get-LinkedInPublishProviders -WorkspaceRoot $root -RepoPath $repoPath -ShipContext $shipCtx)
+$provider = $providers | Where-Object { $_.id } | Select-Object -First 1
 
-if ($providers.Count -eq 0) {
-    Write-Host '[linkedin-publish] no publish provider found' -ForegroundColor Yellow
-    Write-Host '[linkedin-publish] scaffold: capabilities/_private/<pack>/linkedin/ (see README)' -ForegroundColor DarkGray
-    Write-Host '[linkedin-publish] fallback: copy post from preview and paste on linkedin.com/feed' -ForegroundColor DarkGray
-    exit 2
+if (-not $provider -or -not $provider._script_path -or -not (Test-Path $provider._script_path)) {
+    Write-Error 'All publish providers failed or missing scripts.'
+    exit 1
 }
 
-foreach ($provider in $providers) {
-    if (-not $provider._script_path -or -not (Test-Path $provider._script_path)) {
-        Write-Host "WARN: provider '$($provider.id)' missing script" -ForegroundColor Yellow
-        continue
+$result = [ordered]@{}
+foreach ($loc in $locales) {
+    $run = Invoke-LinkedInPublishLocale -Provider $provider -ManifestPathResolved $manifestPathResolved -Locale $loc
+    $entry = [ordered]@{
+        ok       = [bool]$run.ok
+        provider = [string]$run.provider
     }
-
-    Write-Host "== linkedin publish provider: $($provider.id) (locale=$Locale) ==" -ForegroundColor Cyan
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $provider._script_path `
-        -ManifestPath $manifestPathResolved -Locale $Locale -Confirm
-
-    $code = if ($null -eq $LASTEXITCODE -or $LASTEXITCODE -eq '') { 0 } else { [int]$LASTEXITCODE }
-    if ($code -ne 0) {
-        Write-Host "[linkedin-publish] provider $($provider.id) failed (exit $code)" -ForegroundColor Red
-        exit $code
+    if ($run.ok) {
+        Write-Host "[linkedin-publish] published locale=$loc via $($run.provider)" -ForegroundColor Green
+    } else {
+        $entry.error = if ($run.error) { [string]$run.error } else { "exit $($run.exitCode)" }
+        Write-Host "[linkedin-publish] locale=$loc failed: $($entry.error)" -ForegroundColor Red
     }
-
-    Write-Host "[linkedin-publish] published locale=$Locale via $($provider.id)" -ForegroundColor Green
-    exit 0
+    $result[$loc] = $entry
 }
 
-Write-Error 'All publish providers failed or missing scripts.'
-exit 1
+Write-PublishResult -Manifest $manifest -ManifestPath $manifestPathResolved -Result $result
+
+$okCount = @($result.Values | Where-Object { $_.ok -eq $true }).Count
+$failCount = $locales.Count - $okCount
+
+if ($okCount -eq $locales.Count) { exit 0 }
+if ($okCount -eq 0) { exit 1 }
+exit 3

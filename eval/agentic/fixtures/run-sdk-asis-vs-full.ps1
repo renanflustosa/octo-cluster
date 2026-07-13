@@ -24,24 +24,15 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-if (-not $PersonalVault) { $PersonalVault = $env:PERSONAL_VAULT }
-if (-not $KeyFile) {
-    if (-not $PersonalVault) {
-        Write-Host 'BLOCKED: set PERSONAL_VAULT or pass -KeyFile' -ForegroundColor Red
-        exit 2
-    }
-    $KeyFile = Join-Path $PersonalVault 'secrets\octocluster\cursor-api-keys.txt'
+if (-not $PersonalVault) {
+    $PersonalVault = $env:PERSONAL_VAULT
+    if (-not $PersonalVault) { $PersonalVault = $env:PERSONAL_VAULT_ROOT }
 }
-
-if (-not (Test-Path -LiteralPath $KeyFile)) {
-    Write-Host 'BLOCKED: key file missing' -ForegroundColor Red
-    exit 2
-}
-
-$keyRaw = (Get-Content -LiteralPath $KeyFile -Raw -Encoding UTF8).Trim()
-$firstLine = ($keyRaw -split "`r?`n" | Where-Object { $_.Trim() -ne '' } | Select-Object -First 1)
-if (-not $firstLine -or $firstLine -notmatch '^crsr') {
-    Write-Host 'BLOCKED: invalid key file' -ForegroundColor Red
+. (Join-Path $PSScriptRoot 'load-cursor-vault-key.ps1')
+try {
+    $env:CURSOR_API_KEY = Initialize-CursorApiKeyFromVault -KeyFile $KeyFile -VaultRoot $PersonalVault
+} catch {
+    Write-Host $_.Exception.Message -ForegroundColor Red
     exit 2
 }
 
@@ -51,7 +42,6 @@ if ($Phase -eq 2) {
     $MaxRuns = $NCards * 2
 }
 
-$env:CURSOR_API_KEY = $firstLine.Trim()
 $env:OCTO_CLUSTER = $Root
 $env:PERSONAL_VAULT = $PersonalVault
 $env:BAKEOFF_MODEL = $Model

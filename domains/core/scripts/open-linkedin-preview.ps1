@@ -1,7 +1,9 @@
-# Local HTML preview + one-click publish confirm for LinkedIn drafts.
+# Legacy HTML browser preview for LinkedIn drafts (optional). Default: chat preview via show-linkedin-preview.ps1.
 param(
     [Parameter(Mandatory = $true)]
     [string]$ManifestPath,
+
+    [switch]$Browser,
 
     [int]$Port = 0,
 
@@ -10,6 +12,14 @@ param(
 
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot '..\..\..\scripts\_load-env.ps1')
+
+$showPreviewScript = Join-Path $PSScriptRoot 'show-linkedin-preview.ps1'
+
+if (-not $Browser) {
+    Write-Host '[linkedin-preview] browser disabled — use chat preview (show-linkedin-preview.ps1)' -ForegroundColor DarkGray
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $showPreviewScript -ManifestPath $ManifestPath
+    exit $LASTEXITCODE
+}
 
 $root = Get-OctoClusterRoot
 $publishScript = Join-Path $PSScriptRoot 'invoke-linkedin-publish.ps1'
@@ -50,6 +60,41 @@ function Escape-Html {
     return [System.Net.WebUtility]::HtmlEncode($Text)
 }
 
+function Get-PublishJsonBody {
+    param(
+        [string]$Locale,
+        [string]$ManifestFile,
+        [string]$PublishScriptPath
+    )
+
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        if ($Locale -eq 'both') {
+            $output = & powershell -NoProfile -ExecutionPolicy Bypass -File $PublishScriptPath `
+                -ManifestPath $ManifestFile -Confirm -AllLocales 2>&1
+        } else {
+            $output = & powershell -NoProfile -ExecutionPolicy Bypass -File $PublishScriptPath `
+                -ManifestPath $ManifestFile -Locale $Locale -Confirm 2>&1
+        }
+        $code = if ($null -eq $LASTEXITCODE -or $LASTEXITCODE -eq '') { 0 } else { [int]$LASTEXITCODE }
+        if ($code -eq 0) {
+            return '{"ok":true,"detail":"published"}'
+        }
+        $text = ($output | Out-String).Trim()
+        $errorMsg = if ($text) {
+            $last = ($text -split "`r?`n" | Where-Object { $_.Trim() } | Select-Object -Last 1)
+            if ($last -match ':\s*(.+)') { $Matches[1].Trim() } else { $last }
+        } else {
+            "exit $code"
+        }
+        $errorMsg = $errorMsg -replace '"', '\"'
+        return "{`"ok`":false,`"error`":`"$errorMsg`"}"
+    } finally {
+        $ErrorActionPreference = $prevEap
+    }
+}
+
 $imgEn = Get-ImageDataUri -ImagePath ([string]$manifest.images.en)
 $imgPt = Get-ImageDataUri -ImagePath ([string]$manifest.images.pt)
 $postEnHtml = Escape-Html ([string]$manifest.posts.en)
@@ -78,6 +123,7 @@ $html = @"
     .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
     button { cursor: pointer; border: none; border-radius: 999px; padding: 0.6rem 1.2rem; font-weight: 600; font-size: 0.9rem; }
     .publish { background: #0a66c2; color: #fff; }
+    .publish-all { background: #057642; color: #fff; }
     .copy { background: #38444d; color: #fff; }
     #status { padding: 0.75rem 1.5rem; min-height: 2.5rem; }
     .ok { color: #00ba7c; }
@@ -86,8 +132,9 @@ $html = @"
 </head>
 <body>
   <header>
-    <h1>LinkedIn preview — $ticket</h1>
-    <p style="margin:0.25rem 0 0;color:#8899a6">Review posts and images. One click publishes via your private API provider.</p>
+    <h1>LinkedIn preview — $ticket (legacy browser)</h1>
+    <p style="margin:0.25rem 0 0;color:#8899a6">Prefer chat preview: show-linkedin-preview.ps1 + reply publicar.</p>
+    <button class="publish-all" onclick="publish('both')" style="margin-top:0.5rem">Publish EN + PT</button>
   </header>
   <div class="grid">
     <div class="card">
@@ -163,32 +210,8 @@ Write-Host "[linkedin-preview] server $prefix (Ctrl+C to stop)" -ForegroundColor
 if ($IsLinux -or $IsMacOS) { & xdg-open $prefix 2>$null } else { Start-Process $prefix }
 
 if ($NoWait) {
-    $serverScript = Join-Path $draftDir "$ticket-$ts-preview-server.ps1"
-    @"
-`$listener = [System.Net.HttpListener]::new()
-`$listener.Prefixes.Add('$prefix')
-`$listener.Start()
-`$html = Get-Content -Raw -Encoding UTF8 '$previewPath'
-`$publishScript = '$publishScript'
-`$manifestFile = '$manifestPathResolved'
-while (`$listener.IsListening) {
-  `$ctx = `$listener.GetContext()
-  `$req = `$ctx.Request; `$res = `$ctx.Response
-  if (`$req.HttpMethod -eq 'POST' -and `$req.Url.LocalPath -eq '/publish') {
-    `$locale = `$req.QueryString['locale']
-    `$p = Start-Process powershell -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',`$publishScript,'-ManifestPath',`$manifestFile,'-Locale',`$locale,'-Confirm') -Wait -PassThru -NoNewWindow
-    `$body = if (`$p.ExitCode -eq 0) { '{"ok":true}' } else { '{"ok":false,"error":"publish failed"}' }
-    `$buf = [Text.Encoding]::UTF8.GetBytes(`$body)
-    `$res.ContentType = 'application/json'; `$res.OutputStream.Write(`$buf,0,`$buf.Length)
-  } else {
-    `$buf = [Text.Encoding]::UTF8.GetBytes(`$html)
-    `$res.ContentType = 'text/html; charset=utf-8'; `$res.OutputStream.Write(`$buf,0,`$buf.Length)
-  }
-  `$res.Close()
-}
-"@ | Set-Content -Path $serverScript -Encoding UTF8
-    Start-Process powershell -ArgumentList @('-NoProfile', '-WindowStyle', 'Hidden', '-File', $serverScript)
-    Write-Host "[linkedin-preview] background server started" -ForegroundColor Green
+    Write-Host '[linkedin-preview] -NoWait with -Browser: use foreground server or chat preview instead' -ForegroundColor Yellow
+    if ($IsLinux -or $IsMacOS) { & xdg-open $previewPath 2>$null } else { Start-Process $previewPath }
     exit 0
 }
 
@@ -199,18 +222,11 @@ while ($listener.IsListening) {
 
     if ($req.HttpMethod -eq 'POST' -and $req.Url.LocalPath -eq '/publish') {
         $locale = [string]$req.QueryString['locale']
-        if ($locale -notin @('en', 'pt')) {
+        if ($locale -notin @('en', 'pt', 'both')) {
             $body = '{"ok":false,"error":"invalid locale"}'
             $res.StatusCode = 400
         } else {
-            & powershell -NoProfile -ExecutionPolicy Bypass -File $publishScript `
-                -ManifestPath $manifestPathResolved -Locale $locale -Confirm 2>&1 | Out-String | Out-Null
-            $code = if ($null -eq $LASTEXITCODE) { 0 } else { [int]$LASTEXITCODE }
-            if ($code -eq 0) {
-                $body = '{"ok":true,"detail":"published"}'
-            } else {
-                $body = "{`"ok`":false,`"error`":`"exit $code`"}"
-            }
+            $body = Get-PublishJsonBody -Locale $locale -ManifestFile $manifestPathResolved -PublishScriptPath $publishScript
         }
         $buf = [System.Text.Encoding]::UTF8.GetBytes($body)
         $res.ContentType = 'application/json'
