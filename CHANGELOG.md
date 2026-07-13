@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9](https://github.com/renanflustosa/octo-cluster/compare/v0.1.8...v0.1.9) (2026-07-13)
+
+
+### Bug Fixes
+
+* ship auto-merge deadlock, linkedin publish UX, vault cursor key loading ([#55](https://github.com/renanflustosa/octo-cluster/issues/55)) ([6daa62c](https://github.com/renanflustosa/octo-cluster/commit/6daa62c9e6c0ee739967dbe3d0560f4850d3799c))
+
 ## [0.1.8](https://github.com/renanflustosa/octo-cluster/compare/v0.1.7...v0.1.8) (2026-07-13)
 
 
