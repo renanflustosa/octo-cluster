@@ -59,7 +59,7 @@ jobs:
 
           echo "number=$PR" >> "$GITHUB_OUTPUT"
 
-      - name: Wait for checks and enable auto-merge
+      - name: Enable auto-merge
         if: steps.pr.outputs.number != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -87,17 +87,12 @@ jobs:
             exit 0
           fi
 
-          echo "Waiting for checks on PR #$PR..."
-          if ! gh pr checks "$PR" --watch --interval 15; then
-            echo "Checks failed on PR #$PR — skip auto-merge"
-            exit 1
-          fi
-
-          MERGEABLE=$(gh pr view "$PR" --json mergeable --jq -r '.mergeable')
-          if [ "$MERGEABLE" = "CONFLICTING" ]; then
-            echo "PR #$PR has conflicts after checks — skip auto-merge"
+          FAILED=$(gh pr view "$PR" --json statusCheckRollup \
+            --jq '[.statusCheckRollup[]? | select(.name != "auto-merge") | select(.conclusion == "FAILURE" or .state == "FAILURE")] | length')
+          if [ "$FAILED" != "0" ]; then
+            echo "PR #$PR has failing checks — skip auto-merge"
             exit 0
           fi
 
           gh pr merge "$PR" --auto --squash
-          echo "Auto-merge enabled for PR #$PR"
+          echo "Auto-merge enabled for PR #$PR (GitHub queues merge until required checks pass)"

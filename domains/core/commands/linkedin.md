@@ -6,8 +6,9 @@
 
 - `/linkedin` — draft only
 - `/linkedin <ticket-id>` [notes]
-- `/linkedin publish` — draft + images + open preview for API publish
+- `/linkedin publish` — draft + images + **chat preview** (reply `publicar` to publish both locales)
 - `/linkedin <ticket-id> publish` [notes]
+- `/linkedin publish browser` — optional legacy HTML preview (debug only)
 
 `/close` wipes `current_task.md`. If `CARD: (none)` and no ticket arg, stop with a short error.
 
@@ -61,17 +62,46 @@ Create the directory if missing (`state/**` is gitignored).
 
 ## Publish (when message contains `publish`)
 
-After saving manifest + images:
+Two-turn chat flow — **no browser by default**.
+
+### Turn 1 — preview (`/linkedin publish`)
+
+After saving manifest + images, run:
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/domains/core/scripts/open-linkedin-preview.ps1" -ManifestPath "state/memory/<profile>/linkedin-drafts/<ticket>-<ts>.manifest.json" -NoWait
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/domains/core/scripts/show-linkedin-preview.ps1" -ManifestPath "state/memory/<profile>/linkedin-drafts/<ticket>-<ts>.manifest.json"
 ```
 
-This opens a local preview in the browser. User confirms once → private LinkedIn API provider publishes.
+Show a **short chat preview** (~15–25 lines):
 
-If no publish provider configured: preview still opens; status `browser_ready`; user copies posts manually.
+- Hook EN + hook PT (first line of each post)
+- Image basenames
+- Preflight status (`PREFLIGHT_OK`, `PREFLIGHT_REASON`)
+- Instruction: **Responda `publicar` para publicar EN e PT**
 
-**Do not** read vault or OAuth tokens in this agent turn — the publish script delegates to discovered providers.
+Status: `preview_ready`. If `PREFLIGHT_OK=false`, explain fix (e.g. set `LINKEDIN_TOKEN_FILE` to vault token path) — **do not read secrets**.
+
+**Stop and wait** for user confirmation. Do not publish in turn 1.
+
+### Turn 2 — publish (user replies `publicar` or `approve`)
+
+Only after explicit user confirmation:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/domains/core/scripts/invoke-linkedin-publish.ps1" -ManifestPath "state/memory/<profile>/linkedin-drafts/<ticket>-<ts>.manifest.json" -Confirm -AllLocales
+```
+
+Report per-locale result from JSON output (`en` / `pt`: ok or error). Status: `published` | `partial` | `failed` | `manual_required`.
+
+### Optional browser preview (legacy/debug)
+
+When user message includes `browser`:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/domains/core/scripts/open-linkedin-preview.ps1" -ManifestPath "..." -Browser
+```
+
+**Do not** read vault or OAuth tokens in the agent turn — publish scripts delegate to discovered providers.
 
 ---
 
@@ -93,10 +123,12 @@ If no publish provider configured: preview still opens; status `browser_ready`; 
 
 ## Publish (semi-auto)
 
-- Status: draft_only | browser_ready | published | failed
-- Action required: none | open browser and confirm
-- Preview: <path to preview.html or pending>
+- Status: draft_only | preview_ready | published | partial | failed | manual_required
+- Action required: none | reply `publicar` to confirm | set LINKEDIN_TOKEN_FILE
+- EN: ok | failed — <reason>
+- PT: ok | failed — <reason>
 - Manifest: <path to manifest.json>
+- Result: <path to publish-result.json after publish>
 
 ## Metadata
 

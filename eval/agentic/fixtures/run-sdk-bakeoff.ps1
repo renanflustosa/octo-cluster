@@ -15,27 +15,16 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-if (-not $KeyFile) {
+. (Join-Path $PSScriptRoot 'load-cursor-vault-key.ps1')
+try {
     $vault = $env:PERSONAL_VAULT
-    if (-not $vault) {
-        Write-Host 'BLOCKED: set PERSONAL_VAULT or pass -KeyFile' -ForegroundColor Red
-        exit 2
-    }
-    $KeyFile = Join-Path $vault 'secrets\octocluster\cursor-api-keys.txt'
-}
-
-if (-not (Test-Path -LiteralPath $KeyFile)) {
-    Write-Host "BLOCKED: key file missing (path configured in script; not printed)." -ForegroundColor Red
+    if (-not $vault) { $vault = $env:PERSONAL_VAULT_ROOT }
+    $env:CURSOR_API_KEY = Initialize-CursorApiKeyFromVault -KeyFile $KeyFile -VaultRoot $vault
+} catch {
+    Write-Host $_.Exception.Message -ForegroundColor Red
     exit 2
 }
-
-# Load key in-process only — do not Write-Host value
-$keyRaw = (Get-Content -LiteralPath $KeyFile -Raw -Encoding UTF8).Trim()
-$firstLine = ($keyRaw -split "`r?`n" | Where-Object { $_.Trim() -ne '' } | Select-Object -First 1)
-if (-not $firstLine) { Write-Host 'BLOCKED: empty key file'; exit 2 }
-if ($firstLine -notmatch '^crsr') { Write-Host 'BLOCKED: unexpected key format (expected crsr prefix)'; exit 2 }
 if ($MaxRuns -le 0) { $MaxRuns = $NCards * 4 }
-$env:CURSOR_API_KEY = $firstLine.Trim()
 $env:OCTO_CLUSTER = $Root
 $env:BAKEOFF_MODEL = $Model
 $env:BAKEOFF_N_CARDS = [string]$NCards

@@ -124,12 +124,24 @@ Include token/diff numbers **only** when `measure-card-lite` provided them. Neve
 - EN: state/memory/<profile>/linkedin-drafts/<ticket>-en-<ts>.png
 - PT: state/memory/<profile>/linkedin-drafts/<ticket>-pt-<ts>.png
 
-## Publish (semi-auto)
+## Publish (semi-auto) — two-turn chat flow
 
-- Status: draft_only | browser_ready | published | failed
-- Action required: none | open browser and confirm
-- Preview: state/memory/<profile>/linkedin-drafts/<ticket>-<ts>-preview.html
-- Manifest: state/memory/<profile>/linkedin-drafts/<ticket>-<ts>.manifest.json
+**Turn 1** (`/linkedin publish`): run `show-linkedin-preview.ps1`; status `preview_ready`; stop and ask user to reply `publicar`.
+
+**Turn 2** (user says `publicar`): run `invoke-linkedin-publish.ps1 -Confirm -AllLocales`.
+
+Publish block in agent output:
+
+- Status: draft_only | preview_ready | published | partial | failed | manual_required
+- Action required: none | reply `publicar` | set LINKEDIN_TOKEN_FILE
+- EN: ok | failed — reason
+- PT: ok | failed — reason
+- Manifest: state/memory/\<profile\>/linkedin-drafts/\<ticket\>-\<ts\>.manifest.json
+- Result: state/memory/\<profile\>/linkedin-drafts/\<ticket\>-\<ts\>-publish-result.json
+
+Preflight checks (no secret reads): publish provider discovered; `LINKEDIN_TOKEN_FILE` set and file exists.
+
+Optional legacy browser preview: `open-linkedin-preview.ps1 -Browser` only when user requests `browser`.
 
 ## Metadata
 
