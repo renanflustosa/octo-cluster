@@ -107,17 +107,34 @@ if (-not $provider -or -not $provider._script_path -or -not (Test-Path $provider
     exit 1
 }
 
+$localeDelaySec = 10
+$delayRaw = [string]$env:LINKEDIN_PUBLISH_LOCALE_DELAY_SECONDS
+if ($delayRaw -and [int]::TryParse($delayRaw, [ref]$null)) {
+    $localeDelaySec = [Math]::Max(0, [int]$delayRaw)
+}
+
 $result = [ordered]@{}
+$localeIndex = 0
 foreach ($loc in $locales) {
+    if ($localeIndex -gt 0 -and $localeDelaySec -gt 0) {
+        Write-Host "[linkedin-publish] waiting ${localeDelaySec}s before locale=$loc" -ForegroundColor DarkGray
+        Start-Sleep -Seconds $localeDelaySec
+    }
+    $localeIndex++
+
     $run = Invoke-LinkedInPublishLocale -Provider $provider -ManifestPathResolved $manifestPathResolved -Locale $loc
     $entry = [ordered]@{
         ok       = [bool]$run.ok
         provider = [string]$run.provider
     }
     if ($run.ok) {
+        if ($run.postId) { $entry.postId = [string]$run.postId }
         Write-Host "[linkedin-publish] published locale=$loc via $($run.provider)" -ForegroundColor Green
     } else {
         $entry.error = if ($run.error) { [string]$run.error } else { "exit $($run.exitCode)" }
+        if ($run.httpStatus -gt 0) { $entry.httpStatus = [int]$run.httpStatus }
+        if ($run.apiCode) { $entry.apiCode = [string]$run.apiCode }
+        if ($run.apiMessage) { $entry.apiMessage = [string]$run.apiMessage }
         Write-Host "[linkedin-publish] locale=$loc failed: $($entry.error)" -ForegroundColor Red
     }
     $result[$loc] = $entry

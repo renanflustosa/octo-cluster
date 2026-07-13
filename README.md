@@ -10,6 +10,35 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+## Mission
+
+Make high-quality generative AI accessible to anyone using open source software and free tools.
+
+Octo Cluster is a **means**, not the end — a local harness that helps you build and ship with AI while keeping expensive model calls the exception, not the default.
+
+## Principles
+
+- **100% open source** — MIT-licensed core; no proprietary runtime required
+- **Free tools first** — local scripts, grep, LanceDB, and gates before paid APIs
+- **Simple experience** — one workspace folder, optional phase loop, IDE adapters
+- **Transparent development** — public roadmap, issues, and discussions
+- **Architectural quality** — consistency, simplicity, and measurable harness behavior
+
+## Governance
+
+Octo Cluster follows a **SQLite-inspired** model: the code and roadmap are open; technical direction stays with the maintainers so the kernel stays small, fast, and coherent.
+
+| Open to everyone | Centralized with maintainers |
+|------------------|------------------------------|
+| Read the code and docs | Architecture and release gates |
+| Open bugs and discuss ideas | Final design decisions |
+| Follow the public roadmap | PR review without obligation to merge |
+| Suggest improvements via [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues) | Preserve velocity and consistency |
+
+**Open source ≠ open governance.** We welcome feedback, bug reports, and public discussion. Pull requests are reviewed, but there is no expectation that every external contribution will be accepted — especially when it would add complexity or slow evolution.
+
+Details: [Engineering Operating System (EOS)](./docs/governance/eos.md) · [public vs private trackers](./docs/adr/ADR-004-use-github-issues-as-public-work-tracker.md)
+
 ## Engineering Operating System
 
 Octo Cluster follows the [Engineering Operating System (EOS)](./docs/governance/eos.md) — governance, delivery, quality, and AI-agent operations. Planned work is tracked in [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues); see [CONTRIBUTING.md](./CONTRIBUTING.md).
@@ -141,7 +170,11 @@ Most tools are pre-installed by [`.devcontainer/devcontainer.json`](.devcontaine
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). Capability packs that name private products stay in **your fork** or a separate repo; promote shared behavior into `domains/core/`.
+We encourage **bugs, feedback, and public discussion** — open a [GitHub issue](https://github.com/renanflustosa/octo-cluster/issues/new/choose) or join a thread on an existing one. For large changes, read [CONTRIBUTING.md](./CONTRIBUTING.md) and the [Engineering Operating System (EOS)](./docs/governance/eos.md) first.
+
+Architectural direction and merge decisions stay with the maintainers. Capability packs that name private products belong in **your fork** or a separate repo; promote shared behavior into `domains/core/`.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup, branch naming, PR flow, and the public framework boundary.
 
 ## License
 

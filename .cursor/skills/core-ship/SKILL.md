@@ -77,6 +77,18 @@ Release-please PRs auto-merge via `.github/workflows/auto-merge.yml`:
 - Skips conflicting PRs, PRs with failing CI, and PRs that already have auto-merge enabled (fail-safe)
 - Remote branch cleanup relies on repo `delete_branch_on_merge` (enabled idempotently by ship)
 
+**Workflow approval gate (after `.github/workflows/*` changes on `main`):** GitHub may block bot PR checks with `action_required` (“Approve workflows to run”). The REST approve endpoint only applies to fork PRs. Recovery without UI:
+
+```powershell
+# List blocked runs for the bot PR branch
+gh run list --repo <owner>/<repo> --branch release-please--branches--main --json databaseId,conclusion,workflowName
+
+# Re-run each run stuck at action_required (CI + auto-merge)
+gh run rerun <run-id> --repo <owner>/<repo>
+```
+
+After rerun, `auto-merge` should enable squash auto-merge when CI is green. One-time UI approval on the PR also works if `gh run rerun` is unavailable.
+
 Standalone utility: `pwsh scripts/enable-auto-merge.ps1`.
 
 **Git JSON fields (when auto_merge enabled):** `pr_url`, `merged`, `merge_state`, `branch_deleted`, `main_sha`

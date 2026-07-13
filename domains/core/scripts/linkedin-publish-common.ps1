@@ -143,6 +143,51 @@ function Get-LinkedInPublishPreflight {
     }
 }
 
+function Get-LinkedInPublishShellExe {
+    $pwsh = (Get-Command pwsh -ErrorAction SilentlyContinue).Source
+    if ($pwsh) { return $pwsh }
+    return (Get-Command powershell -ErrorAction SilentlyContinue).Source
+}
+
+function ConvertTo-LinkedInPublishError {
+    param(
+        [string]$OutputText,
+        [int]$ExitCode
+    )
+
+    $lines = @($OutputText -split "`r?`n" | Where-Object { $_.Trim() })
+    $httpStatus = 0
+    $apiCode = ''
+    $apiMessage = ''
+
+    foreach ($line in $lines) {
+        if ($line -match '^LINKEDIN_HTTP_STATUS=(\d+)$') { $httpStatus = [int]$Matches[1] }
+        if ($line -match '^LINKEDIN_API_CODE=(.+)$') { $apiCode = $Matches[1].Trim() }
+        if ($line -match '^LINKEDIN_API_MESSAGE=(.+)$') { $apiMessage = $Matches[1].Trim() }
+    }
+
+    $errorMsg = ''
+    if ($apiMessage) {
+        $errorMsg = if ($httpStatus -gt 0) { "HTTP $httpStatus $apiMessage" } else { $apiMessage }
+    } elseif ($httpStatus -gt 0) {
+        $errorMsg = "HTTP $httpStatus"
+    } else {
+        $errorMsg = if ($lines.Count -gt 0) { $lines[-1] } else { "exit $ExitCode" }
+        if ($errorMsg -match 'Write-Error|WriteErrorException') {
+            $errorMsg = ($lines | Where-Object { $_ -match ':' } | Select-Object -Last 1)
+            if ($errorMsg -match ':\s*(.+)') { $errorMsg = $Matches[1].Trim() }
+        }
+        if ($errorMsg -match 'error:\s*\((\d+)\)') { $httpStatus = [int]$Matches[1] }
+    }
+
+    return @{
+        error      = $errorMsg
+        httpStatus = $httpStatus
+        apiCode    = $apiCode
+        apiMessage = $apiMessage
+    }
+}
+
 function Invoke-LinkedInPublishLocale {
     param(
         [Parameter(Mandatory = $true)][hashtable]$Provider,
@@ -154,24 +199,24 @@ function Invoke-LinkedInPublishLocale {
     $ErrorActionPreference = 'Continue'
     try {
         Write-Host "== linkedin publish provider: $($Provider.id) (locale=$Locale) ==" -ForegroundColor Cyan
-        $output = & powershell -NoProfile -ExecutionPolicy Bypass -File $Provider._script_path `
+        $shellExe = Get-LinkedInPublishShellExe
+        $output = & $shellExe -NoProfile -ExecutionPolicy Bypass -File $Provider._script_path `
             -ManifestPath $ManifestPathResolved -Locale $Locale -Confirm 2>&1
         $code = if ($null -eq $LASTEXITCODE -or $LASTEXITCODE -eq '') { 0 } else { [int]$LASTEXITCODE }
         $text = ($output | Out-String).Trim()
-        $errorMsg = ''
-        if ($code -ne 0) {
-            $errorMsg = if ($text) { ($text -split "`r?`n" | Where-Object { $_ } | Select-Object -Last 1) } else { "exit $code" }
-            if ($errorMsg -match 'Write-Error|WriteErrorException') {
-                $errorMsg = ($text -split "`r?`n" | Where-Object { $_ -match ':' } | Select-Object -Last 1)
-                if ($errorMsg -match ':\s*(.+)') { $errorMsg = $Matches[1].Trim() }
-            }
-        }
+        $parsed = ConvertTo-LinkedInPublishError -OutputText $text -ExitCode $code
+        $postId = ''
+        if ($text -match '"id"\s*:\s*"(urn:li:[^"]+)"') { $postId = $Matches[1] }
         return @{
-            ok       = ($code -eq 0)
-            exitCode = $code
-            error    = $errorMsg
-            output   = $text
-            provider = [string]$Provider.id
+            ok         = ($code -eq 0)
+            exitCode   = $code
+            error      = [string]$parsed.error
+            httpStatus = [int]$parsed.httpStatus
+            apiCode    = [string]$parsed.apiCode
+            apiMessage = [string]$parsed.apiMessage
+            postId     = $postId
+            output     = $text
+            provider   = [string]$Provider.id
         }
     } finally {
         $ErrorActionPreference = $prevEap

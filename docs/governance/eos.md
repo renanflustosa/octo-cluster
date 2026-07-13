@@ -43,7 +43,11 @@ Use [GitHub Milestones](https://github.com/renanflustosa/octo-cluster/milestones
 
 Examples: `[governance] add code of conduct`, `[memory] implement profile compaction`
 
-Forbidden: vague titles (`Fix stuff`, `Improve code`), gerunds without imperative verb.
+Forbidden: vague titles (`Fix stuff`, `Improve code`), gerunds without imperative verb, non-English verbs in titles.
+
+**Private team trackers:** maintainers who use a private work tracker (for example Linear via local MCP) MUST use the **identical** `[domain] imperative verb + object` pattern. Never expose private tracker IDs, URLs, or workspace names in the public repository.
+
+**Domain labels:** every issue carries exactly **one** domain label that matches the `[domain]` prefix in the title. Meta labels (`ai-ready`, `Bug`, `Feature`, `test`, `chore`) are optional and do not replace the domain label.
 
 ### Workflow
 
