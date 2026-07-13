@@ -18,6 +18,7 @@ Details: [`contexts/operational/agent-loop.md`](contexts/operational/agent-loop.
 
 - Identify active execution context (`AI_EXECUTION_CONTEXT` → `contexts/runtime/<id>.json`).
 - Read consumer-boundary rules before any public git change.
+- When creating Linear issues (private tracker), follow [`domains/core/rules/linear-issue-naming.mdc`](domains/core/rules/linear-issue-naming.mdc) — same EOS title pattern as GitHub Issues.
 - Edit **source** in `domains/core/` and `capabilities/` — not `.cursor/` by hand.
 - After domain or capability changes, run `pwsh scripts/sync-cursor.ps1`.
 

@@ -18,7 +18,7 @@ Octo Cluster today:
 | Cost model | Fixed compact index | Embeddings + index build + script search |
 | IDE lock-in | Claude Code | Cursor (`domains/core/hooks/hooks.platform.json` → empty `hooks`) |
 
-Ticket: Linear **8CL-17**. Related analysis: [opensre-analysis.md](../guides/opensre-analysis.md) (harness / cost / hooks overlap).
+Related analysis: [opensre-analysis.md](../guides/opensre-analysis.md) (harness / cost / hooks overlap). Mega-brain pattern analysis completed as a private maintainer spike.
 
 ### Cursor hook constraints (evidence)
 

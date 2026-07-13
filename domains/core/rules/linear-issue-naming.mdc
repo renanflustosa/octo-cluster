@@ -1,0 +1,40 @@
+---
+description: Canonical Linear issue title and domain-label rules for maintainers with MCP access
+alwaysApply: true
+---
+
+# Linear issue naming (maintainer private tracker)
+
+When creating or updating issues in the **private** Linear workspace via MCP or UI, follow the same EOS pattern as [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues).
+
+## Title format (required)
+
+```text
+[domain] imperative verb + object
+```
+
+Examples: `[governance] revise README governance section`, `[eval] run TIP pilot ast-grep vs grep-first`
+
+## Valid domain prefixes
+
+Use exactly one domain label that matches the title prefix:
+
+`governance` · `standards` · `dx` · `eval` · `orchestration` · `mcp` · `token` · `rag` · `context` · `memory` · `kernel` · `ci` · `security` · `docs` · `observability`
+
+Map title-only aliases: `adapter` → `dx`, `pack` → `kernel` or `mcp` (by scope).
+
+## Rules
+
+- English imperative verb after the domain prefix
+- Exactly **one** domain label per issue (meta labels like `ai-ready`, `Bug`, `test` are optional)
+- Forbidden: Portuguese titles, vague objects (`Fix stuff`), gerunds without imperative verb, multiple domain labels
+
+## Before marking `ai-ready`
+
+1. Title matches `^\[[a-z]+\] [a-z].+`
+2. Domain label equals title prefix
+3. DoR checklist complete per [eos.md](../../docs/governance/eos.md#definition-of-ready-dor)
+
+## Consumer boundary
+
+Never paste Linear issue IDs, URLs, or workspace names into the **public** octo-cluster tree. Private tracker details belong in gitignored `docs/_private/` or local vault overlays only.

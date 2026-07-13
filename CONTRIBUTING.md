@@ -88,6 +88,8 @@ Maintainer `/ship` with zero-touch policy: feature branch → PR → auto-merge 
 
 **Public tracker:** [GitHub Issues](https://github.com/renanflustosa/octo-cluster/issues).
 
+Use the EOS naming pattern for public issues: `[domain] imperative verb + object` (see [eos.md](./docs/governance/eos.md#issue-naming)). Maintainers mirror the same pattern in any private team tracker — without publishing tracker IDs or URLs in this repository.
+
 Open an issue before large changes when possible. Use [GitHub Milestones](https://github.com/renanflustosa/octo-cluster/milestones) for release planning.
 
 For bugs, use the GitHub bug report template. Include OS, IDE adapter, and `invoke-pipeline … -Action discover` output when relevant.
