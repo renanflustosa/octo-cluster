@@ -23,7 +23,7 @@ DIY LanceDB + FTS5 hybrid (`engine/context-engine/`).
 
 ## Metrics
 
-Lite at `/close` · Full weekly at `/start-workspace`. See [`metrics/README.md`](metrics/README.md).
+Lite at `/close` · Full weekly at first `/scan` of the week. See [`metrics/README.md`](metrics/README.md).
 
 ## Agentic eval
 

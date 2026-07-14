@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Octo Cluster pipeline CLI entry point (scan, ship, model, close, start-workspace, ...).
+  Octo Cluster pipeline CLI entry point (scan, ship, model, close, ...).
 
 .DESCRIPTION
   Self-locating wrapper around scripts/invoke-pipeline.ps1 (in-process — no nested -File).
@@ -26,9 +26,7 @@ param(
     [string]$PrTitle,
     [string]$PrBodyFile,
     [switch]$SkipGit,
-    [switch]$SkipCommit,
-    [switch]$SkipIndex,
-    [switch]$WithStack
+    [switch]$SkipCommit
 )
 
 $ErrorActionPreference = 'Stop'
@@ -39,8 +37,6 @@ $mergedArgs = Merge-OctoScriptArgs -Base $ScriptArgs -ScriptArgsJson $ScriptArgs
     Ticket    = $Ticket
     TicketUrl = $TicketUrl
     Profile   = $Profile
-    SkipIndex = $SkipIndex
-    WithStack = $WithStack
 }
 
 $target = Join-Path $PSScriptRoot 'scripts\invoke-pipeline.ps1'

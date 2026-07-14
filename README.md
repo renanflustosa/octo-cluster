@@ -131,7 +131,7 @@ See [context model](./docs/architecture/context-model.md) and [add a capability 
 One chat ≈ one work item. Phase commands are **optional**; routine edits do not need them.
 
 ```text
-/start-workspace  →  /scan ISSUE-123 description  →  /model  →  Execute plan  →  /ship  →  /close
+/scan ISSUE-123 description  →  /model  →  Execute plan  →  /ship  →  /close
 ```
 
 Discover the active pipeline skill:

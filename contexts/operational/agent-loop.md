@@ -7,7 +7,7 @@ Phase commands are **optional** — routine edits do not require them.
 ## Optional loop
 
 ```text
-/start-workspace  →  /scan  →  /model  →  Execute plan  →  /ship  →  /close
+/scan  →  /model  →  Execute plan  →  /ship  →  /close
 ```
 
 Meta (no pipeline): `/prompt` — rewrite only, never execute. Also: `/review`, `/debug`.
@@ -18,7 +18,7 @@ One chat ≈ one work item.
 
 | Entry | Command |
 |-------|---------|
-| Pipeline | `pwsh octo.ps1 -Pipeline scan\|model\|ship\|close\|start-workspace\|review\|debug -Action discover\|run` |
+| Pipeline | `pwsh octo.ps1 -Pipeline scan\|model\|ship\|close\|review\|debug -Action discover\|run` |
 | Domain tools | `pwsh octo-domain.ps1` — context-search, read-gate |
 | Sync adapter | `pwsh scripts/sync-cursor.ps1` |
 | Boundary audit | `pwsh scripts/boundary-audit.ps1` |
@@ -40,7 +40,7 @@ pwsh octo.ps1 -Pipeline scan -Action discover
 
 | Pipeline | Skill |
 |----------|-------|
-| scan, model, close, start-workspace | `domains/core/skills/core-adaptive-loop/SKILL.md` |
+| scan, model, close | `domains/core/skills/core-adaptive-loop/SKILL.md` |
 | ship | `domains/core/skills/core-ship/SKILL.md` |
 | review | `domains/core/skills/code-review/SKILL.md` |
 | debug | `domains/core/skills/systematic-debugging/SKILL.md` |

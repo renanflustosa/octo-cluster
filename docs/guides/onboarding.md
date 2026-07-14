@@ -57,7 +57,6 @@ Set in install scripts or your IDE workspace:
 | Task | Command |
 |------|---------|
 | Pipeline discover | `pwsh octo.ps1 -Pipeline scan -Action discover` |
-| Start workspace | `pwsh octo.ps1 -Pipeline start-workspace -Action run` |
 | Validate harness | `cd engine/context-engine && bun run validate octo-cluster` |
 | Sync adapter after editing `domains/` | `pwsh scripts/sync-cursor.ps1` |
 | Health check | `pwsh scripts/productivity-audit.ps1` |
@@ -93,13 +92,12 @@ IDE workspace files (`.code-workspace`) are **consumer-managed** — outside thi
 ## CORE loop (optional)
 
 ```text
-/start-workspace → /scan ISSUE-123 description → /model → Execute plan → /ship → /close
+/scan ISSUE-123 description → /model → Execute plan → /ship → /close
 ```
 
 | Phase | Harness |
 |-------|---------|
-| start-workspace | `invoke-pipeline -Pipeline start-workspace -Action run` |
-| scan | bootstrap + `current_task.md` (≤200 tokens) |
+| scan | implicit daily bootstrap + `current_task.md` (≤200 tokens) |
 | model | Plan without code; Execute only planned files |
 | ship | verify (repo-policy) + gates + git policy |
 | close | archive + reindex memory |

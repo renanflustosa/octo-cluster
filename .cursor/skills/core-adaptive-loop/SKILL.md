@@ -5,7 +5,7 @@ description: Universal loop master ref (/scan to /close). Domain-agnostic phase 
 
 # Loop sequence
 
-**Morning:** `/start-workspace` or `invoke-pipeline.ps1 -Pipeline start-workspace -Action run` (once per day).
+First `/scan` of the day triggers implicit daily bootstrap (validate, context budget, LanceDB index if stale).
 
 `/scan` â†’ `/model` (Plan â†’ **Execute plan**) â†’ `/ship` â†’ `/close`
 
@@ -30,7 +30,7 @@ description: Universal loop master ref (/scan to /close). Domain-agnostic phase 
 ## Harness dispatch
 
 ```powershell
-powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline <scan|model|ship|close|start-workspace> -Action discover
+powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline <scan|model|ship|close> -Action discover
 powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline <phase> -Action run
 powershell -File $env:OCTO_CLUSTER\scripts\invoke-domain-script.ps1 -Name read-gate -ScriptArgs @{ Path = "<file>" }
 ```

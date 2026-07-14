@@ -55,7 +55,6 @@ capabilities/my-company/
 ├── ship/manifest.yaml
 │   └── providers/          # optional gate scripts
 ├── close/manifest.yaml
-├── start-workspace/manifest.yaml
 └── skills/                 # auxiliary triggers (optional)
     ├── manifest.yaml
     └── branch-and-scope/skill.md
@@ -70,6 +69,8 @@ skill: skill.md
 ```
 
 Place playbook content in `capabilities/my-company/<pipeline>/skill.md` (canonical). Do **not** rely on syncing pack skills to `.cursor/skills/`.
+
+Optional: child packs may extend daily bootstrap via `domains/<pack>/scripts/<prefix>-start-workspace.ps1` (invoked internally by `invoke-domain-script -Name start-workspace` — not a user-facing pipeline).
 
 ---
 

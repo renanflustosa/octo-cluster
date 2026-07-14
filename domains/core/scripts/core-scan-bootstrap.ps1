@@ -1,4 +1,4 @@
-﻿# Generic /scan bootstrap - implicit start-workspace + context-engine validate + optional ticket providers.
+﻿# Generic /scan bootstrap - implicit daily bootstrap + context-engine validate + optional ticket providers.
 param(
     [string]$Profile = "",
     [string]$Ticket = "",
@@ -25,12 +25,12 @@ if (-not $SkipStartWorkspace) {
         if ($last -eq $today) { $runStart = $false }
     }
     if ($runStart) {
-        Write-Step "Implicit start-workspace (stale or missing stamp)"
+        Write-Step "Implicit daily bootstrap (stale or missing stamp)"
         & powershell -ExecutionPolicy Bypass -File $invokeScript -Name start-workspace
-        if ($LASTEXITCODE -ne 0) { Write-Host "WARN: implicit start-workspace reported issues" -ForegroundColor Yellow }
+        if ($LASTEXITCODE -ne 0) { Write-Host "WARN: implicit daily bootstrap reported issues" -ForegroundColor Yellow }
         New-Item -ItemType Directory -Force -Path $memRoot | Out-Null
         Set-Content -Path $startStamp -Value $today -Encoding UTF8
-    } else { Write-Host "[ok] start-workspace already ran today ($today)" -ForegroundColor Green }
+    } else { Write-Host "[ok] daily bootstrap already ran today ($today)" -ForegroundColor Green }
 }
 Write-Step "Context-engine validate"
 $ce = Get-ContextEngineRoot
