@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.11](https://github.com/renanflustosa/octo-cluster/compare/v0.1.10...v0.1.11) (2026-07-14)
+
+
+### Features
+
+* add per-phase model routing rule and explicit command models ([#61](https://github.com/renanflustosa/octo-cluster/issues/61)) ([6d689bf](https://github.com/renanflustosa/octo-cluster/commit/6d689bf56eedaab63903bb5c32bdf16fbedeb3cf))
+
 ## [0.1.10](https://github.com/renanflustosa/octo-cluster/compare/v0.1.9...v0.1.10) (2026-07-13)
 
 
