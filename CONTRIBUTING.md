@@ -57,7 +57,7 @@ docs/45-update-onboarding
 
 Target `main` for features and fixes via pull request. Direct push to `main` is blocked by branch rulesets.
 
-Maintainer `/ship` with zero-touch policy: feature branch → PR → auto-merge when CI passes → release-please bump on `main`.
+Maintainer `/ship` with zero-touch policy: feature branch → PR → auto-merge when CI passes → merge to `main`.
 
 ## Pull requests
 
