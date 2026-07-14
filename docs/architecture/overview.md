@@ -9,7 +9,7 @@ This repository is a **tool-agnostic AI workspace platform** with a Cursor adapt
 - `contexts/` selects which packs apply (repo ownership, memory profile, docs root).
 - `domains/<pack>/` holds legacy overlays: rules, hooks, scripts, docs.
 - `adapters/` translate core + capabilities into tool-specific outputs (future).
-- `.cursor/` is generated; never edit by hand.
+- `.cursor/` is synced from `domains/core/` and **committed for convenience** — edit source in `domains/`, then run sync; do not hand-edit rules/skills/commands in `.cursor/`.
 - Tool integrations are disposable; core knowledge is permanent.
 
 ## Key layers
@@ -22,7 +22,7 @@ This repository is a **tool-agnostic AI workspace platform** with a Cursor adapt
 | **Child domain** | `domains/<pack>/` | Rules, hooks, pack scripts, docs |
 | **Adapter** | `scripts/sync-cursor.ps1` | Generates `.cursor/` (core commands/skills + child rules/hooks) |
 | **Tools** | `engine/`, `state/`, `eval/` | Context engine, memory, promptfoo |
-| **Generated** | `.cursor/`, `generated/` | Tool-facing artifacts |
+| **Generated** | `.cursor/` | Cursor adapter output (committed; synced from core) |
 
 ## Runtime dispatch
 
@@ -40,7 +40,7 @@ Use `AI_EXECUTION_CONTEXT` only — older pack-selector env vars are removed by 
 - Each adapter must be isolated.
 - Adapters do not contain business knowledge.
 - Core and capability assets remain reusable across all tools.
-- `.cursor/` is the current Cursor adapter output; `generated/` is the explicit target for multi-tool sync.
+- `.cursor/` is the current Cursor adapter output (committed for convenience). Long-term multi-tool target: `generated/<tool>/`.
 
 ## Transition status
 
@@ -52,11 +52,11 @@ Use `AI_EXECUTION_CONTEXT` only — older pack-selector env vars are removed by 
 
 ## Portability contract
 
-**Supported:** desktop OS (Linux Ubuntu 24.04 official, macOS, Windows) via Dev Container or native `pwsh` + Bun.
+**Supported:** desktop OS (Linux Ubuntu 24.04 official, macOS, Windows) via native `pwsh` + Bun.
 
-**Canonical setup:** Dev Container Ubuntu 24.04 — same commands on every host (`pwsh octo.ps1`, `bun run validate`).
+**Canonical setup:** clone repo → `pwsh install.ps1` (Windows) or `./install.sh` (Linux/macOS) → `pwsh scripts/sync-cursor.ps1` → `cd engine/context-engine && bun run validate octo-cluster`.
 
-**Native Linux:** `./install.sh` + `./scripts/octo` — thin bash shims only; harness stays in `.ps1`.
+**Dev Container:** optional future path — not shipped in this repo yet; use native bootstrap above.
 
 **Out of scope:** iOS/mobile CLI harness (git, Docker, LanceDB, hooks require desktop/server).
 
