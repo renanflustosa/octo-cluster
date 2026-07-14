@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.13](https://github.com/renanflustosa/octo-cluster/compare/v0.1.12...v0.1.13) (2026-07-14)
+
+
+### Features
+
+* fast portable ship policy with async auto-merge and safe branch cleanup ([#66](https://github.com/renanflustosa/octo-cluster/issues/66)) ([5418d13](https://github.com/renanflustosa/octo-cluster/commit/5418d139af3dd6ead372b6199811e329d55053d3))
+
 ## [0.1.12](https://github.com/renanflustosa/octo-cluster/compare/v0.1.11...v0.1.12) (2026-07-14)
 
 
