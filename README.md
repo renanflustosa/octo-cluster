@@ -54,7 +54,7 @@ Most teams stitch token savings piecemeal: grep rules here, a RAG script there, 
 | **Harness** | Scripts, hooks, repo policies, local gates (`go test`, `bun validate`, Promptfoo, …) |
 | **Context engine** | LanceDB semantic search + memory profiles per project |
 | **Token economy** | Read budgets, grep-first, compressed task cards, optional “caveman” prose mode |
-| **Core loop** | Optional phase commands (`/scan` → `/model` → `/ship` → `/close`) — useful, not required |
+| **Core loop** | Optional phase commands (`/scan` → `/model` → `/ship` → `/close`, plus `/review`, `/debug`, `/prompt`) — useful, not required |
 | **Capability packs** | Pluggable domain extensions (issue tracker, repos, verify providers) |
 
 ```text
@@ -134,11 +134,23 @@ One chat ≈ one work item. Phase commands are **optional**; routine edits do no
 /scan ISSUE-123 description  →  /model  →  Execute plan  →  /ship  →  /close
 ```
 
+Meta and support commands: `/review` (PR review), `/debug` (systematic troubleshooting), `/prompt` (rewrites a prompt without executing it), `/linkedin` (bilingual draft from an active card).
+
 Discover the active pipeline skill:
 
 ```powershell
 pwsh octo.ps1 -Pipeline scan -Action discover
 ```
+
+### Delivery (`/ship`)
+
+`/ship` runs **verify → gate → deliver**, driven by repository policy (`repo-policies/`) — no project vocabulary hardcoded in core. Delivery is script-only (LLM budget = 1, the verdict):
+
+- Feature branch → commit → push → PR against `base_branch`, then **auto-merge** enabled on the PR
+- Returns immediately after enabling auto-merge; add `-WaitForMerge` to block until merge, `-FullVerify` to run every policy check instead of the fast tier
+- Remote branch auto-deleted on merge; local branches pruned only after GitHub confirms their PR merged (never resets or cleans the worktree)
+- Portable across machines: paths resolve from `OCTO_CLUSTER`; `gh auth login` (scopes `repo`, `workflow`) is the only per-machine prerequisite
+- Ship any repo via `-RepoPath <path>`; policy is picked from `.octo/repo-policy` in the target repo
 
 ## Docs
 
