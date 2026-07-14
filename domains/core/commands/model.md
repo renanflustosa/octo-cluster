@@ -1,6 +1,6 @@
 # model
 
-**Plan mode** — design first; **Execute plan** implements. Model: session default (Auto).
+**Plan mode** — design first; **Execute plan** implements. Model: `gpt-5.6-terra-medium` (switch in picker before Phase A). Phase B Execute: switch back to `composer-2.5-fast`.
 
 ## Phase A — Plan (read-only)
 

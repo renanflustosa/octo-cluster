@@ -1,6 +1,6 @@
 # close
 
-**Agent mode** — archive ticket, compact memory, reindex. Model: session default (Auto).
+**Agent mode** — archive ticket, compact memory, reindex. Model: `composer-2.5-fast`.
 
 **Discover (once per thread):**
 
