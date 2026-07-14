@@ -1,5 +1,0 @@
-id: core-start-workspace
-pack: core
-pipeline: start-workspace
-description: Daily workspace bootstrap and health checks
-skill: domains/core/skills/core-adaptive-loop/SKILL.md

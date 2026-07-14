@@ -28,7 +28,7 @@ function ConvertTo-WorkspaceRelativePath {
     return ($Path -replace '\\', '/')
 }
 
-$pipelines = @('ship', 'scan', 'model', 'close', 'start-workspace', 'review', 'debug')
+$pipelines = @('ship', 'scan', 'model', 'close', 'review', 'debug')
 $ctx = Get-ShipExecutionContext
 $workspace = Get-OctoClusterRoot
 $entries = @()

@@ -8,7 +8,7 @@ alwaysApply: true
 Execute work through the optional phase loop. Routine edits do not need a command.
 
 ```text
-/start-workspace → /scan → /model → Execute plan → /ship → /close
+/scan → /model → Execute plan → /ship → /close
 ```
 
 Meta (no pipeline): `/prompt` rewrites prompts only — never executes the task.
@@ -19,7 +19,7 @@ Also available: `/review` (PR), `/debug` (systematic).
 
 1. **Core vs child:** Never hardcode consumer/project specifics into core. Use `AI_EXECUTION_CONTEXT` and discovered capability packs.
 2. **One chat ≈ one work item.** Phase commands mark absolute phase changes.
-3. **Implicit bootstrap:** First interaction of the day or first `/scan` runs start-workspace health checks before phase output.
+3. **Implicit bootstrap:** First `/scan` of the day runs daily health checks (validate, context budget, LanceDB index if stale) before phase output.
 4. **Token cost:** Prefer local tools (grep, scripts, LanceDB, bun test) over paid LLM calls when they suffice.
 5. **Self-correct** on compiler/linter/test/harness failures before asking for human review.
 6. **Prose:** caveman-mode by default; full prose on `/model`, `/ship`, security, or when asked.
@@ -27,5 +27,5 @@ Also available: `/review` (PR), `/debug` (systematic).
 ## Canonical detail
 
 - Operational loop: `contexts/operational/agent-loop.md`
-- Skills: `core-adaptive-loop` (scan/model/close/start-workspace), `core-ship`, `code-review`, `systematic-debugging`
+- Skills: `core-adaptive-loop` (scan/model/close), `core-ship`, `code-review`, `systematic-debugging`
 - Source of truth: `domains/core/` → `pwsh scripts/sync-cursor.ps1` → `.cursor/`

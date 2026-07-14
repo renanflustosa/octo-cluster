@@ -1,4 +1,4 @@
-﻿# Generic pipeline entrypoint (ship, scan, model, close, start-workspace, ...).
+﻿# Generic pipeline entrypoint (ship, scan, model, close, ...).
 # Usage: invoke-pipeline.ps1 -Pipeline scan [-Action discover|run] [-ScriptArgs @{ ... }]
 
 param(
@@ -29,7 +29,7 @@ if ($PrBodyFile) { $ScriptArgs['PrBodyFile'] = $PrBodyFile }
 if ($SkipGit) { $ScriptArgs['SkipGit'] = $true }
 if ($SkipCommit) { $ScriptArgs['SkipCommit'] = $true }
 
-$allowed = @('ship', 'scan', 'model', 'close', 'start-workspace', 'review', 'debug')
+$allowed = @('ship', 'scan', 'model', 'close', 'review', 'debug')
 if ($Pipeline -notin $allowed) {
     throw "Invalid pipeline '$Pipeline'. Allowed: $($allowed -join ', ')"
 }
@@ -77,11 +77,6 @@ switch ($Pipeline) {
         if ($RepoPath) { $shipArgs['RepoPath'] = $RepoPath }
         Write-Host "[invoke-pipeline] ship -> invoke-ship.ps1 -Phase $Phase" -ForegroundColor DarkGray
         Invoke-OctoBoundScript -Path $invokeShip -BoundArgs $shipArgs
-        exit $LASTEXITCODE
-    }
-    'start-workspace' {
-        Write-Host "[invoke-pipeline] start-workspace -> invoke-domain-script.ps1" -ForegroundColor DarkGray
-        Invoke-DomainScript -Name start-workspace -BoundArgs $ScriptArgs -DomainOverride $Domain
         exit $LASTEXITCODE
     }
     'close' {

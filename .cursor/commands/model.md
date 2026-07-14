@@ -30,11 +30,10 @@ User clicks **Execute plan** after approving Phase A. Same chat (SINGLE CARD MOD
 
 **Playbook:** `domains/core/skills/core-adaptive-loop/SKILL.md` · read `ponytail-lite` once — apply ladder before each file edit.
 
-**Index pre-check (platform, before Phase A):**
+**Index pre-check (platform, before Phase A):** run `/scan` first (implicit daily bootstrap on first scan of the day), or:
 
 ```powershell
-powershell -File $env:OCTO_CLUSTER\scripts\invoke-pipeline.ps1 -Pipeline start-workspace -Action run
-# or: cd $env:OCTO_CLUSTER\engine\context-engine; bun run validate octo-cluster
+cd $env:OCTO_CLUSTER\engine\context-engine; bun run validate octo-cluster
 ```
 
 Ensures LanceDB memory + harness validate before Plan. Cursor index covers codebase exploration separately.

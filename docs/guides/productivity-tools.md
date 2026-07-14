@@ -5,7 +5,7 @@
 ## Canonical loop
 
 ```text
-/start-workspace → /scan → /model → Execute plan → /ship → /close
+/scan → /model → Execute plan → /ship → /close
 ```
 
 Meta: `/prompt` (rewrite only). Also: `/review`, `/debug`.

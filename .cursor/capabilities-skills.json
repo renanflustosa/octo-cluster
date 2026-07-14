@@ -1,5 +1,5 @@
 ﻿{
-    "generatedAt":  "2026-07-14T18:44:13.7171210Z",
+    "generatedAt":  "2026-07-14T19:08:50.4454479Z",
     "executionContext":  "platform",
     "capabilityPacks":  [
                             "core",
@@ -20,10 +20,6 @@
                       },
                       {
                           "pipeline":  "close",
-                          "skill":  "domains/core/skills/core-adaptive-loop/SKILL.md"
-                      },
-                      {
-                          "pipeline":  "start-workspace",
                           "skill":  "domains/core/skills/core-adaptive-loop/SKILL.md"
                       },
                       {

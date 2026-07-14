@@ -23,6 +23,8 @@ Pipeline skills resolve at runtime via [`scripts/invoke-pipeline.ps1`](../script
 | [guides/token-metrics-baseline.md](./guides/token-metrics-baseline.md) | Token metrics baseline |
 | [guides/harness-tool-cluster.md](./guides/harness-tool-cluster.md) | Harness tool catalog + bakeoff |
 | [guides/tool-impact-protocol.md](./guides/tool-impact-protocol.md) | TIP — measure external tools before promote |
+| [guides/graphify-analysis.md](./guides/graphify-analysis.md) | Graphify knowledge-graph evaluation (research spike) |
+| [guides/memory-provenance.md](./guides/memory-provenance.md) | EXTRACTED / INFERRED / AMBIGUOUS labels for memory links |
 | [guides/v1-harness-readiness.md](./guides/v1-harness-readiness.md) | V1 config stack certainty (10 layers) |
 | [adr/ADR-006-harness-tool-cluster.md](./adr/ADR-006-harness-tool-cluster.md) | Catalog + experiment protocol |
 
