@@ -1,6 +1,6 @@
 # scan
 
-**Skip** if scan done this chat — use prior output. Model: session default (Auto).
+**Skip** if scan done this chat — use prior output. Model: `composer-2.5-fast`.
 
 **User message = ticket source:** `/scan TICKET-123 description` — no carry-forward paste.
 

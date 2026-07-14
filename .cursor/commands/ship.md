@@ -1,6 +1,6 @@
 # ship
 
-**Agent mode** — verify → gate → deliver. Only **READY** proceeds.
+**Agent mode** — verify → gate → deliver. Only **READY** proceeds. Model: `gpt-5.6-terra-medium` for the verdict; scripts do the rest (COST 0). Scripts-only ship: `composer-2.5-fast` is enough.
 
 **Discover (once):**
 
