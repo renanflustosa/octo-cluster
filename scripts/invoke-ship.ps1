@@ -13,6 +13,8 @@ param(
     [string]$PrBodyFile,
     [switch]$SkipGit,
     [switch]$SkipCommit,
+    [switch]$WaitForMerge,
+    [switch]$FullVerify,
     [switch]$SkipEval,
     [switch]$SkipChildGate
 )
@@ -34,6 +36,8 @@ if ($PrBodyFile) { $bound['PrBodyFile'] = $PrBodyFile }
 if ($RepoPath) { $bound['RepoPath'] = $RepoPath }
 if ($SkipGit) { $bound['SkipGit'] = $true }
 if ($SkipCommit) { $bound['SkipCommit'] = $true }
+if ($WaitForMerge) { $bound['WaitForMerge'] = $true }
+if ($FullVerify) { $bound['FullVerify'] = $true }
 if ($SkipEval) { $bound['SkipEval'] = $true }
 if ($SkipChildGate) { $bound['SkipChildGate'] = $true }
 

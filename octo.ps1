@@ -20,13 +20,16 @@ param(
     [string]$RepoPath,
     [string]$Ticket,
     [string]$TicketUrl,
-    [string]$Profile,
+    [Alias('Profile')][string]$ExecutionProfile,
     [string]$CommitMessage,
     [string]$FeatureBranch,
     [string]$PrTitle,
     [string]$PrBodyFile,
     [switch]$SkipGit,
-    [switch]$SkipCommit
+    [switch]$SkipCommit,
+    [switch]$WaitForMerge,
+    [switch]$FullVerify,
+    [switch]$SkipEval
 )
 
 $ErrorActionPreference = 'Stop'
@@ -36,12 +39,13 @@ $ErrorActionPreference = 'Stop'
 $mergedArgs = Merge-OctoScriptArgs -Base $ScriptArgs -ScriptArgsJson $ScriptArgsJson -Flat @{
     Ticket    = $Ticket
     TicketUrl = $TicketUrl
-    Profile   = $Profile
+    Profile   = $ExecutionProfile
 }
 
 $target = Join-Path $PSScriptRoot 'scripts\invoke-pipeline.ps1'
 & $target -Pipeline $Pipeline -Action $Action -Phase $Phase -ScriptArgs $mergedArgs `
     -Domain $Domain -RepoPath $RepoPath -CommitMessage $CommitMessage `
     -FeatureBranch $FeatureBranch -PrTitle $PrTitle -PrBodyFile $PrBodyFile `
-    -SkipGit:$SkipGit -SkipCommit:$SkipCommit
+    -SkipGit:$SkipGit -SkipCommit:$SkipCommit -WaitForMerge:$WaitForMerge `
+    -FullVerify:$FullVerify -SkipEval:$SkipEval
 exit $LASTEXITCODE

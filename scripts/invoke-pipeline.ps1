@@ -15,7 +15,10 @@ param(
     [string]$PrTitle,
     [string]$PrBodyFile,
     [switch]$SkipGit,
-    [switch]$SkipCommit
+    [switch]$SkipCommit,
+    [switch]$WaitForMerge,
+    [switch]$FullVerify,
+    [switch]$SkipEval
 )
 
 $ErrorActionPreference = "Stop"
@@ -28,6 +31,9 @@ if ($PrTitle) { $ScriptArgs['PrTitle'] = $PrTitle }
 if ($PrBodyFile) { $ScriptArgs['PrBodyFile'] = $PrBodyFile }
 if ($SkipGit) { $ScriptArgs['SkipGit'] = $true }
 if ($SkipCommit) { $ScriptArgs['SkipCommit'] = $true }
+if ($WaitForMerge) { $ScriptArgs['WaitForMerge'] = $true }
+if ($FullVerify) { $ScriptArgs['FullVerify'] = $true }
+if ($SkipEval) { $ScriptArgs['SkipEval'] = $true }
 
 $allowed = @('ship', 'scan', 'model', 'close', 'review', 'debug')
 if ($Pipeline -notin $allowed) {

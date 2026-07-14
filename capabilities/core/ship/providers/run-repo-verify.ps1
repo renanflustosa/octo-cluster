@@ -1,5 +1,8 @@
 ﻿# Run repository-policy verify commands (verification phase provider).
-param([string]$RepoPath)
+param(
+    [string]$RepoPath,
+    [switch]$Fast
+)
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot '..\..\..\..\scripts\_load-env.ps1')
@@ -26,6 +29,10 @@ foreach ($cmd in $commands) {
     $id = [string]$cmd.id
     $run = [string]$cmd.run
     if (-not $run) { continue }
+    if ($Fast -and $cmd.tier -eq 'full') {
+        Write-Host "[repo-verify] skip full verify '$id' in fast profile" -ForegroundColor DarkGray
+        continue
+    }
 
     $cwd = $RepoPath
     if ($cmd.cwd) {

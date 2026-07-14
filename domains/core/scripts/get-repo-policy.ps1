@@ -172,6 +172,7 @@ function Get-RepoVerifyCommands {
             cwd      = if ($entry.cwd) { [string]$entry.cwd } else { $null }
             run      = $run
             optional = ($entry.optional -eq $true)
+            tier     = if ($entry.tier) { [string]$entry.tier } else { 'fast' }
         })
     }
 

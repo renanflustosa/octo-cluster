@@ -28,7 +28,7 @@ Read `SHIP_SKILL` once per thread.
 
 **Read budget:** ≤3 files · ≤300 lines · grep-first
 
-Run scoped checks from the /model validation plan plus repo-policies/<repo>.yaml verify commands (provider repo-policy-verify).
+Run scoped checks from the /model validation plan plus the fast-tier repo-policy checks (provider repo-policy-verify). Pass `-FullVerify` for commands marked `tier: full`.
 
 **Verdict (≤40 lines):** `READY` | `NEEDS FIXES` | `BLOCKED`
 
@@ -64,11 +64,12 @@ When `git.auto_merge: true` (see repo policy), the git phase also:
 1. Creates/checks out feature branch (or derives from `CARD:` in `current_task.md` when `auto_branch_from_ticket: true`)
 2. Commits all tracked/untracked changes (`git add -A`); aborts if anything remains uncommitted after commit
 3. Pushes, opens PR against `base_branch`
-4. Ensures GitHub `allow_auto_merge` and `delete_branch_on_merge` on the repo (idempotent via `scripts/enable-auto-merge.ps1`), enables `gh pr merge --auto`, and waits for CI (timeout from `ci_wait_timeout_minutes`)
-5. On merge: best-effort remote/local branch cleanup; local `-d` with `-D` fallback after squash merge
-6. When `checkout_main_after_merge` or `reset_worktree_after_ship`: restores clean `base_branch` (`git reset --hard origin/<base>` + `git clean -fd`) — only after push started; abort before push preserves local work
+4. Ensures GitHub `allow_auto_merge` and `delete_branch_on_merge` on the repo (idempotent via `scripts/enable-auto-merge.ps1`) and enables `gh pr merge --auto`
+5. Returns immediately with `merge_state=auto_merge_enabled`; add `-WaitForMerge` only when the caller must wait for CI and merge
+6. Prunes local branches only after GitHub confirms their PRs were merged; GitHub deletes the remote branch on merge
+7. Returns to `base_branch` after a waited-for merge with `git pull --ff-only`; it never resets or cleans the worktree automatically
 
-**Clean worktree contract:** after a ship with push, the operator must be on `base_branch` with empty `git status --porcelain`. Uncommitted changes never left behind on `base_branch`.
+**Worktree contract:** `/ship` never discards local work. A successful asynchronous ship may leave the operator on its feature branch until the next cleanup or an explicit `-WaitForMerge` delivery.
 
 Release-please PRs auto-merge via `.github/workflows/auto-merge.yml`:
 
@@ -91,7 +92,7 @@ After rerun, `auto-merge` should enable squash auto-merge when CI is green. One-
 
 Standalone utility: `pwsh scripts/enable-auto-merge.ps1`.
 
-**Git JSON fields (when auto_merge enabled):** `pr_url`, `merged`, `merge_state`, `branch_deleted`, `main_sha`
+**Git JSON fields (when auto_merge enabled):** `pr_url`, `merged`, `merge_state`, `branch_deleted`, `main_sha`. `SHIP_RESULT` is emitted by the orchestrator. A non-zero exit means a requested waited-for merge could not complete.
 
 When `git.auto_close_after_ship: true` and `CARD:` is set in `current_task.md`, successful git delivery also:
 
@@ -104,7 +105,7 @@ Skip auto-close when git success criteria fail (e.g. `merged=false` with `auto_m
 
 ## E2E validation (maintainer)
 
-1. `/ship` a trivial change on a feature branch → PR auto-merges when CI passes → local `main` clean
+1. `/ship` a trivial change on a feature branch → PR queues auto-merge immediately → `-WaitForMerge` confirms merge and returns to local `main`
 2. Push lands on `main` → release-please opens `chore(main): release X` bot PR
 3. Bot PR auto-merges when CI green (no manual approve/delete) → tag published on GitHub Releases
 

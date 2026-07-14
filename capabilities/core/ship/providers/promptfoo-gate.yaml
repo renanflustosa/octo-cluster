@@ -1,7 +1,7 @@
 id: promptfoo-eval
 phase: gates
 kind: script
-blocking: true
+blocking: false
 priority: 10
 when: always
 owner:

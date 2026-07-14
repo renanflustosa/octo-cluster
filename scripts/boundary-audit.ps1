@@ -56,6 +56,7 @@ $allowedRepoPolicyFiles = @(
     'octo-cluster.yaml',
     'consumer-demo.yaml',
     'feature-branch-main.yaml',
+    'node-pnpm-feature-branch-main.yaml',
     'private-secrets-vault.yaml'
 )
 

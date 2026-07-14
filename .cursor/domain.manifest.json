@@ -1,10 +1,10 @@
 {
-  "executionContext": "platform",
-  "skillDiscovery": "capabilities-skills.json + invoke-pipeline discover",
-  "skillsPolicy": "core-only",
-  "domain": "platform",
   "commandsPolicy": "core-only",
-  "childRoot": null,
+  "syncedAt": "2026-07-14T22:26:46.7013439Z",
+  "domain": "platform",
+  "skillDiscovery": "capabilities-skills.json + invoke-pipeline discover",
   "coreRoot": "domains/core",
-  "syncedAt": "2026-07-14T20:21:11.2203018Z"
+  "executionContext": "platform",
+  "skillsPolicy": "core-only",
+  "childRoot": null
 }

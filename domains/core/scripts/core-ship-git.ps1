@@ -11,6 +11,8 @@ param(
     [switch]$SkipCommit,
     [switch]$SkipPush,
     [switch]$SkipPullRequest,
+    [switch]$WaitForMerge,
+    [switch]$CleanupMergedBranches,
     [switch]$WhatIf
 )
 
@@ -75,7 +77,7 @@ function Test-GitDirty {
     return $true
 }
 
-function Ensure-Commit {
+function Invoke-ShipCommit {
     param(
         [string]$Message,
         [switch]$Skip
@@ -114,15 +116,10 @@ function Restore-CleanBaseBranch {
         Write-Host "`[ship-git] WhatIf: would restore clean $BaseBranch" -ForegroundColor Yellow
         return
     }
-    Write-Host "`[ship-git] restoring clean $BaseBranch" -ForegroundColor Cyan
+    Write-Host "`[ship-git] returning to $BaseBranch" -ForegroundColor Cyan
     Invoke-Git @('checkout', $BaseBranch) | Out-Null
     Invoke-Git @('fetch', 'origin') | Out-Null
-    if ($GitPolicy.reset_worktree_after_ship -eq $true -or $GitPolicy.checkout_main_after_merge -eq $true) {
-        Invoke-Git @('reset', '--hard', "origin/$BaseBranch") | Out-Null
-        Invoke-Git @('clean', '-fd') | Out-Null
-    } else {
-        Invoke-Git @('pull', '--ff-only', 'origin', $BaseBranch) | Out-Null
-    }
+    Invoke-Git @('pull', '--ff-only', 'origin', $BaseBranch) | Out-Null
     $remaining = Invoke-Git @('status', '--porcelain')
     if ($remaining) {
         throw "[ship-git] base branch still dirty after restore:`n$remaining"
@@ -140,10 +137,7 @@ function Get-BaseBranchFromPolicy {
 
 function Test-ShouldRestoreBaseWorktree {
     param([hashtable]$GitPolicy)
-    if (-not $script:DeliveryStarted) { return $false }
-    if ($GitPolicy.reset_worktree_after_ship -eq $true) { return $true }
-    if ($GitPolicy.checkout_main_after_merge -eq $true) { return $true }
-    return $false
+    return ($script:ShipMerged -and $GitPolicy.checkout_main_after_merge -eq $true)
 }
 
 function Sync-BaseBranch {
@@ -155,7 +149,7 @@ function Sync-BaseBranch {
     Invoke-Git @('pull', '--ff-only', 'origin', $BaseBranch) | Out-Null
 }
 
-function Rebase-OntoRemoteBase {
+function Update-BranchFromRemoteBase {
     param(
         [Parameter(Mandatory = $true)][string]$BaseBranch
     )
@@ -210,18 +204,18 @@ function New-PullRequest {
         Write-Host "`[ship-git] PR already exists: $existing" -ForegroundColor Green
         return $existing
     }
-    $args = @('pr', 'create', '--base', $BaseBranch)
-    if ($Title) { $args += @('--title', $Title) }
+    $ghArgs = @('pr', 'create', '--base', $BaseBranch)
+    if ($Title) { $ghArgs += @('--title', $Title) }
     if ($BodyFile) {
         if (-not (Test-Path $BodyFile)) { throw "PR body file not found: $BodyFile" }
-        $args += @('--body-file', $BodyFile)
+        $ghArgs += @('--body-file', $BodyFile)
     } else {
-        $args += '--fill'
+        $ghArgs += '--fill'
     }
     $prevEap = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
     try {
-        $out = gh @args 2>&1
+        $out = gh @ghArgs 2>&1
         if ($LASTEXITCODE -ne 0) {
             throw "gh pr create failed: $out"
         }
@@ -286,9 +280,9 @@ function Enable-PrAutoMerge {
         [Parameter(Mandatory = $true)][int]$PrNumber,
         [Parameter(Mandatory = $true)][hashtable]$GitPolicy
     )
-    $args = @('pr', 'merge', [string]$PrNumber, '--auto') + (Get-MergeMethodArgs -GitPolicy $GitPolicy)
+    $ghArgs = @('pr', 'merge', [string]$PrNumber, '--auto') + (Get-MergeMethodArgs -GitPolicy $GitPolicy)
     Write-Host "`[ship-git] enabling auto-merge on PR #$PrNumber" -ForegroundColor Cyan
-    Invoke-Gh -Args $args | Out-Null
+    Invoke-Gh -Args $ghArgs | Out-Null
 }
 
 function Get-PrStatus {
@@ -354,20 +348,42 @@ function Remove-ShipBranch {
         [Parameter(Mandatory = $true)][hashtable]$GitPolicy
     )
     try {
-        if ($GitPolicy.delete_branch_after_merge) {
-            Write-Host "`[ship-git] deleting remote branch origin/$BranchName" -ForegroundColor Cyan
-            Invoke-Git @('push', 'origin', '--delete', $BranchName) | Out-Null
+        if (-not $GitPolicy.delete_branch_after_merge) { return $false }
+        $current = (Invoke-Git @('branch', '--show-current')).Trim()
+        if ($current -eq $BranchName) {
+            Invoke-Git @('checkout', $BaseBranch) | Out-Null
         }
-        if ($GitPolicy.delete_branch_after_merge) {
-            try {
-                Invoke-Git @('branch', '-d', $BranchName) | Out-Null
-            } catch {
-                Write-Host "`[ship-git] branch -d failed (squash merge?) - force delete local $BranchName" -ForegroundColor Yellow
-                Invoke-Git @('branch', '-D', $BranchName) | Out-Null
-            }
-        }
+        # GitHub deletes the remote branch after merge. This force delete is safe
+        # only because the caller has already confirmed the PR state is MERGED.
+        Invoke-Git @('branch', '-D', $BranchName) | Out-Null
+        return $true
     } catch {
         Write-Host "`[ship-git] branch cleanup warning: $_" -ForegroundColor Yellow
+        return $false
+    }
+}
+
+function Remove-MergedLocalBranches {
+    param(
+        [Parameter(Mandatory = $true)][string]$BaseBranch,
+        [Parameter(Mandatory = $true)][hashtable]$GitPolicy
+    )
+    if ($WhatIf -or -not $GitPolicy.delete_branch_after_merge) { return }
+
+    Invoke-Git @('fetch', '--prune', 'origin') | Out-Null
+    $current = (Invoke-Git @('branch', '--show-current')).Trim()
+    $branches = @(Invoke-Git @('for-each-ref', 'refs/heads', '--format=%(refname:short)'))
+    foreach ($branch in $branches) {
+        $branch = $branch.Trim()
+        if (-not $branch -or $branch -eq $BaseBranch -or $branch -eq $current) { continue }
+        try {
+            $merged = (Invoke-Gh -Args @('pr', 'list', '--head', $branch, '--base', $BaseBranch, '--state', 'merged', '--json', 'number', '--jq', 'length')).Trim()
+            if ($merged -eq '0') { continue }
+            Invoke-Git @('branch', '-D', $branch) | Out-Null
+            Write-Host "`[ship-git] removed merged local branch $branch" -ForegroundColor DarkGray
+        } catch {
+            Write-Host "`[ship-git] branch cleanup warning for ${branch}: $_" -ForegroundColor Yellow
+        }
     }
 }
 
@@ -389,16 +405,21 @@ function Invoke-PostPullRequestAutomation {
     Enable-GitHubAutoMergeSetting -WhatIf:$WhatIf | Out-Null
     $prNumber = Resolve-PrNumber -PrUrl $PrUrl -HeadBranch $BranchName -BaseBranch $BaseBranch
     Enable-PrAutoMerge -PrNumber $prNumber -GitPolicy $GitPolicy
+    if (-not $WaitForMerge) {
+        return @{
+            merged         = $false
+            merge_state    = 'auto_merge_enabled'
+            branch_deleted = $false
+            main_sha       = $null
+        }
+    }
     $wait = Wait-ForPrMerged -PrNumber $prNumber -GitPolicy $GitPolicy
 
     $branchDeleted = $false
     $mainSha = $null
     if ($wait.merged) {
-        Remove-ShipBranch -BranchName $BranchName -BaseBranch $BaseBranch -GitPolicy $GitPolicy
-        $branchDeleted = [bool]$GitPolicy.delete_branch_after_merge
-        if ($GitPolicy.checkout_main_after_merge -or $GitPolicy.reset_worktree_after_ship) {
-            Invoke-Git @('checkout', $BaseBranch) | Out-Null
-        }
+        $branchDeleted = Remove-ShipBranch -BranchName $BranchName -BaseBranch $BaseBranch -GitPolicy $GitPolicy
+        $script:ShipMerged = $true
         $mainSha = (Invoke-Git @('rev-parse', 'HEAD')).Trim()
     } elseif ($RevalidateNeeded) {
         Write-Host "`[ship-git] revalidate recommended after rebase (revalidate_after_rebase)" -ForegroundColor Yellow
@@ -429,7 +450,7 @@ function Invoke-DirectStrategy {
         Invoke-Git @('checkout', $target) | Out-Null
     }
 
-    Ensure-Commit -Message $Message -Skip:$SkipCommit
+    Invoke-ShipCommit -Message $Message -Skip:$SkipCommit
     Assert-WorkingTreeCleanAfterCommit -Skip:$SkipCommit
 
     if (-not $SkipPush) {
@@ -469,7 +490,7 @@ function Invoke-FeatureBranchStrategy {
         if ($WhatIf) {
             Write-Host "`[ship-git] would checkout/create branch $BranchName" -ForegroundColor Cyan
         } else {
-            $exists = git show-ref --verify --quiet "refs/heads/$BranchName"; $code = $LASTEXITCODE
+            $null = git show-ref --verify --quiet "refs/heads/$BranchName"; $code = $LASTEXITCODE
             if ($code -eq 0) {
                 Invoke-Git @('checkout', $BranchName) | Out-Null
             } else {
@@ -478,13 +499,13 @@ function Invoke-FeatureBranchStrategy {
         }
     }
 
-    Ensure-Commit -Message $Message -Skip:$SkipCommit
+    Invoke-ShipCommit -Message $Message -Skip:$SkipCommit
     Assert-WorkingTreeCleanAfterCommit -Skip:$SkipCommit
 
     Invoke-Git @('fetch', 'origin') | Out-Null
     $rebased = $false
     if ($GitPolicy.sync_remote_before_pr) {
-        $rebased = Rebase-OntoRemoteBase -BaseBranch $base
+        $rebased = Update-BranchFromRemoteBase -BaseBranch $base
     }
 
     if (-not $SkipPush) {
@@ -532,6 +553,7 @@ if (-not $RepoPath) {
 
 $RepoPath = (Resolve-Path $RepoPath).Path
 $script:DeliveryStarted = $false
+$script:ShipMerged = $false
 $gitPolicy = @{}
 $baseBranch = 'main'
 Push-Location $RepoPath
@@ -539,6 +561,14 @@ try {
     $policy = Get-RepoPolicy -RepoPath $RepoPath
     $gitPolicy = $policy.git
     $baseBranch = Get-BaseBranchFromPolicy -GitPolicy $gitPolicy
+    Remove-MergedLocalBranches -BaseBranch $baseBranch -GitPolicy $gitPolicy
+    if ($CleanupMergedBranches) {
+        @{
+            strategy = [string]$gitPolicy.strategy
+            cleanup  = 'completed'
+        } | ConvertTo-Json -Compress
+        exit 0
+    }
 
     if (-not (Test-GitDirty) -and -not $SkipCommit) {
         if (-not $CommitMessage) {
@@ -567,6 +597,9 @@ try {
         }
     }
 
+    if ($WaitForMerge -and $gitPolicy.auto_merge -eq $true -and $result.merged -ne $true) {
+        throw "[ship-git] auto-merge did not complete (state=$($result.merge_state))."
+    }
     $result | ConvertTo-Json -Compress
     exit 0
 } catch {
