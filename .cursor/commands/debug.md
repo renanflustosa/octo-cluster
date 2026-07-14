@@ -1,6 +1,8 @@
 # debug
 
-**Debug mode** or **Agent** with runtime evidence. Model: session default (Auto).
+**Debug mode** or **Agent** with runtime evidence. Model: `gpt-5.6-terra-medium`; thinking only after 2 failed hypotheses.
+
+**Evidence script-first:** gather runtime evidence via `bun test`, logs, and grep **before** each hypothesis — no LLM speculation without a reproducible signal.
 
 **Discover (first debug only):**
 

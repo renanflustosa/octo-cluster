@@ -2,6 +2,8 @@
 
 **Skip** if scan done this chat — use prior output. Model: `composer-2.5-fast`.
 
+**LLM turn budget: 1 (the scope output).** Scripts run first and do all mechanics (bootstrap, baseline, card fetch). Do not narrate script output — read `TICKET_CARD` when printed and go straight to scoping.
+
 **User message = ticket source:** `/scan TICKET-123 description` — no carry-forward paste.
 
 **Discover (once per thread):**
