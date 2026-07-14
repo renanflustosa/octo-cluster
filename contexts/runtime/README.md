@@ -17,7 +17,7 @@ Selected by `AI_EXECUTION_CONTEXT` (default: `platform`). Resolved by `domains/c
 | `combination_id` | Bakeoff arm label persisted on metrics cards (e.g. `baseline`, `compress-on`) |
 | `harness_tools` | Boolean map of catalog toggles (defaults = current platform behavior) |
 
-See [harness-tool-cluster.md](../guides/harness-tool-cluster.md) and [harness-catalog.yaml](../architecture/harness-catalog.yaml).
+See [harness-tool-cluster.md](../../docs/guides/harness-tool-cluster.md) and [harness-catalog.yaml](../../docs/architecture/harness-catalog.yaml).
 
 Override locally without editing tracked defaults:
 

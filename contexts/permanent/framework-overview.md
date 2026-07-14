@@ -9,7 +9,7 @@ Stable mental model for octo-cluster. For full detail see [`docs/index.md`](../.
 | **Core** | `domains/core/` | Universal rules, skills, commands, harness scripts |
 | **Capability packs** | `capabilities/<pack>/` | Pipeline manifests + providers |
 | **Execution context** | `contexts/runtime/*.json` | Enabled packs, memory profile, ship repos |
-| **Generated adapter** | `.cursor/` | Cursor output — edit `domains/`, then sync |
+| **Generated adapter** | `.cursor/` | Cursor output — synced from `domains/core/`; committed for convenience |
 | **Engine** | `engine/context-engine/` | Bun + LanceDB semantic search (primary) |
 | **Legacy engine** | `engine/context/`, `engine/indexing/` | Python helpers — prefer context-engine for new work |
 

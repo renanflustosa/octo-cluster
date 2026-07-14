@@ -75,32 +75,37 @@ This is **evidence-informed, not a production savings guarantee.** Full method, 
 
 ## Quick start
 
-**Official dev setup:** Ubuntu 24.04 inside **Dev Container** (same flow on Windows, macOS, or Linux host). **iOS is out of scope** — desktop CLI harness only.
+**Official dev setup:** native bootstrap on **Windows, macOS, or Linux** with PowerShell 7 and Bun. **iOS is out of scope** — desktop CLI harness only.
 
-**Prerequisites:** [Git](https://git-scm.com/downloads) and [Docker](https://docs.docker.com/get-docker/) (Desktop on Windows/macOS, Engine on Linux). [Cursor](https://cursor.com) or VS Code with the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
+**Prerequisites:** [Git](https://git-scm.com/downloads), [PowerShell 7](https://github.com/PowerShell/PowerShell/releases), [Bun](https://bun.sh), and optionally [GitHub CLI](https://cli.github.com/) for `/ship`.
 
 ```bash
 git clone https://github.com/renanflustosa/octo-cluster.git <clone-root>
 cd <clone-root>
 ```
 
-Open the folder in Cursor → **Dev Containers: Reopen in Container**. The first build runs [`.devcontainer/post-create.sh`](.devcontainer/post-create.sh) (Bun deps, `.cursor/` sync, memory index, harness audit).
+**Windows:** `pwsh -File install.ps1`  
+**Linux/macOS:** `./install.sh`
 
-Inside the container (same on every host):
+Then sync the Cursor adapter and validate:
 
-```bash
-gh auth login   # once, for PR flow in /ship
-pwsh octo.ps1 -Pipeline scan -Action discover
+```powershell
+pwsh scripts/sync-cursor.ps1
 cd engine/context-engine && bun run validate octo-cluster
+pwsh scripts/productivity-audit.ps1
+```
+
+Smoke test:
+
+```powershell
+pwsh octo.ps1 -Pipeline scan -Action discover
 ```
 
 Full guide: [onboarding](./docs/guides/onboarding.md).
 
-**Linux/macOS native (optional, no container):** install `git`, `pwsh`, `bun`, `gh`, `rg`, then `./install.sh`. Use `./scripts/octo` as entry point.
+**Dev Container:** optional future path — not shipped in this repo yet.
 
-**Windows host bootstrap (optional):** `pwsh -File install.ps1` — sets User-level `OCTO_CLUSTER` without Dev Container.
-
-Env vars are set by the dev container; a consumer-managed IDE workspace covers local terminals when not in a container.
+Env vars: set `OCTO_CLUSTER` to the repo root (install scripts do this). Use `AI_EXECUTION_CONTEXT=platform` unless overridden in a local multi-root workspace.
 
 Add this folder as a root in your **local** multi-root workspace (vault, product repos, etc.) — never commit workspace files to this repo.
 
@@ -114,7 +119,7 @@ octo-cluster/          ← drop this folder into any multi-root workspace
   engine/              context-engine (Bun + LanceDB)
   scripts/             sync adapters, invoke-pipeline, install helpers
   adapters/            IDE/tooling adapter scaffolding
-  .cursor/             generated for Cursor — edit domains/, then sync
+  .cursor/             synced from domains/core/ — edit domains/, then sync
 ```
 
 Agent context hub: [`contexts/README.md`](./contexts/README.md). Docs index: [`docs/index.md`](./docs/index.md).
@@ -129,9 +134,9 @@ One chat ≈ one work item. Phase commands are **optional**; routine edits do no
 /start-workspace  →  /scan ISSUE-123 description  →  /model  →  Execute plan  →  /ship  →  /close
 ```
 
-Discover the active pipeline skill (inside the dev container):
+Discover the active pipeline skill:
 
-```bash
+```powershell
 pwsh octo.ps1 -Pipeline scan -Action discover
 ```
 
@@ -155,18 +160,17 @@ pwsh octo.ps1 -Pipeline scan -Action discover
 | [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) | Community standards |
 | [THIRD_PARTY.md](./THIRD_PARTY.md) | Attributions |
 
-## Install helpers (optional)
-
-Most tools are pre-installed by [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json).
+## Install helpers
 
 | Script | Purpose |
 |--------|---------|
 | [`install.sh`](./install.sh) | Linux/macOS native bootstrap (delegates to `pwsh`) |
-| [`install.ps1`](./install.ps1) | Windows host bootstrap (optional) |
+| [`install.ps1`](./install.ps1) | Windows host bootstrap |
 | [`scripts/octo`](./scripts/octo) | Bash shim → `octo.ps1` on Unix |
+| `scripts/sync-cursor.ps1` | Sync `domains/core/` → `.cursor/` |
+| `scripts/productivity-audit.ps1` | Local harness health check |
 | `scripts/install-go.ps1` | Go via [go.dev](https://go.dev/dl/) MSI or zip |
 | `scripts/install-ollama.ps1` | Ollama via official install script |
-| `scripts/productivity-audit.ps1` | Local harness health check |
 
 ## Contributing
 

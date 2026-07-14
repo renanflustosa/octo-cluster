@@ -133,19 +133,20 @@ In Continue settings: enable **terminal / command** tools (Agent mode) so the mo
 
 Disable tab autocomplete in Continue if not needed (not a project priority).
 
-### 2.5 octo-cluster Dev Container
+### 2.5 octo-cluster local bootstrap
 
-1. Open `~/GitHub/octo-cluster` in VSCodium
-2. Command palette → **Dev Containers: Reopen in Container**
-3. Wait for `.devcontainer/post-create.sh` (bun install, sync `.cursor/`, validate)
+1. Clone `octo-cluster` and run `./install.sh` (or `pwsh install.ps1` on Windows)
+2. `pwsh scripts/sync-cursor.ps1`
+3. `cd engine/context-engine && bun run validate octo-cluster`
 
-Verify inside container:
+Verify:
 
 ```bash
 pwsh octo.ps1 -Pipeline scan -Action discover
-cd engine/context-engine && bun run validate octo-cluster
 pwsh scripts/productivity-audit.ps1
 ```
+
+**Note:** Dev Container is not shipped in this repo — use native bootstrap above.
 
 ---
 

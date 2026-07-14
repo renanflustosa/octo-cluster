@@ -33,7 +33,7 @@ pwsh octo.ps1 -Pipeline scan -Action discover
 
 | Variable | Purpose |
 |----------|---------|
-| `OCTO_CLUSTER` | Repo root (set by devcontainer / install.ps1) |
+| `OCTO_CLUSTER` | Repo root (set by install scripts or IDE workspace) |
 | `AI_EXECUTION_CONTEXT` | Selects `contexts/runtime/<id>.json` (default: `platform`) |
 
 ## Pipeline → skill (platform)

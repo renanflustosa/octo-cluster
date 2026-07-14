@@ -9,48 +9,49 @@ Read [EOS](../governance/eos.md) for project conventions.
 | Supported | Not supported |
 |-----------|---------------|
 | Linux (Ubuntu 24.04 official), macOS, Windows | iOS / mobile CLI harness |
-| Dev Container (canonical on all hosts) | Rewriting harness in bash |
-| Native Linux via `./install.sh` + `pwsh` | |
+| Native bootstrap via `install.ps1` / `install.sh` | Rewriting harness in bash |
+| Dev Container (optional future) | |
 
 Harness orchestration runs on **PowerShell 7 (`pwsh`)** everywhere. Context engine runs on **Bun**. Bash shims (`scripts/octo`) are optional ergonomics only.
 
-## Dev Container (all platforms)
+## Native bootstrap (canonical)
 
-One path for **Windows, macOS, and Linux**: Docker on the host, Ubuntu inside the container.
-
-### Host prerequisites
+### Prerequisites
 
 | Item | How |
 |------|-----|
 | Git | [git-scm.com](https://git-scm.com/downloads) |
-| Docker | [Docker Desktop](https://docs.docker.com/desktop/) (Windows/macOS) or [Docker Engine](https://docs.docker.com/engine/install/) (Linux) |
-| Cursor or VS Code | [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) |
+| PowerShell 7 | [PowerShell releases](https://github.com/PowerShell/PowerShell/releases) |
+| Bun | [bun.sh](https://bun.sh) |
+| GitHub CLI (optional, for `/ship`) | [cli.github.com](https://cli.github.com/) |
 
-### First open
+### First setup
 
 ```bash
 git clone https://github.com/renanflustosa/octo-cluster.git
 cd octo-cluster
 ```
 
-1. Open the folder in Cursor.
-2. Command palette → **Dev Containers: Reopen in Container** (or accept the prompt).
-3. Wait for `.devcontainer/post-create.sh` — installs Bun deps, syncs `.cursor/`, seeds memory, runs `bun run validate octo-cluster`.
+**Windows:** `pwsh -File install.ps1`  
+**Linux/macOS:** `chmod +x install.sh scripts/octo scripts/octo-domain && ./install.sh`
 
-After build:
+Then:
 
-```bash
-gh auth login   # once, for PRs and /ship
+```powershell
+pwsh scripts/sync-cursor.ps1
+cd engine/context-engine && bun install && bun run validate octo-cluster
 pwsh scripts/productivity-audit.ps1
 ```
 
-Expected: `[READY]` with optional `gh auth` WARN until you log in.
+Optional: `gh auth login` once for PR flow in `/ship`.
 
-### Inside the container
+Expected audit: `[READY]` with optional `gh auth` WARN until you log in.
 
-Env is set automatically:
+### Environment
 
-- `OCTO_CLUSTER` → workspace root (`${localWorkspaceFolder}`)
+Set in install scripts or your IDE workspace:
+
+- `OCTO_CLUSTER` → clone root
 - `AI_EXECUTION_CONTEXT=platform`
 
 | Task | Command |
@@ -58,14 +59,14 @@ Env is set automatically:
 | Pipeline discover | `pwsh octo.ps1 -Pipeline scan -Action discover` |
 | Start workspace | `pwsh octo.ps1 -Pipeline start-workspace -Action run` |
 | Validate harness | `cd engine/context-engine && bun run validate octo-cluster` |
-| Sync adapters after editing `domains/` | `pwsh scripts/sync-cursor.ps1` |
+| Sync adapter after editing `domains/` | `pwsh scripts/sync-cursor.ps1` |
 | Health check | `pwsh scripts/productivity-audit.ps1` |
 
 Optional: add this clone as a root in your consumer-managed IDE workspace (local vault, product repos, etc.).
 
-## Linux/macOS native (optional)
+## Dev Container (optional future)
 
-When not using Dev Container, install prerequisites then bootstrap once:
+Not shipped in this repo yet. Use native bootstrap above. See [oss-workstation-setup.md](./oss-workstation-setup.md) for a manual Ubuntu workstation path.
 
 ```bash
 # Ubuntu example — see docs/guides/oss-workstation-setup.md
@@ -84,9 +85,7 @@ export OCTO_CLUSTER="$(pwd)"   # add to ~/.bashrc for persistence
 
 ## Workspace
 
-IDE workspace files (`.code-workspace`) are **consumer-managed** — outside this repository. Set `OCTO_CLUSTER` and `AI_EXECUTION_CONTEXT` in `terminal.integrated.env.windows` when opening integrated terminals without Dev Container.
-
-Terminal env (when not using Dev Container — local shell only):
+IDE workspace files (`.code-workspace`) are **consumer-managed** — outside this repository. Set `OCTO_CLUSTER` and `AI_EXECUTION_CONTEXT` in `terminal.integrated.env.windows` when opening integrated terminals.
 
 - `AI_EXECUTION_CONTEXT=platform`
 - `OCTO_CLUSTER` → clone root
@@ -143,7 +142,7 @@ CORE rules:
 
 | Layer | Status |
 |-------|--------|
-| devcontainer bootstrap + audit | OK |
+| install bootstrap + audit | OK |
 | invoke-pipeline + capabilities | OK |
 | repo-policies verify | OK |
 | LanceDB memory + code (cap 80) | OK |
@@ -159,7 +158,7 @@ If Write is blocked: `pwsh scripts/sync-cursor.ps1` + `pwsh scripts/validate-cur
 
 ## Recommended extensions
 
-PowerShell · YAML — installed via `.devcontainer/devcontainer.json`
+PowerShell · YAML — see [`.vscode/extensions.json`](../../.vscode/extensions.json)
 
 ## Next step
 
