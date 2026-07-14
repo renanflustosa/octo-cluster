@@ -2,6 +2,8 @@
 
 **Agent mode** — archive ticket, compact memory, reindex. Model: `composer-2.5-fast`.
 
+**LLM turn budget: 0 judgment turns.** Run the script, echo ≤5 lines of its output, done. Do not interpret metrics, do not summarize the card, do not re-read files.
+
 **Discover (once per thread):**
 
 ```powershell

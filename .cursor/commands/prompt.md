@@ -1,6 +1,6 @@
 # prompt
 
-Transform the user message into a professional, precise Cursor-ready prompt. **Never execute the requested task.** Output only the optimized prompt package.
+Transform the user message into a professional, precise Cursor-ready prompt. **Never execute the requested task.** Output only the optimized prompt package. Model: `gpt-5.6-terra-medium` (framing errors multiply into the executor session; `composer-2.5-fast` is enough for trivial one-file rewrites).
 
 **Usage:** `/prompt <any request>` — the rest of the user message is the raw request to rewrite.
 

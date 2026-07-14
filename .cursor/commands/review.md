@@ -1,6 +1,8 @@
 # review
 
-**Ask mode** — review a GitHub Pull Request. Model: session default (Auto).
+**Ask mode** — review a GitHub Pull Request. Model: `composer-2.5-fast`.
+
+**LLM turn budget: 1 (the findings).** Run `gh pr view` and `gh pr diff` before any Read — the diff is the source of truth; broad file reads only when a finding needs surrounding context.
 
 **Discover (first review only):**
 

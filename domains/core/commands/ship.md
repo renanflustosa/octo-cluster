@@ -20,6 +20,8 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "$env:OCTO_CLUSTER/octo.ps1" -Pipe
 
 Use flat parameters (`-CommitMessage`, `-FeatureBranch`). Avoid `-ScriptArgs @{ ... }` through `powershell -File`.
 
+**LLM turn budget: 1 (the verdict).** Git, branch, PR, auto-merge, and worktree restore are 100% script via the orchestrator — **never run git commands manually** during `/ship`. Do not narrate script output; report the final JSON verdict only.
+
 Phases (fail-fast): discover → preflight? → **verification** → **gates** → **git** → reviews? → **close?** (when `auto_close_after_ship` + CARD + git OK)  
 Contracts via repo policy — no hardcoded project vocabulary.
 

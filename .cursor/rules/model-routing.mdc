@@ -16,6 +16,7 @@ alwaysApply: true
 | `/close` | Agent | `composer-2.5-fast` | card-lite is script — no LLM needed |
 | `/review` | Ask | `composer-2.5-fast` | — |
 | `/debug` | Agent | `gpt-5.6-terra-medium` | thinking only after 2 failed hypotheses |
+| `/prompt` (meta) | Ask | `gpt-5.6-terra-medium` | `composer-2.5-fast` for trivial one-file rewrites |
 
 ## Rules
 
