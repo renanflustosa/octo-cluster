@@ -39,6 +39,11 @@ if (Test-Path $hooks) {
     & powershell -NoProfile -ExecutionPolicy Bypass -File $hooks
 }
 
+$cleanup = Join-Path $PSScriptRoot "domains\core\scripts\core-ship-git.ps1"
+if (Test-Path $cleanup) {
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $cleanup -RepoPath $env:OCTO_CLUSTER -CleanupMergedBranches
+}
+
 $validateHooks = Join-Path $PSScriptRoot "scripts\validate-cursor-hooks.ps1"
 if (Test-Path $validateHooks) {
     & powershell -NoProfile -ExecutionPolicy Bypass -File $validateHooks

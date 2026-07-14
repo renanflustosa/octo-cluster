@@ -47,6 +47,20 @@ Optional: `gh auth login` once for PR flow in `/ship`.
 
 Expected audit: `[READY]` with optional `gh auth` WARN until you log in.
 
+### Ship readiness
+
+On every computer, run this after bootstrap before the first delivery:
+
+```powershell
+gh auth status
+pwsh octo.ps1 -Pipeline ship -Action discover
+```
+
+`/ship` opens the PR and enables GitHub auto-merge without waiting. Add
+`-WaitForMerge` when the terminal must wait for checks and merge. GitHub removes
+the remote branch; the next ship run prunes only local branches whose PRs are
+confirmed as merged.
+
 ### Environment
 
 Set in install scripts or your IDE workspace:

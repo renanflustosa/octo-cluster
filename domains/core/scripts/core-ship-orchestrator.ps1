@@ -12,6 +12,8 @@ param(
     [string]$PrBodyFile,
     [switch]$SkipGit,
     [switch]$SkipCommit,
+    [switch]$WaitForMerge,
+    [switch]$FullVerify,
     [switch]$SkipEval,
     [switch]$SkipChildGate
 )
@@ -37,10 +39,10 @@ function Resolve-FeatureBranchFromPolicy {
     param(
         [hashtable]$GitPolicy,
         [string]$CommitMessage,
-        [string]$Profile
+        [string]$MemoryProfile
     )
     if (-not $GitPolicy.auto_branch_from_ticket) { return $null }
-    $ticket = Get-TicketFromCurrentTask -Profile $Profile
+    $ticket = Get-TicketFromCurrentTask -Profile $MemoryProfile
     if (-not $ticket) { return $null }
     $prefix = if ($GitPolicy.branch_prefix) { [string]$GitPolicy.branch_prefix } else { 'feat' }
     $safeTicket = ($ticket.ToLower() -replace '[^a-z0-9-]', '-' -replace '-+', '-').Trim('-')
@@ -49,7 +51,7 @@ function Resolve-FeatureBranchFromPolicy {
     return "$prefix/$safeTicket"
 }
 
-function Parse-ShipGitJson {
+function ConvertFrom-ShipGitJson {
     param([string]$Output)
     if (-not $Output) { return $null }
     $lines = @($Output -split "`r?`n")
@@ -92,7 +94,7 @@ function Invoke-ShipProvider {
     $params = @('-ExecutionPolicy', 'Bypass', '-File', $Provider._script_path)
     foreach ($key in $BoundArgs.Keys) {
         $val = $BoundArgs[$key]
-        if ($val -is [switch]) {
+        if ($val -is [switch] -or $val -is [bool]) {
             if ($val) { $params += "-$key" }
         } else {
             $params += @("-$key", [string]$val)
@@ -153,7 +155,7 @@ function Invoke-ShipAutoClose {
         [hashtable]$GitPolicy
     )
 
-    $profile = if ($ShipContext.memory_profile) { [string]$ShipContext.memory_profile } else { 'octo-cluster' }
+    $memoryProfile = if ($ShipContext.memory_profile) { [string]$ShipContext.memory_profile } else { 'octo-cluster' }
     $baseBranch = if ($GitPolicy.base_branch) { [string]$GitPolicy.base_branch } else { 'main' }
 
     Write-Host "== ship phase: close (auto after successful git) ==" -ForegroundColor Cyan
@@ -163,7 +165,7 @@ function Invoke-ShipAutoClose {
 
     $closeScript = Join-Path $PSScriptRoot 'core-close.ps1'
     & powershell -ExecutionPolicy Bypass -File $closeScript `
-        -Ticket $Ticket -Profile $profile -ShipVerdict READY `
+        -Ticket $Ticket -Profile $memoryProfile -ShipVerdict READY `
         -BaseRef $baseBranch -RepoRoot $RepoPath
     if ($LASTEXITCODE -ne 0) {
         Write-Host "`[ship] auto-close memory failed (exit $LASTEXITCODE)" -ForegroundColor Red
@@ -198,7 +200,7 @@ Write-Host ("SHIP_CONTEXT=" + ($shipCtx | ConvertTo-Json -Compress)) -Foreground
 $gitResult = $null
 $repoPolicy = Get-RepoPolicy -RepoPath $RepoPath
 $gitPolicy = $repoPolicy.git
-$profile = if ($shipCtx.memory_profile) { [string]$shipCtx.memory_profile } else { 'octo-cluster' }
+$memoryProfile = if ($shipCtx.memory_profile) { [string]$shipCtx.memory_profile } else { 'octo-cluster' }
 
 foreach ($phaseName in $runPhases) {
     switch ($phaseName) {
@@ -220,7 +222,7 @@ foreach ($phaseName in $runPhases) {
                 $FeatureBranch = Resolve-FeatureBranchFromPolicy `
                     -GitPolicy $gitPolicy `
                     -CommitMessage $CommitMessage `
-                    -Profile $profile
+                    -MemoryProfile $memoryProfile
                 if ($FeatureBranch) {
                     Write-Host "`[ship] derived FeatureBranch=$FeatureBranch" -ForegroundColor Cyan
                 }
@@ -232,6 +234,7 @@ foreach ($phaseName in $runPhases) {
             if ($PrTitle) { $gitArgs.PrTitle = $PrTitle }
             if ($PrBodyFile) { $gitArgs.PrBodyFile = $PrBodyFile }
             if ($SkipCommit) { $gitArgs.SkipCommit = $true }
+            if ($WaitForMerge) { $gitArgs.WaitForMerge = $true }
 
             $params = @('-ExecutionPolicy', 'Bypass', '-File', $gitScript)
             foreach ($key in $gitArgs.Keys) {
@@ -246,10 +249,12 @@ foreach ($phaseName in $runPhases) {
             $gitOut = & powershell @params 2>&1 | Out-String
             Write-Host ($gitOut.TrimEnd())
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            $gitResult = Parse-ShipGitJson -Output $gitOut
+            $gitResult = ConvertFrom-ShipGitJson -Output $gitOut
         }
         default {
-            $phaseResult = Invoke-ShipPhase -PhaseName $phaseName -RepoPath $RepoPath -ShipContext $shipCtx
+            $extra = @{}
+            if ($phaseName -eq 'verification' -and -not $FullVerify) { $extra.Fast = $true }
+            $phaseResult = Invoke-ShipPhase -PhaseName $phaseName -RepoPath $RepoPath -ShipContext $shipCtx -ExtraArgs $extra
             if ($phaseResult.exit_code -ne 0) { exit $phaseResult.exit_code }
         }
     }
@@ -264,7 +269,7 @@ if ($Phase -eq 'gates' -or $Phase -eq 'all') {
 
 $autoCloseResult = $null
 if (($Phase -eq 'all') -and $gitPolicy.auto_close_after_ship) {
-    $ticket = Get-TicketFromCurrentTask -Profile $profile
+    $ticket = Get-TicketFromCurrentTask -Profile $memoryProfile
     if ($ticket -and (Test-ShipGitSuccess -GitResult $gitResult -GitPolicy $gitPolicy)) {
         $autoCloseResult = Invoke-ShipAutoClose -Ticket $ticket -RepoPath $RepoPath `
             -ShipContext $shipCtx -GitPolicy $gitPolicy
@@ -273,6 +278,9 @@ if (($Phase -eq 'all') -and $gitPolicy.auto_close_after_ship) {
     }
 }
 
+if ($gitResult) {
+    Write-Host ("SHIP_RESULT=" + ($gitResult | ConvertTo-Json -Compress)) -ForegroundColor Cyan
+}
 Write-Host "`[ok] ship orchestrator completed (phase=$Phase)" -ForegroundColor Green
 if ($autoCloseResult) {
     Write-Host ("SHIP_AUTO_CLOSE=" + ($autoCloseResult | ConvertTo-Json -Compress)) -ForegroundColor Cyan

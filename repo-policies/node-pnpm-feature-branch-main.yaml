@@ -8,7 +8,17 @@ git:
   merge_method: squash
   delete_branch_after_merge: true
   checkout_main_after_merge: true
-  sync_remote_after_pr: true
 
 verify:
   enabled: true
+  commands:
+    install:
+      run: pnpm install --frozen-lockfile
+    prisma_generate:
+      run: pnpm db:generate
+    typecheck:
+      run: pnpm typecheck
+    test:
+      run: pnpm test
+    build:
+      run: pnpm build
