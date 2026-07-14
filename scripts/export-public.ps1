@@ -141,7 +141,7 @@ foreach ($exampleFile in @(
 # Filter repo-policies to public set
 $rp = Join-Path $Dest 'repo-policies'
 if (Test-Path $rp) {
-    Get-ChildItem $rp -File | Where-Object { $_.Name -notin @('default.yaml', 'octo-cluster.yaml', 'consumer-demo.yaml') } | ForEach-Object {
+    Get-ChildItem $rp -File | Where-Object { $_.Name -notin @('default.yaml', 'octo-cluster.yaml', 'consumer-demo.yaml', 'feature-branch-main.yaml') } | ForEach-Object {
         Remove-Item $_.FullName -Force
         Write-Host "[remove] repo-policies/$($_.Name)" -ForegroundColor Yellow
     }
