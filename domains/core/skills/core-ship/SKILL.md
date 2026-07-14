@@ -71,7 +71,7 @@ When `git.auto_merge: true` (see repo policy), the git phase also:
 
 **Worktree contract:** `/ship` never discards local work. A successful asynchronous ship may leave the operator on its feature branch until the next cleanup or an explicit `-WaitForMerge` delivery.
 
-Release-please PRs auto-merge via `.github/workflows/auto-merge.yml`:
+Bot PRs (e.g. Dependabot) auto-merge via `.github/workflows/auto-merge.yml`:
 
 - Triggers on bot PRs (`user.type == Bot`) for `opened`, `synchronize`, `ready_for_review`, and `check_suite.completed`
 - Sets `GH_REPO` so `gh` works without checkout; enables `gh pr merge --auto --squash` immediately — GitHub queues merge until required checks pass (no `gh pr checks --watch`; avoids self-referential deadlock)
@@ -82,7 +82,7 @@ Release-please PRs auto-merge via `.github/workflows/auto-merge.yml`:
 
 ```powershell
 # List blocked runs for the bot PR branch
-gh run list --repo <owner>/<repo> --branch release-please--branches--main --json databaseId,conclusion,workflowName
+gh run list --repo <owner>/<repo> --branch <bot-pr-branch> --json databaseId,conclusion,workflowName
 
 # Re-run each run stuck at action_required (CI + auto-merge)
 gh run rerun <run-id> --repo <owner>/<repo>
@@ -106,8 +106,8 @@ Skip auto-close when git success criteria fail (e.g. `merged=false` with `auto_m
 ## E2E validation (maintainer)
 
 1. `/ship` a trivial change on a feature branch → PR queues auto-merge immediately → `-WaitForMerge` confirms merge and returns to local `main`
-2. Push lands on `main` → release-please opens `chore(main): release X` bot PR
-3. Bot PR auto-merges when CI green (no manual approve/delete) → tag published on GitHub Releases
+2. Merge lands on `main`; remote branch auto-deleted via repo `delete_branch_on_merge`
+3. Any bot PR (e.g. Dependabot) auto-merges when CI is green (no manual approve/delete)
 
 ## Customization
 
