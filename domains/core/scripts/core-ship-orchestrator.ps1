@@ -13,6 +13,7 @@ param(
     [switch]$SkipGit,
     [switch]$SkipCommit,
     [switch]$WaitForMerge,
+    [switch]$NoWaitForMerge,
     [switch]$FullVerify,
     [switch]$SkipEval,
     [switch]$SkipChildGate
@@ -78,6 +79,18 @@ function Test-ShipGitSuccess {
         return [bool]$GitResult.pr_url
     }
     return $true
+}
+
+function Resolve-WaitForMerge {
+    param(
+        [hashtable]$GitPolicy,
+        [switch]$WaitForMerge,
+        [switch]$NoWaitForMerge
+    )
+    if ($NoWaitForMerge) { return $false }
+    if ($WaitForMerge) { return $true }
+    if ($GitPolicy.auto_merge -ne $true) { return $false }
+    return ($GitPolicy.wait_for_merge -eq $true)
 }
 
 function Invoke-ShipProvider {
@@ -234,7 +247,9 @@ foreach ($phaseName in $runPhases) {
             if ($PrTitle) { $gitArgs.PrTitle = $PrTitle }
             if ($PrBodyFile) { $gitArgs.PrBodyFile = $PrBodyFile }
             if ($SkipCommit) { $gitArgs.SkipCommit = $true }
-            if ($WaitForMerge) { $gitArgs.WaitForMerge = $true }
+            if (Resolve-WaitForMerge -GitPolicy $gitPolicy -WaitForMerge:$WaitForMerge -NoWaitForMerge:$NoWaitForMerge) {
+                $gitArgs.WaitForMerge = $true
+            }
 
             $params = @('-ExecutionPolicy', 'Bypass', '-File', $gitScript)
             foreach ($key in $gitArgs.Keys) {

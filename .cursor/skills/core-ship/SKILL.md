@@ -65,11 +65,11 @@ When `git.auto_merge: true` (see repo policy), the git phase also:
 2. Commits all tracked/untracked changes (`git add -A`); aborts if anything remains uncommitted after commit
 3. Pushes, opens PR against `base_branch`
 4. Ensures GitHub `allow_auto_merge` and `delete_branch_on_merge` on the repo (idempotent via `scripts/enable-auto-merge.ps1`) and enables `gh pr merge --auto`
-5. Returns immediately with `merge_state=auto_merge_enabled`; add `-WaitForMerge` only when the caller must wait for CI and merge
+5. Waits for CI and merge when repo policy has `wait_for_merge: true` (default for feature-branch + auto_merge policies); pass `-NoWaitForMerge` to return immediately with `merge_state=auto_merge_enabled`
 6. Prunes local branches only after GitHub confirms their PRs were merged; GitHub deletes the remote branch on merge
-7. Returns to `base_branch` after a waited-for merge with `git pull --ff-only`; it never resets or cleans the worktree automatically
+7. Returns to `base_branch` after merge when `checkout_main_after_merge` is set; it never resets or cleans the worktree automatically
 
-**Worktree contract:** `/ship` never discards local work. A successful asynchronous ship may leave the operator on its feature branch until the next cleanup or an explicit `-WaitForMerge` delivery.
+**Worktree contract:** `/ship` never discards local work. With `-NoWaitForMerge`, the operator may remain on the feature branch until the next cleanup or a waited-for merge.
 
 Bot PRs (e.g. Dependabot) auto-merge via `.github/workflows/auto-merge.yml`:
 
@@ -105,9 +105,10 @@ Skip auto-close when git success criteria fail (e.g. `merged=false` with `auto_m
 
 ## E2E validation (maintainer)
 
-1. `/ship` a trivial change on a feature branch → PR queues auto-merge immediately → `-WaitForMerge` confirms merge and returns to local `main`
+1. `/ship` a trivial change on a feature branch → PR queues auto-merge → waits for merge by default → returns to local `main` when policy enables checkout
 2. Merge lands on `main`; remote branch auto-deleted via repo `delete_branch_on_merge`
 3. Any bot PR (e.g. Dependabot) auto-merges when CI is green (no manual approve/delete)
+4. `-NoWaitForMerge` returns after enabling auto-merge without blocking on CI/merge
 
 ## Customization
 

@@ -57,7 +57,7 @@ pwsh octo.ps1 -Pipeline ship -Action discover
 ```
 
 `/ship` opens the PR and enables GitHub auto-merge without waiting. Add
-`-WaitForMerge` when the terminal must wait for checks and merge. GitHub removes
+`-NoWaitForMerge` when the terminal must not wait for checks and merge. Default `/ship` waits when repo policy sets `wait_for_merge: true`. GitHub removes
 the remote branch; the next ship run prunes only local branches whose PRs are
 confirmed as merged.
 
