@@ -13,6 +13,7 @@ git:
   ci_wait_timeout_minutes: 20
   auto_branch_from_ticket: true
   branch_prefix: feat
+  wait_for_merge: true
   auto_close_after_ship: true
 
 verify:

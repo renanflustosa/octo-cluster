@@ -17,6 +17,7 @@ param(
     [switch]$SkipGit,
     [switch]$SkipCommit,
     [switch]$WaitForMerge,
+    [switch]$NoWaitForMerge,
     [switch]$FullVerify,
     [switch]$SkipEval
 )
@@ -32,6 +33,7 @@ if ($PrBodyFile) { $ScriptArgs['PrBodyFile'] = $PrBodyFile }
 if ($SkipGit) { $ScriptArgs['SkipGit'] = $true }
 if ($SkipCommit) { $ScriptArgs['SkipCommit'] = $true }
 if ($WaitForMerge) { $ScriptArgs['WaitForMerge'] = $true }
+if ($NoWaitForMerge) { $ScriptArgs['NoWaitForMerge'] = $true }
 if ($FullVerify) { $ScriptArgs['FullVerify'] = $true }
 if ($SkipEval) { $ScriptArgs['SkipEval'] = $true }
 

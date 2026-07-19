@@ -9,6 +9,8 @@ git:
   delete_branch_after_merge: true
   checkout_main_after_merge: true
   sync_remote_after_pr: true
+  wait_for_merge: true
+  auto_close_after_ship: true
 
 verify:
   enabled: true

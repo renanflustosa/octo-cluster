@@ -8,6 +8,8 @@ git:
   merge_method: squash
   delete_branch_after_merge: true
   checkout_main_after_merge: true
+  wait_for_merge: true
+  auto_close_after_ship: true
 
 verify:
   enabled: true

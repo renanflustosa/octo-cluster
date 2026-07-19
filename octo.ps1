@@ -28,6 +28,7 @@ param(
     [switch]$SkipGit,
     [switch]$SkipCommit,
     [switch]$WaitForMerge,
+    [switch]$NoWaitForMerge,
     [switch]$FullVerify,
     [switch]$SkipEval
 )
@@ -47,5 +48,5 @@ $target = Join-Path $PSScriptRoot 'scripts\invoke-pipeline.ps1'
     -Domain $Domain -RepoPath $RepoPath -CommitMessage $CommitMessage `
     -FeatureBranch $FeatureBranch -PrTitle $PrTitle -PrBodyFile $PrBodyFile `
     -SkipGit:$SkipGit -SkipCommit:$SkipCommit -WaitForMerge:$WaitForMerge `
-    -FullVerify:$FullVerify -SkipEval:$SkipEval
+    -NoWaitForMerge:$NoWaitForMerge -FullVerify:$FullVerify -SkipEval:$SkipEval
 exit $LASTEXITCODE

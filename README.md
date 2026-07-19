@@ -45,7 +45,7 @@ Also available: `/review` (PR review), `/debug` (systematic troubleshooting), `/
 `verify → gate → deliver`, driven by `repo-policies/` — no project vocabulary hardcoded in core. Delivery is script-only (LLM budget = 1, the verdict):
 
 - feature branch → PR against `base_branch` → **auto-merge**; remote branch deleted on merge
-- returns after enabling auto-merge; `-WaitForMerge` to block until merge, `-FullVerify` for all policy checks
+- returns after enabling auto-merge when `-NoWaitForMerge` is set; default waits for merge on auto_merge repos; `-FullVerify` for all policy checks
 - ship any repo with `-RepoPath <path>` (policy from its `.octo/repo-policy`); portable via `OCTO_CLUSTER` + `gh auth login` (scopes `repo`, `workflow`)
 
 ## Layout
