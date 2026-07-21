@@ -154,6 +154,10 @@ if (Test-Path $validateHooks) {
 }
 
 if ($Workstation) {
+    $wsProfile = [Environment]::GetEnvironmentVariable("OCTO_WORKSTATION_PROFILE", "User")
+    if (-not $wsProfile) { $wsProfile = $env:OCTO_WORKSTATION_PROFILE }
+    $skipContainers = ($wsProfile -eq "windows-cursor")
+
     $results += (Test-Tool -Id "OCTO_CLUSTER_env" -Label "OCTO_CLUSTER env" -InstallHint "Set OCTO_CLUSTER to your clone root" -Check {
         $v = [Environment]::GetEnvironmentVariable("OCTO_CLUSTER", "User")
         if (-not $v) { $v = $env:OCTO_CLUSTER }
@@ -191,6 +195,7 @@ if ($Workstation) {
     } catch {
         $results += [ordered]@{ id = "ollama"; label = "Ollama (optional)"; status = "WARN"; hint = ".\scripts\install-ollama.ps1" }
     }
+    if (-not $skipContainers) {
     try {
         $list = (wsl -l -q 2>$null | Out-String) -replace "`0", ""
         if ($list -match "Ubuntu") {
@@ -222,6 +227,7 @@ if ($Workstation) {
         }
     } catch {
         $results += [ordered]@{ id = "docker"; label = "Docker (optional)"; status = "WARN"; hint = "Docker Engine or Desktop" }
+    }
     }
 }
 
