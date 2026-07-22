@@ -1,53 +1,28 @@
-# Agent contract — octo-cluster
+# Agent contract - octo-cluster
 
-Local AI-assisted development harness. Tool-agnostic operating rules.
+Minimal AI-assisted development harness for Windows 11 + Cursor.
 
-## Read order
+## What this is
 
-1. This file (`AGENTS.md`)
-2. [`contexts/context-index.yaml`](contexts/context-index.yaml) — declarative priority map
-3. [`domains/core/rules/`](domains/core/rules/) — always-apply rules (synced to `.cursor/rules/`)
-4. [`contexts/permanent/`](contexts/permanent/) — stable framework summary
-5. [`contexts/operational/`](contexts/operational/) — active loop and CLI entry points
-6. [`contexts/runtime/`](contexts/runtime/) — execution JSON (via `AI_EXECUTION_CONTEXT`, default `platform`)
-7. [`docs/index.md`](docs/index.md) — deep reference (EOS, guides, architecture)
+A small set of Cursor rules, skills, and commands in `.cursor/`, plus two PowerShell scripts in `scripts/`. There is no pipeline or sync step: `.cursor/` is edited directly and is the source of truth.
 
-Details: [`contexts/operational/agent-loop.md`](contexts/operational/agent-loop.md).
+## Rules (always apply)
 
-## Before making changes
+- `.cursor/rules/00-consumer-boundary.mdc` - consumer identifiers are secrets; never commit them to this public repo.
+- `.cursor/rules/ponytail-lite.mdc` - minimal implementation ladder before writing code.
+- `.cursor/rules/caveman-mode.mdc` - telegraphic prose by default.
 
-- Identify active execution context (`AI_EXECUTION_CONTEXT` → `contexts/runtime/<id>.json`).
-- Read consumer-boundary rules before any public git change.
-- When creating Linear issues (private tracker), follow [`domains/core/rules/linear-issue-naming.mdc`](domains/core/rules/linear-issue-naming.mdc) — same EOS title pattern as GitHub Issues.
-- Edit **source** in `domains/core/` and `capabilities/` — not `.cursor/` by hand.
-- After domain or capability changes, run `pwsh scripts/sync-cursor.ps1`.
+## Commands
 
-## Never auto-load
+`/ship`, `/review`, `/debug`, `/prompt` - see `.cursor/commands/`.
 
-See [`contexts/context-index.yaml`](contexts/context-index.yaml) `never_auto_load`. Includes:
+## Before any git change
 
-- `state/` (local memory indexes)
-- `contexts/temporary/`
-- `capabilities/_private/`, `domains/_private/`, `contexts/_private/`, `docs/_private/`
-- `engine/context-engine/node_modules/`, `generated/`, `.git/`
-
-Index exclusions: [`.aiignore`](.aiignore) (canonical); [`.cursorignore`](.cursorignore) mirrors it for Cursor.
-
-## Destructive changes
-
-- Run `pwsh scripts/boundary-audit.ps1` before committing to the public tree.
-- Do not move runtime JSON without updating harness loaders (PS1 + context-engine).
-- Present a plan before large refactors.
-
-## Large changes
-
-Explain scope and run validation:
+Run the boundary gate (also enforced by git hooks):
 
 ```powershell
-pwsh domains/core/scripts/resolve-execution-context.ps1
-cd engine/context-engine && bun run validate octo-cluster
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-audit.ps1 -Staged   # before commit
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-audit.ps1           # before push
 ```
 
-## Human index
-
-[`README.md`](README.md) — setup and layout for humans.
+Deliver with `scripts/ship.ps1` (commit + push to `main`). Do not run git by hand during `/ship`.

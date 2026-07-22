@@ -18,8 +18,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-. (Join-Path $PSScriptRoot '_load-env.ps1')
-$root = Get-OctoClusterRoot
+$root = (git rev-parse --show-toplevel 2>$null)
+if (-not $root) { $root = Split-Path $PSScriptRoot -Parent }
 Set-Location $root
 
 $contentPatterns = @(
@@ -61,10 +61,7 @@ $allowedRepoPolicyFiles = @(
 )
 
 $contentExcludePaths = @(
-    'scripts/migrate-octo-cluster.ps1',
-    'docs/guides/public-framework-boundary.md',
-    'scripts/boundary-audit.ps1',
-    'CHANGELOG.md'
+    'scripts/boundary-audit.ps1'
 )
 
 function Get-AuditPaths {

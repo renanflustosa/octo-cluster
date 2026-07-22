@@ -16,7 +16,7 @@ Public repositories must never store them.
 Before staging, committing, pushing, or opening a PR in this repository:
 
 1. **Generalize** consumer-specific names in tracked paths and file contents — or remove them.
-2. **Relocate** consumer context to private overlay (`domains/_private/`, gitignored local config, consumer workspace) — never the public tree.
+2. **Relocate** consumer context to a gitignored local overlay or a separate consumer workspace — never the public tree.
 3. **Run** `.\scripts\boundary-audit.ps1 -Staged` before commit; full `.\scripts\boundary-audit.ps1` before push.
 4. **Stop** if the audit fails — fix violations before proceeding. Do not bypass hooks, CI, or this rule.
 
@@ -32,4 +32,4 @@ Filenames, folder names, markdown, yaml, json, prompts, scripts, commit messages
 
 ## Reference
 
-`docs/guides/public-framework-boundary.md` · `scripts/boundary-audit.ps1` · `.githooks/pre-commit` · `.githooks/pre-push`
+`scripts/boundary-audit.ps1` · `.githooks/pre-commit` · `.githooks/pre-push`

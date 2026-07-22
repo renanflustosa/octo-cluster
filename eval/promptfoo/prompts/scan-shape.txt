@@ -1,1 +1,0 @@
-Produce a /scan output with at most 6 bullet points for ticket MPL-0001 fixing grid sort in scheduling module.

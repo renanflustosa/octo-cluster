@@ -1,2 +1,0 @@
-Emit a scan output with Objective, Scope, Git, Risks, Next — max 6 bullets.
-Reference AI_EXECUTION_CONTEXT and invoke-pipeline.ps1 for harness dispatch.

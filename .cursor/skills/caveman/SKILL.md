@@ -1,6 +1,6 @@
 ﻿---
 name: caveman
-description: Telegraphic output compression for agent replies. Use on status, scan, change, close. Off on model, ship, verify, security.
+description: Telegraphic output compression for agent replies. On by default. Off on /ship, security, and irreversible actions.
 ---
 
 # Caveman (lite default)
@@ -12,7 +12,7 @@ Compress natural-language replies. Keep code, paths, symbols, error strings exac
 | Mode | When |
 |------|------|
 | **lite** | Default â€” drop filler, hedging, articles |
-| **off** | `/model`, `/ship`, security, irreversible ops, user repeats question |
+| **off** | `/ship`, security, irreversible ops, user repeats question |
 
 ## Rules
 
@@ -23,7 +23,7 @@ Compress natural-language replies. Keep code, paths, symbols, error strings exac
 
 ## Does NOT replace
 
-- Structural caps in `pack token-economy rules when enabled` (single-card, @â‰¤3, readâ‰¤300)
-- Log compression via `engine/context-engine` compress-log
+- Technical accuracy: never drop a detail to be shorter
+- Full prose when the user asks to clarify
 
-Trigger: active when `core/rules/caveman-mode.mdc` applies.
+Trigger: active when `.cursor/rules/caveman-mode.mdc` applies.
