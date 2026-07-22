@@ -1,26 +1,5 @@
 # AI index exclusions - canonical source (mirror in .cursorignore)
 
-# === RUNTIME STATE ===
 state/
-
-# === DEPS / CACHE ===
-engine/context-engine/node_modules/
-engine/context-engine/.cache/
-**/.cache/
-generated/
-
-# === PRIVATE OVERLAYS ===
-capabilities/_private/
-domains/_private/
-contexts/_private/
-docs/_private/
-
-# === DISCARDABLE CONTEXT ===
-contexts/temporary/
-
-# === LEGACY ===
-docs/temp/
-
-# === GIT / LOGS ===
 .git/
 *.log
