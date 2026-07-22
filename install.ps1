@@ -1,93 +1,23 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Bootstrap octo-cluster on a new machine (platform / CORE context).
-  Installs prerequisites via direct download (no winget): git check, bun, PowerShell 7 (pwsh), gh, ripgrep.
+  Minimal octo-cluster setup for Win11 + Cursor.
+  Installs the repository git hooks (pre-commit / pre-push boundary gates).
+.EXAMPLE
+  pwsh -File install.ps1
 #>
-param(
-    [string]$WorkspaceRoot = $PSScriptRoot,
-    [switch]$SkipOptional,
-    [switch]$WithOllama
-)
+param()
 
-$ErrorActionPreference = "Stop"
-$env:OCTO_CLUSTER = (Resolve-Path $WorkspaceRoot).Path
-[Environment]::SetEnvironmentVariable('OCTO_CLUSTER', $env:OCTO_CLUSTER, 'User')
+$ErrorActionPreference = 'Stop'
+$root = (git rev-parse --show-toplevel 2>$null)
+if (-not $root) { $root = $PSScriptRoot }
+Set-Location $root
 
-Write-Host "OCTO_CLUSTER=$env:OCTO_CLUSTER"
-
-$migrate = Join-Path $PSScriptRoot "scripts\migrate-octo-cluster.ps1"
-if (Test-Path $migrate) {
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $migrate -WorkspaceRoot $env:OCTO_CLUSTER
+if (-not (Test-Path (Join-Path $root '.githooks'))) {
+    throw "Missing hooks directory: $root/.githooks"
 }
 
-# Prerequisites first (bun, gh, rg) - fast direct downloads
-$prereq = Join-Path $PSScriptRoot "scripts\install-prerequisites.ps1"
-. $prereq
-Install-PlatformPrerequisites -SkipOptional:$SkipOptional
-
-if ($WithOllama) {
-    try { Install-Ollama | Out-Null } catch { Write-Warning "Ollama optional install skipped: $($_.Exception.Message)" }
-}
-
-# Sync domains -> .cursor
-& (Join-Path $PSScriptRoot "scripts\sync-cursor.ps1")
-
-# Boundary gates (pre-commit / pre-push)
-$hooks = Join-Path $PSScriptRoot "scripts\install-git-hooks.ps1"
-if (Test-Path $hooks) {
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $hooks
-}
-
-$cleanup = Join-Path $PSScriptRoot "domains\core\scripts\core-ship-git.ps1"
-if (Test-Path $cleanup) {
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $cleanup -RepoPath $env:OCTO_CLUSTER -CleanupMergedBranches
-}
-
-$validateHooks = Join-Path $PSScriptRoot "scripts\validate-cursor-hooks.ps1"
-if (Test-Path $validateHooks) {
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $validateHooks
-    if ($LASTEXITCODE -ne 0) { throw "validate-cursor-hooks failed - run .\scripts\sync-cursor.ps1" }
-}
-
-# State dirs
-@("state\memory", "state\logs\metrics-baseline", "state\metrics") | ForEach-Object {
-    New-Item -ItemType Directory -Force -Path (Join-Path $env:OCTO_CLUSTER $_) | Out-Null
-}
-
-# Context engine deps (Bun + LanceDB)
-. (Join-Path $PSScriptRoot "scripts\_load-env.ps1")
-Ensure-ContextEngineDeps -AllowInstall | Out-Null
-Write-Host "context-engine deps OK (Bun + @lancedb/lancedb)" -ForegroundColor DarkGray
-
-# Seed platform memory profile from tracked fixtures
-$bun = Get-BunExecutable
-if ($bun) {
-    $ce = Join-Path $env:OCTO_CLUSTER "engine\context-engine"
-    Push-Location $ce
-    try { & $bun run seed-profile octo-cluster } finally { Pop-Location }
-    Write-Host "Indexing octo-cluster memory..." -ForegroundColor DarkGray
-    Push-Location $ce
-    try { & $bun run index-incremental octo-cluster --kind memory --incremental } finally { Pop-Location }
-}
-
-$audit = Join-Path $env:OCTO_CLUSTER "scripts\productivity-audit.ps1"
-if (Test-Path $audit) {
-    Write-Host ""
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $audit
-    if ($LASTEXITCODE -ne 0) { throw "productivity-audit failed - fix missing tools and re-run .\install.ps1" }
-}
-
-Write-Host @"
-
-Done. Next steps:
-  1. OCTO_CLUSTER is set at User scope (persists across terminals and agent shells).
-     Open your consumer-managed IDE workspace for session env in integrated terminals.
-  2. gh auth login   (once, for PRs/issues)
-  3. New chat -> /scan <TICKET> description
-
-Entry point: octo.ps1 (see docs/architecture/path-resolution.md)
-
-Active context: AI_EXECUTION_CONTEXT=platform. See docs/guides/onboarding.md.
-
-"@
+git config core.hooksPath .githooks
+Write-Host "Installed git hooksPath -> .githooks (pre-commit + pre-push run boundary-audit)." -ForegroundColor Green
+Write-Host ""
+Write-Host "Done. Next: open the repo in Cursor and use /ship, /review, /debug, /prompt."

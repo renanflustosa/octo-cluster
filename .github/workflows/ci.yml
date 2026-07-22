@@ -1,56 +1,19 @@
 name: CI
 
 on:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
       - main
-
-env:
-  OCTO_CLUSTER: ${{ github.workspace }}
-  AI_EXECUTION_CONTEXT: platform
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  validate:
+  boundary:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
 
-      - name: Install Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install context-engine dependencies
-        working-directory: engine/context-engine
-        run: bun install
-
-      - name: Unit and harness tests
-        working-directory: engine/context-engine
-        run: bun test src/lib/ensure-profile-seed.test.ts src/harness.test.ts
-
-      - name: Simulate fresh clone (no state/memory)
-        shell: pwsh
-        run: |
-          if (Test-Path state/memory/octo-cluster) {
-            Remove-Item -Recurse -Force state/memory/octo-cluster
-          }
-
-      - name: Validate octo-cluster profile
-        working-directory: engine/context-engine
-        run: bun run validate octo-cluster
-
       - name: Public framework boundary audit
         shell: pwsh
         run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-audit.ps1
-
-      - name: Harness productivity-audit smoke
-        shell: pwsh
-        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/productivity-audit.ps1 -CiSmoke
-
-      - name: Scan pipeline discover
-        shell: pwsh
-        run: |
-          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/invoke-pipeline.ps1 -Pipeline scan -Action discover

@@ -1,7 +1,0 @@
-﻿id: core-ship
-pack: core
-pipeline: ship
-description: Verify gates and deliver changes
-skill: domains/core/skills/core-ship/SKILL.md
-contract: contract.yaml
-providers: providers/repo-verify-gate.yaml, providers/promptfoo-gate.yaml
