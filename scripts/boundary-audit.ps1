@@ -61,10 +61,7 @@ $allowedRepoPolicyFiles = @(
 )
 
 $contentExcludePaths = @(
-    'scripts/migrate-octo-cluster.ps1',
-    'docs/guides/public-framework-boundary.md',
-    'scripts/boundary-audit.ps1',
-    'CHANGELOG.md'
+    'scripts/boundary-audit.ps1'
 )
 
 function Get-AuditPaths {

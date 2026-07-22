@@ -1,4 +1,4 @@
-# AI index exclusions — canonical source (mirror in .cursorignore)
+# AI index exclusions - canonical source (mirror in .cursorignore)
 
 # === RUNTIME STATE ===
 state/
@@ -24,5 +24,3 @@ docs/temp/
 # === GIT / LOGS ===
 .git/
 *.log
-**/*.pyc
-eval/**/__pycache__/

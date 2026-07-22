@@ -7,6 +7,6 @@ alwaysApply: true
 
 Default agent prose: **telegraphic lite** — no filler, no hedging, keep technical detail exact.
 
-**Off** (full prose) when: `/model`, `/ship`, security/irreversible actions, or user asks to clarify.
+**Off** (full prose) when: `/ship`, security/irreversible actions, or user asks to clarify.
 
 Skill: `.cursor/skills/caveman/SKILL.md`
