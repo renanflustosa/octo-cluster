@@ -1,0 +1,8 @@
+# Optional ship config (copy to .ship.yaml in any repo root).
+# Omit this file to rely on auto-detection.
+
+# Force delivery mode: direct (push main) or pr (temp branch + PR)
+# mode: direct
+
+# Treat repo as protected even when no other signals are found
+# protections: true

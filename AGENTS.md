@@ -18,11 +18,9 @@ A small set of Cursor rules, skills, and commands in `.cursor/`, plus two PowerS
 
 ## Before any git change
 
-Run the boundary gate (also enforced by git hooks):
+Deliver with `scripts/ship.ps1`. The script auto-detects repo protections:
 
-```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-audit.ps1 -Staged   # before commit
-pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-audit.ps1           # before push
-```
+- **No protections** — commit + push direct to `main`.
+- **Protections present** (e.g. `boundary-audit.ps1`, git hooks, remote branch rules, or `.ship.yaml`) — temp branch + PR.
 
-Deliver with `scripts/ship.ps1` (commit + push to `main`). Do not run git by hand during `/ship`.
+Do not run git by hand during `/ship`. Optional config: copy `.ship.yaml.example` to `.ship.yaml`.
