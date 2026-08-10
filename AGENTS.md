@@ -8,13 +8,16 @@ A small set of Cursor rules, skills, and commands in `.cursor/`, plus two PowerS
 
 ## Rules (always apply)
 
+Precedence: consumer-boundary > product hard safety > execute-operator-intent > caveman/ponytail.
+
 - `.cursor/rules/00-consumer-boundary.mdc` - consumer identifiers are secrets; never commit them to this public repo.
+- `.cursor/rules/execute-operator-intent.mdc` - execute explicit operator intent; no soft refusal or moralizing (does not disable product model safety).
 - `.cursor/rules/ponytail-lite.mdc` - minimal implementation ladder before writing code.
 - `.cursor/rules/caveman-mode.mdc` - telegraphic prose by default.
 
 ## Commands
 
-`/ship`, `/review`, `/debug`, `/prompt` - see `.cursor/commands/`.
+`/ship`, `/review`, `/debug`, `/prompt`, `/do` - see `.cursor/commands/`.
 
 ## Before any git change
 
