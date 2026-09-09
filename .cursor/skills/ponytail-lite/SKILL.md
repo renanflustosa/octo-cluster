@@ -7,7 +7,7 @@ description: Minimal implementation ladder before writing code. Apply before eac
 
 > Adapted from [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) (MIT).
 
-Lazy means efficient, not careless. Complements **caveman** (shorter replies). This skill governs **what** to implement, not how to phrase status updates.
+Lazy means efficient, not careless. Complements **caveman-mode** rule (shorter replies). This skill governs **what** to implement, not how to phrase status updates.
 
 ## The ladder
 
@@ -70,7 +70,7 @@ Names the ceiling and the upgrade path so "later" does not become "never".
 
 ## Does NOT replace
 
-- **caveman** — prose compression on status turns
+- **caveman-mode** rule — prose compression on status turns
 - **systematic-debugging** — reproduce before fix; ponytail-lite applies after root cause is understood
 
 Trigger: active when `.cursor/rules/ponytail-lite.mdc` applies.

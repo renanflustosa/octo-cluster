@@ -19,5 +19,6 @@ if (-not (Test-Path (Join-Path $root '.githooks'))) {
 
 git config core.hooksPath .githooks
 Write-Host "Installed git hooksPath -> .githooks (pre-commit + pre-push run boundary-audit)." -ForegroundColor Green
+Write-Host "Optional: copy boundary-patterns.example.yaml -> boundary-patterns.local.yaml for custom boundary patterns." -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "Done. Next: open the repo in Cursor and use /ship, /review, /debug, /prompt."

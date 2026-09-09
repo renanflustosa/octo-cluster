@@ -1,0 +1,15 @@
+# Copy to boundary-patterns.local.yaml (gitignored) and customize.
+# Generic adopters: omit the local file or leave both lists empty.
+#
+# content_patterns: regex matched against file contents (git grep -E)
+# filename_patterns: matched against path segments and basenames
+
+content_patterns:
+  - 'your-internal-codename'
+  - 'private-product-name'
+  - 'client-workspace-id'
+
+filename_patterns:
+  - 'client-name'
+  - 'internal-vault'
+  - 'private-overlay'

@@ -17,7 +17,7 @@ Before staging, committing, pushing, or opening a PR in this repository:
 
 1. **Generalize** consumer-specific names in tracked paths and file contents — or remove them.
 2. **Relocate** consumer context to a gitignored local overlay or a separate consumer workspace — never the public tree.
-3. **Run** `.\scripts\boundary-audit.ps1 -Staged` before commit; full `.\scripts\boundary-audit.ps1` before push.
+3. **Run** `.\scripts\boundary-audit.ps1 -Staged` before commit; full `.\scripts\boundary-audit.ps1` before push. Configure patterns in `boundary-patterns.local.yaml` (see `boundary-patterns.example.yaml`).
 4. **Stop** if the audit fails — fix violations before proceeding. Do not bypass hooks, CI, or this rule.
 
 ## In scope
