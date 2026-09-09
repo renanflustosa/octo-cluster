@@ -1,9 +1,10 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Public-framework boundary gate: blocks consumer identifiers in tracked/staged files.
+  Public-framework boundary gate: blocks configured identifiers in tracked/staged files.
 .DESCRIPTION
-  Scans file paths and contents for consumer-specific names. Used by CI, pre-commit, and pre-push.
+  Loads patterns from boundary-patterns.local.yaml (gitignored) and optional boundary-patterns.yaml.
+  Copy boundary-patterns.example.yaml to boundary-patterns.local.yaml to customize.
 .PARAMETER Staged
   Audit only staged paths (pre-commit). Default: all tracked files (git ls-files).
 .PARAMETER Json
@@ -22,35 +23,6 @@ $root = (git rev-parse --show-toplevel 2>$null)
 if (-not $root) { $root = Split-Path $PSScriptRoot -Parent }
 Set-Location $root
 
-$contentPatterns = @(
-    'sigla[-_]',
-    '\bmplan\b',
-    '\bmponto\b',
-    'ponto-eletronico',
-    'personal-vault',
-    'openpolvo',
-    'polvocode',
-    'polvo00',
-    'integracoes',
-    'mplan-ingestion',
-    'powerbuilder',
-    'OPE-[0-9]',
-    'AI_DOMAIN',
-    'AI_WORKSPACE'
-)
-
-$filenamePatterns = @(
-    'sigla',
-    'mplan',
-    'mponto',
-    'ponto',
-    'personal-vault',
-    'openpolvo',
-    'polvo',
-    'integracoes',
-    'ai-workspace'
-)
-
 $allowedRepoPolicyFiles = @(
     'default.yaml',
     'octo-cluster.yaml',
@@ -61,8 +33,82 @@ $allowedRepoPolicyFiles = @(
 )
 
 $contentExcludePaths = @(
-    'scripts/boundary-audit.ps1'
+    'scripts/boundary-audit.ps1',
+    'boundary-patterns.example.yaml'
 )
+
+function Read-YamlStringList {
+    param(
+        [string[]]$Lines,
+        [ref]$Index,
+        [string]$Key
+    )
+    $results = @()
+    while ($Index.Value -lt $Lines.Count) {
+        $line = $Lines[$Index.Value]
+        if ($line -match '^\s*-\s+(.+)$') {
+            $raw = $Matches[1].Trim()
+            if (($raw.StartsWith("'") -and $raw.EndsWith("'")) -or ($raw.StartsWith('"') -and $raw.EndsWith('"'))) {
+                $raw = $raw.Substring(1, $raw.Length - 2)
+            }
+            if ($raw) { $results += $raw }
+            $Index.Value++
+            continue
+        }
+        if ($line -match '^\S') { break }
+        $Index.Value++
+    }
+    return $results
+}
+
+function Read-BoundaryPatternFile {
+    param([string]$Path)
+    if (-not (Test-Path $Path)) {
+        return @{ Content = @(); Filename = @() }
+    }
+
+    $lines = Get-Content $Path
+    $content = @()
+    $filename = @()
+    $i = 0
+
+    while ($i -lt $lines.Count) {
+        $line = $lines[$i]
+        if ($line -match '^\s*#') { $i++; continue }
+        if ($line -match '^content_patterns:\s*$') {
+            $i++
+            $content += Read-YamlStringList -Lines $lines -Index ([ref]$i) -Key 'content_patterns'
+            continue
+        }
+        if ($line -match '^filename_patterns:\s*$') {
+            $i++
+            $filename += Read-YamlStringList -Lines $lines -Index ([ref]$i) -Key 'filename_patterns'
+            continue
+        }
+        $i++
+    }
+
+    return @{ Content = $content; Filename = $filename }
+}
+
+function Get-BoundaryPatterns {
+    param([string]$Root)
+
+    $mergedContent = @()
+    $mergedFilename = @()
+
+    foreach ($name in @('boundary-patterns.local.yaml', 'boundary-patterns.yaml')) {
+        $path = Join-Path $Root $name
+        $cfg = Read-BoundaryPatternFile -Path $path
+        if ($cfg.Content.Count -gt 0) { $mergedContent += $cfg.Content }
+        if ($cfg.Filename.Count -gt 0) { $mergedFilename += $cfg.Filename }
+    }
+
+    return @{
+        Content  = @($mergedContent | Select-Object -Unique)
+        Filename = @($mergedFilename | Select-Object -Unique)
+    }
+}
 
 function Get-AuditPaths {
     if ($Staged) {
@@ -76,7 +122,10 @@ function Get-AuditPaths {
 }
 
 function Test-FilenameViolation {
-    param([string]$RelativePath)
+    param(
+        [string]$RelativePath,
+        [string[]]$FilenamePatterns
+    )
     $base = [System.IO.Path]::GetFileName($RelativePath).ToLowerInvariant()
     $full = $RelativePath.ToLowerInvariant().Replace('\', '/')
 
@@ -86,7 +135,7 @@ function Test-FilenameViolation {
         }
     }
 
-    foreach ($pat in $filenamePatterns) {
+    foreach ($pat in $FilenamePatterns) {
         if ($base -match $pat -or $full -match "/$pat" -or $full -match "$pat/") {
             return "filename pattern '$pat'"
         }
@@ -94,12 +143,16 @@ function Test-FilenameViolation {
     return $null
 }
 
+$patterns = Get-BoundaryPatterns -Root $root
+$contentPatterns = $patterns.Content
+$filenamePatterns = $patterns.Filename
+
 $findings = @()
 $paths = Get-AuditPaths
 
 foreach ($rel in $paths) {
     if (-not $rel) { continue }
-    $reason = Test-FilenameViolation -RelativePath $rel
+    $reason = Test-FilenameViolation -RelativePath $rel -FilenamePatterns $filenamePatterns
     if ($reason) {
         $findings += [ordered]@{
             kind    = 'filename'
@@ -145,8 +198,12 @@ $passed = ($findings.Count -eq 0)
 
 if ($Json) {
     @{
-        passed   = $passed
-        staged   = [bool]$Staged
+        passed          = $passed
+        staged          = [bool]$Staged
+        patterns_loaded = @{
+            content  = $contentPatterns.Count
+            filename = $filenamePatterns.Count
+        }
         findings = $findings
     } | ConvertTo-Json -Depth 5
     if (-not $passed) { exit 1 }
@@ -155,7 +212,10 @@ if ($Json) {
 
 $scope = if ($Staged) { 'staged changes' } else { 'tracked source' }
 if ($passed) {
-    Write-Host "boundary-audit: OK (no consumer identifiers in $scope)" -ForegroundColor Green
+    $patternNote = if ($contentPatterns.Count -eq 0 -and $filenamePatterns.Count -eq 0) {
+        ' (no patterns configured — copy boundary-patterns.example.yaml to boundary-patterns.local.yaml)'
+    } else { '' }
+    Write-Host "boundary-audit: OK (no consumer identifiers in $scope)$patternNote" -ForegroundColor Green
     exit 0
 }
 

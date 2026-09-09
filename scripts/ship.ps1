@@ -15,6 +15,24 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+function Invoke-Git {
+    param(
+        [switch]$PassThru,
+        [Parameter(ValueFromRemainingArguments = $true)][string[]]$GitArgs
+    )
+    $prev = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    if ($PassThru) {
+        $out = (& git @GitArgs 2>&1 | ForEach-Object { "$_" })
+    } else {
+        & git @GitArgs 2>&1 | Out-Null
+    }
+    $code = $LASTEXITCODE
+    $ErrorActionPreference = $prev
+    if ($PassThru) { return @{ Output = $out; ExitCode = $code } }
+    return $code
+}
+
 function Read-ShipConfig {
     param([string]$Root)
     $result = @{ Mode = $null; Protections = $false }
@@ -99,57 +117,50 @@ function Invoke-ShipGates {
 function Move-ToBaseBranch {
     param([string]$Branch)
 
-    git fetch origin $Branch 2>$null | Out-Null
+    Invoke-Git fetch --quiet origin $Branch | Out-Null
     $baseRef = "origin/$Branch"
-    $null = git rev-parse --verify $baseRef 2>$null
-    if ($LASTEXITCODE -ne 0) { $baseRef = $Branch }
+    if ((Invoke-Git -PassThru rev-parse --verify $baseRef).ExitCode -ne 0) { $baseRef = $Branch }
 
-    $current = (git branch --show-current).Trim()
+    $current = ((Invoke-Git -PassThru branch --show-current).Output | Select-Object -Last 1).Trim()
     if ($current -eq $Branch) { return }
 
-    $dirty = git status --porcelain
+    $dirty = (Invoke-Git -PassThru status --porcelain).Output
     $stashed = $false
     if ($dirty) {
-        git stash push -u -m 'ship-auto-stash' | Out-Null
-        if ($LASTEXITCODE -ne 0) { throw '[ship] stash failed.' }
+        if ((Invoke-Git stash push -u -m 'ship-auto-stash') -ne 0) { throw '[ship] stash failed.' }
         $stashed = $true
     }
 
-    git checkout $Branch 2>$null | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        git checkout -b $Branch $baseRef 2>$null | Out-Null
+    if ((Invoke-Git checkout $Branch) -ne 0) {
+        if ((Invoke-Git checkout -b $Branch $baseRef) -ne 0) { throw "[ship] checkout $Branch failed." }
     }
-    if ($LASTEXITCODE -ne 0) { throw "[ship] checkout $Branch failed." }
 
     if ($stashed) {
-        git stash pop | Out-Null
-        if ($LASTEXITCODE -ne 0) { throw '[ship] stash pop failed - resolve conflicts and re-run.' }
+        if ((Invoke-Git stash pop) -ne 0) { throw '[ship] stash pop failed - resolve conflicts and re-run.' }
     }
 }
 
 function New-ShipTempBranch {
     param([string]$Branch)
 
-    git fetch origin $Branch 2>$null | Out-Null
+    Invoke-Git fetch --quiet origin $Branch | Out-Null
     $baseRef = "origin/$Branch"
-    $null = git rev-parse --verify $baseRef 2>$null
-    if ($LASTEXITCODE -ne 0) { $baseRef = $Branch }
+    if ((Invoke-Git -PassThru rev-parse --verify $baseRef).ExitCode -ne 0) { $baseRef = $Branch }
 
     $tempBranch = "ship/$(Get-Date -Format 'yyyyMMdd-HHmmss')"
-    $dirty = git status --porcelain
+    $dirty = (Invoke-Git -PassThru status --porcelain).Output
     $stashed = $false
     if ($dirty) {
-        git stash push -u -m 'ship-auto-stash' | Out-Null
-        if ($LASTEXITCODE -ne 0) { throw '[ship] stash failed.' }
+        if ((Invoke-Git stash push -u -m 'ship-auto-stash') -ne 0) { throw '[ship] stash failed.' }
         $stashed = $true
     }
 
-    git checkout -b $tempBranch $baseRef 2>$null | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw "[ship] create branch $tempBranch from $baseRef failed." }
+    if ((Invoke-Git checkout -b $tempBranch $baseRef) -ne 0) {
+        throw "[ship] create branch $tempBranch from $baseRef failed."
+    }
 
     if ($stashed) {
-        git stash pop | Out-Null
-        if ($LASTEXITCODE -ne 0) { throw '[ship] stash pop failed - resolve conflicts and re-run.' }
+        if ((Invoke-Git stash pop) -ne 0) { throw '[ship] stash pop failed - resolve conflicts and re-run.' }
     }
 
     return $tempBranch
