@@ -21,7 +21,7 @@ Complete Phase 1 before proposing fixes. Use for test failures, production bugs,
 2. **Reproduce** — exact steps; if flaky, gather data instead of guessing.
 3. **Recent changes** — git diff, deps, config, environment.
 4. **Multi-component systems** — log at each boundary (in/out, config propagation); run once to see *where* it breaks.
-5. **Trace data flow** — bad value upstream? See [root-cause-tracing.md](root-cause-tracing.md).
+5. **Trace data flow** — bad value upstream? See [root-cause-tracing.md](references/root-cause-tracing.md).
 
 ## Phase 2: Pattern Analysis
 
@@ -38,7 +38,7 @@ One hypothesis: "X is the cause because Y." Smallest test change; one variable. 
 3. Verify fix and no regressions.
 4. **≥ 3 failed fix attempts** → stop; question architecture with operator before fix #4.
 
-After root cause found, optional hardening: [defense-in-depth.md](defense-in-depth.md), [condition-based-waiting.md](condition-based-waiting.md).
+After root cause found, optional hardening: [defense-in-depth.md](references/defense-in-depth.md), [condition-based-waiting.md](references/condition-based-waiting.md).
 
 ## Red flags — STOP, return to Phase 1
 
