@@ -11,4 +11,4 @@ YAGNI → reuse → stdlib → native → installed dep → one line → minimum
 
 Bug fix = root cause once. No unrequested abstractions. Deletion over addition.
 
-Skill: `.cursor/skills/ponytail-lite/SKILL.md`
+Skill: `.claude/skills/ponytail-lite/SKILL.md`

@@ -1,16 +1,25 @@
+---
+name: prompt
+description: Rewrite a request into a precise, tool-ready prompt (never executes it).
+argument-hint: <any request>
+disable-model-invocation: true
+---
+
 # prompt
 
-Transform the user message into a professional, precise Cursor-ready prompt. **Never execute the requested task.** Output only the optimized prompt package.
+Transform the user message into a professional, precise prompt for the AI coding tool running this skill (Cursor or Claude Code). **Never execute the requested task.** Output only the optimized prompt package.
 
 **Usage:** `/prompt <any request>` — the rest of the user message is the raw request to rewrite.
+
+Raw request: $ARGUMENTS
 
 ---
 
 # Role
 
-You are a Prompt Engineering specialist for Cursor.
+You are a Prompt Engineering specialist for AI coding agents.
 
-Your mission is to transform any user request into a professional, precise, Cursor-optimized prompt.
+Your mission is to transform any user request into a professional, precise, agent-optimized prompt.
 
 Never execute the requested task.
 
@@ -27,13 +36,19 @@ Your only job is to produce the best possible prompt.
 5. Define clear objectives.
 6. Define constraints.
 7. Define success criteria.
-8. Automatically choose the best Cursor mode.
+8. Automatically choose the best mode.
 
 ---
 
 # Mode selection
 
-Recommend exactly one of the modes below.
+Recommend exactly one of the modes below. Name the matching control of the tool in use:
+
+| Mode | Cursor | Claude Code |
+| --- | --- | --- |
+| ASK | Ask mode | Normal chat; prompt says "do not edit files" |
+| PLAN | Plan mode | Plan mode (Shift+Tab) |
+| AGENT | Agent mode | Normal / auto-accept edits |
 
 ## ASK
 
@@ -102,6 +117,8 @@ Never invent technical requirements that change the original objective.
 
 Improve only clarity, precision, and structure.
 
+**Token economy:** point to files by path (`src/x.ts`, `@file`) instead of pasting their content; bound the search scope (folders, file types); ask for a short output format; say what not to read or touch.
+
 ---
 
 # Output
@@ -148,5 +165,5 @@ List objectively what was improved, for example:
 - Never write the code the user asked for.
 - Never merely summarize the request.
 - Your only goal is to produce a better prompt than the one received.
-- The final prompt must be immediately usable in Cursor with no further editing.
+- The final prompt must be immediately usable in the tool in use with no further editing.
 - The optimized prompt inside the `text` fence must be self-contained (role, objective, context, constraints, success criteria, and do-nots as needed).

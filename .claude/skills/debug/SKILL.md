@@ -1,6 +1,15 @@
+---
+name: debug
+description: Fix a bug with runtime evidence first (reproduce, minimal fix, proof).
+argument-hint: <bug or failing command>
+disable-model-invocation: true
+---
+
 # debug
 
 Debug mode. Fix bugs with runtime evidence, not speculation.
+
+Problem: $ARGUMENTS
 
 Gather a reproducible signal (test, logs, grep) before each hypothesis. Then: reproduce -> minimal fix -> scoped re-run. No refactors.
 
