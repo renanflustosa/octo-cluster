@@ -73,4 +73,4 @@ Names the ceiling and the upgrade path so "later" does not become "never".
 - **caveman-mode** rule — prose compression on status turns
 - **systematic-debugging** — reproduce before fix; ponytail-lite applies after root cause is understood
 
-Trigger: active when `.cursor/rules/ponytail-lite.mdc` applies.
+Trigger: active when `.cursor/rules/ponytail-lite.mdc` applies (Cursor rule; imported by `CLAUDE.md` in Claude Code).

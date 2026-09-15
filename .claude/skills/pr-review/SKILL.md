@@ -1,27 +1,22 @@
 ---
-name: code-review
+name: pr-review
 description: Review a GitHub Pull Request for bugs, security, performance, and code quality. Use when user asks to review a PR or wants pull request feedback. Don't use for reviewing local uncommitted changes, creating new PRs, or merging branches.
+argument-hint: "[PR number] [BUGS|SECURITY|PERFORMANCE]"
 ---
 
 # Review Pull Request
 
-Mode: $ARGUMENTS
+Ask mode. Arguments: $ARGUMENTS
 
-If mode is one of the following, adjust the review:
+If a focus mode is given, adjust the review:
 - BUGS: Focus only on logical or other bugs
 - SECURITY: Focus only on security issues
 - PERFORMANCE: Focus only on performance issues
 
-## Pre-loaded context
-
-- PR details: !`gh pr view`
-- PR diff: !`gh pr diff`
-- Changed files: !`gh pr diff --name-only`
-
 ## Workflow
 
-1. Analyze the diff and pre-loaded PR context
-2. Read changed files to understand full context
+1. Run `gh pr view [PR]` and `gh pr diff [PR]` before reading files — the diff is the source of truth
+2. Read surrounding files only when a finding needs context
 3. Review based on mode (or all categories if no mode set)
 4. Provide structured feedback
 

@@ -2,22 +2,30 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Minimal AI-assisted development harness for **Windows 11 + Cursor**.
+Minimal AI-assisted development harness for **Windows 11 + Cursor / Claude Code**.
 
-A small set of Cursor rules, skills, and commands in `.cursor/`, plus two PowerShell scripts. No pipeline, no build step, no environment variables required — edit `.cursor/` directly; it is the source of truth.
+A few always-on rules, a handful of shared skills, and two PowerShell scripts. No pipeline, no build step, no sync — both tools read the same files.
 
 ## What you get
 
 | Layer | Contents |
 | --- | --- |
 | **Rules** (always on) | consumer-boundary, execute-operator-intent, ponytail-lite, caveman-mode |
-| **Commands** (on demand) | `/ship`, `/review`, `/debug`, `/prompt` |
-| **Skills** (on demand) | ponytail-lite, systematic-debugging, code-review |
+| **Slash skills** (manual) | `/prompt`, `/ship`, `/debug` |
+| **Skills** (on demand) | ponytail-lite, systematic-debugging, pr-review |
 | **Scripts** | `ship.ps1` (deliver), `boundary-audit.ps1` (public-repo gate) |
+
+## How each tool loads it
+
+| | Cursor | Claude Code |
+| --- | --- | --- |
+| Rules | `.cursor/rules/*.mdc` | `CLAUDE.md` imports the same `.mdc` files |
+| Skills | `.claude/skills/` (native compat) | `.claude/skills/` |
+| Settings | — | `.claude/settings.json` (deny reads of `state/`, `.env*`, logs) |
 
 ## Quick start
 
-Prerequisites: [Git](https://git-scm.com/downloads), [PowerShell](https://github.com/PowerShell/PowerShell/releases). [GitHub CLI](https://cli.github.com/) (`gh`) is optional — required only when `/ship` detects protections and opens a PR, or for `/review`.
+Prerequisites: [Git](https://git-scm.com/downloads), [PowerShell](https://github.com/PowerShell/PowerShell/releases). [GitHub CLI](https://cli.github.com/) (`gh`) is optional — required only when `/ship` detects protections and opens a PR, or for `pr-review`.
 
 ```bash
 git clone https://github.com/renanflustosa/octo-cluster.git
@@ -25,20 +33,29 @@ cd octo-cluster
 pwsh -File install.ps1
 ```
 
-`install.ps1` installs git hooks (pre-commit / pre-push) that run the boundary audit. Open the folder in Cursor — commands load automatically.
+`install.ps1` installs git hooks (pre-commit / pre-push) that run the boundary audit. Open the folder in Cursor or Claude Code — skills load automatically.
 
 **Optional:** copy `boundary-patterns.example.yaml` to `boundary-patterns.local.yaml` and add patterns for names that must never appear in tracked public files. Generic adopters can leave the local file empty or omit it.
 
-## Multi-root workspace
+## Multi-repo setups
 
-Add this repo as a folder root alongside your product repos in a Cursor workspace. No sync step — each repo keeps its own git root; `/ship` runs `scripts/ship.ps1` from whichever repo you are delivering.
+- **Cursor:** add this repo as a folder root alongside your product repos in a workspace.
+- **Claude Code:** Claude loads skills from the start folder only. From a hub folder that contains your repos:
 
-## Commands
+  ```powershell
+  pwsh -File install.ps1 -ClaudeSkillsTo <hub-folder>   # junctions <hub>/.claude/skills/* -> this repo
+  ```
+
+  Then add `@<path-to-octo-cluster>/CLAUDE.md` to the hub `CLAUDE.md` for the rules. Edits here show up in the hub immediately.
+
+Each repo keeps its own git root; `/ship` runs `scripts/ship.ps1` against whichever repo you are delivering.
+
+## Slash skills
 
 - **`/ship`** — boundary gate, commit, push to `main` or temp branch + PR when protections are detected.
-- **`/review`** — review a GitHub Pull Request (`gh pr view` / `gh pr diff`).
 - **`/debug`** — fix a bug with runtime evidence first.
-- **`/prompt`** — rewrite a request into a precise prompt (never executes it).
+- **`/prompt`** — rewrite a request into a precise prompt for the tool in use (never executes it).
+- **`/pr-review`** — review a GitHub Pull Request (`gh pr view` / `gh pr diff`). In Claude Code, the built-in `/code-review` covers local diffs.
 
 ## Delivery (`/ship`)
 
@@ -60,24 +77,27 @@ Protection signals: `scripts/boundary-audit.ps1`, git hooks referencing audit/ga
 
 | Layer | When loaded | Token impact |
 | --- | --- | --- |
-| Always-on rules (~5 KB) | Every agent turn | Fixed baseline — keep thin |
+| Always-on rules (~4 KB) | Every agent turn | Fixed baseline — keep thin |
 | caveman-mode rule | Every turn | **Saves** reply tokens |
 | execute-operator-intent rule | Every turn | **Costs** ~1 KB; reduces thrash from over-refusal |
-| Skills (ponytail, debugging, review) | On demand via command or relevance | **Costs** only when invoked |
-| `/prompt` | On demand | Upfront cost; **saves** thrash on complex tasks |
-| `/ship`, `/debug`, `/review` | On demand | No always-on cost |
+| Skills (ponytail, debugging, pr-review) | On demand; only the description is always listed | **Costs** only when invoked |
+| `/prompt`, `/ship`, `/debug` | Manual only (`disable-model-invocation`) | **Zero** until invoked — not even the description |
+| `.claude/settings.json` deny rules | Claude Code | **Saves** — agent can't read runtime state or logs |
 
-**Design:** short always-on rules + heavy playbooks in skills/commands. Target always-on budget: **≤ 8 KB**.
+**Design:** short always-on rules + heavy playbooks in skills. Target always-on budget: **≤ 8 KB**.
 
 ## Layout
 
 ```text
-.cursor/    rules, skills, commands (source of truth — edit here)
-scripts/    ship.ps1, boundary-audit.ps1
-.githooks/  pre-commit + pre-push boundary gates
-examples/   optional hooks (not enabled by default)
+.cursor/rules/   always-on rules (Cursor; imported by CLAUDE.md)
+.claude/skills/  shared skills + slash skills (Cursor and Claude Code)
+.claude/settings.json  Claude Code read-deny rules
+CLAUDE.md        Claude Code entry (imports rules)
+scripts/         ship.ps1, boundary-audit.ps1
+.githooks/       pre-commit + pre-push boundary gates
+examples/        optional hooks (not enabled by default)
 install.ps1
-AGENTS.md   agent contract (read first if you use AI assistance)
+AGENTS.md        agent contract (read first if you use AI assistance)
 INSPIRATIONS.md  curated upstream links (no vendored copies)
 ```
 
@@ -87,7 +107,7 @@ This is a public framework. Consumer-specific names (client, product, vault, wor
 
 ## Optional extras
 
-See [examples/hooks/](examples/hooks/) for an optional `beforeShellExecution` hook (secret-scan example). Not enabled by default — copy to `.cursor/hooks.json` if you want it.
+See [examples/hooks/](examples/hooks/) for an optional secret-scan shell hook that works in Cursor (`beforeShellExecution`) and Claude Code (`PreToolUse`). Not enabled by default.
 
 ## Inspirations
 

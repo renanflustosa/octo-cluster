@@ -1,10 +1,10 @@
 # Agent contract - octo-cluster
 
-Minimal AI-assisted development harness for Windows 11 + Cursor.
+Minimal AI-assisted development harness for Windows 11 + Cursor / Claude Code.
 
 ## What this is
 
-A small set of Cursor rules, skills, and commands in `.cursor/`, plus two PowerShell scripts in `scripts/`. There is no pipeline or sync step: `.cursor/` is edited directly and is the source of truth.
+Always-on rules in `.cursor/rules/`, shared skills in `.claude/skills/` (loaded natively by both Cursor and Claude Code), plus two PowerShell scripts in `scripts/`. No pipeline or sync step: edit these folders directly. `CLAUDE.md` imports the Cursor rules, so rules have one source.
 
 ## Rules (always apply)
 
@@ -19,14 +19,13 @@ Precedence: consumer-boundary > product hard safety > execute-operator-intent > 
 
 Always-on rules budget: **≤ 8 KB**. Details in README → Token economics.
 
-## Commands
+## Slash skills (manual only, `disable-model-invocation`)
 
-| Command | Purpose |
+| Skill | Purpose |
 | --- | --- |
 | `/ship` | Deliver via `scripts/ship.ps1` (direct push or PR when protections detected). |
-| `/review` | Review a GitHub Pull Request (`gh pr view` / `gh pr diff`). |
 | `/debug` | Fix a bug with runtime evidence first. |
-| `/prompt` | Rewrite a request into a precise prompt (never executes it). |
+| `/prompt` | Rewrite a request into a precise prompt for the tool in use (never executes it). |
 
 ## Skills (on demand)
 
@@ -34,7 +33,7 @@ Always-on rules budget: **≤ 8 KB**. Details in README → Token economics.
 | --- | --- |
 | ponytail-lite | Planning or coding; ladder before each edit. |
 | systematic-debugging | `/debug` or any bug/test failure. |
-| code-review | `/review` or PR feedback requests. |
+| pr-review | `/pr-review` or PR feedback requests. |
 
 See [INSPIRATIONS.md](./INSPIRATIONS.md) for upstream sources.
 
