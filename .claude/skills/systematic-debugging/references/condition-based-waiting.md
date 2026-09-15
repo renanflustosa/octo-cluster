@@ -79,8 +79,6 @@ async function waitFor<T>(
 }
 ```
 
-See `condition-based-waiting-example.ts` in this directory for complete implementation with domain-specific helpers (`waitForEvent`, `waitForEventCount`, `waitForEventMatch`) from actual debugging session.
-
 ## Common Mistakes
 
 **❌ Polling too fast:** `setTimeout(check, 1)` - wastes CPU

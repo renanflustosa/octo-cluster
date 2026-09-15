@@ -1,29 +1,5 @@
-# Canonical: .aiignore — keep sections in sync
+# AI index exclusions - mirror of .aiignore (keep both files identical below)
 
-# === RUNTIME STATE ===
 state/
-
-# === DEPS / CACHE ===
-engine/context-engine/node_modules/
-engine/context-engine/.cache/
-**/.cache/
-generated/
-
-# === PRIVATE OVERLAYS ===
-capabilities/_private/
-domains/_private/
-contexts/_private/
-docs/_private/
-
-# === DISCARDABLE CONTEXT ===
-contexts/temporary/
-
-# === LEGACY ===
-docs/temp/
-
-# === GIT / LOGS ===
 .git/
 *.log
-**/*.pyc
-eval/**/__pycache__/
-
