@@ -1,0 +1,13 @@
+---
+description: Cost routing — tier first, no mid-task model switch, capped loops
+alwaysApply: true
+---
+
+# Cost routing (lite)
+
+Tier at start: L0 trivial · L1 local · L2 multi-file/tests · L3 architecture/hard bug · L4 critical.
+Session model: L0 haiku · L1-L2 sonnet · L3-L4 opus. Mismatch → say once at start; never switch model mid-task (full cache rebuild).
+Subagent only for broad fan-out search or verbose output; pass `model: haiku` for search. Else direct tools.
+Retry cap: 2 failed attempts, same approach → stop, show evidence, propose escalation.
+Verify: focused test on changed behavior first; widen only on failure.
+Same manual task twice → propose script or skill.

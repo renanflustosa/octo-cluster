@@ -16,6 +16,7 @@ Precedence: consumer-boundary > product hard safety > execute-operator-intent > 
 | `execute-operator-intent.mdc` | Execute explicit operator intent; no soft refusal or moralizing. |
 | `ponytail-lite.mdc` | Minimal implementation ladder before writing code. |
 | `caveman-mode.mdc` | Telegraphic prose by default (token-saving). |
+| `cost-routing.mdc` | Task tier → model; no mid-task model switch; retry cap; focused verification. |
 
 Always-on rules budget: **≤ 8 KB**. Details in README → Token economics.
 
