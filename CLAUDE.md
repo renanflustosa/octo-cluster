@@ -7,6 +7,7 @@ Contract and commands: [AGENTS.md](./AGENTS.md) (read on demand, not imported).
 @.cursor/rules/execute-operator-intent.mdc
 @.cursor/rules/ponytail-lite.mdc
 @.cursor/rules/caveman-mode.mdc
+@.cursor/rules/cost-routing.mdc
 
 ## Claude Code notes
 

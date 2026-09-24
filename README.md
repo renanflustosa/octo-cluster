@@ -10,7 +10,7 @@ A few always-on rules, a handful of shared skills, and two PowerShell scripts. N
 
 | Layer | Contents |
 | --- | --- |
-| **Rules** (always on) | consumer-boundary, execute-operator-intent, ponytail-lite, caveman-mode |
+| **Rules** (always on) | consumer-boundary, execute-operator-intent, ponytail-lite, caveman-mode, cost-routing |
 | **Slash skills** (manual) | `/prompt`, `/ship`, `/debug` |
 | **Skills** (on demand) | ponytail-lite, systematic-debugging, pr-review |
 | **Scripts** | `ship.ps1` (deliver), `boundary-audit.ps1` (public-repo gate) |
@@ -78,14 +78,27 @@ Protection signals: `scripts/boundary-audit.ps1`, git hooks referencing audit/ga
 
 | Layer | When loaded | Token impact |
 | --- | --- | --- |
-| Always-on rules (~4 KB) | Every agent turn | Fixed baseline — keep thin |
+| Always-on rules (~5 KB) | Every agent turn | Fixed baseline — keep thin |
 | caveman-mode rule | Every turn | **Saves** reply tokens |
 | execute-operator-intent rule | Every turn | **Costs** ~1 KB; reduces thrash from over-refusal |
+| cost-routing rule | Every turn | **Costs** ~0.6 KB; one model per task, retry cap, focused verification |
 | Skills (ponytail, debugging, pr-review) | On demand; only the description is always listed | **Costs** only when invoked |
 | `/prompt`, `/ship`, `/debug` | Manual only (`disable-model-invocation`) | **Zero** until invoked — not even the description |
 | `.claude/settings.json` deny rules | Claude Code | **Saves** — agent can't read runtime state or logs |
 
 **Design:** short always-on rules + heavy playbooks in skills. Target always-on budget: **≤ 8 KB**.
+
+Always-on rules are cached, so their per-turn cost is small. In long sessions most spend is re-reading context: cache reads × context size × requests. Levers, in order: smaller context per request, fewer requests, cheaper output model.
+
+### Cost profile (Claude Code)
+
+Copy [`examples/settings/claude-cost-profile.example.json`](examples/settings/claude-cost-profile.example.json) to `~/.claude/settings.json` (merge if it exists): Sonnet by default at medium effort, auto-compact at 200k tokens, subagents on Sonnet. Escalate per task at session start: `/model opus` for architecture or hard bugs, `/model haiku` for trivial edits.
+
+- Pick model and effort at session start. A model switch re-reads the whole conversation uncached (effort changes on Opus 5.5 keep the cache).
+- `/clear` between unrelated tasks; `/compact` at natural breaks; `/rewind` instead of arguing down a wrong path.
+- Avoid `/loop`, agent teams and `[1m]` models in long sessions — each re-sends the full context.
+- On subscription plans, cap usage credits (claude.ai → Settings → Usage).
+- Measure before and after a change: `/usage` (session tokens, 7-day attribution by skill and subagent).
 
 ## Layout
 
@@ -96,7 +109,7 @@ Protection signals: `scripts/boundary-audit.ps1`, git hooks referencing audit/ga
 CLAUDE.md        Claude Code entry (imports rules)
 scripts/         ship.ps1, boundary-audit.ps1
 .githooks/       pre-commit + pre-push boundary gates
-examples/        optional hooks (not enabled by default)
+examples/        optional hooks and settings (not enabled by default)
 install.ps1
 AGENTS.md        agent contract (read first if you use AI assistance)
 INSPIRATIONS.md  curated upstream links (no vendored copies)
