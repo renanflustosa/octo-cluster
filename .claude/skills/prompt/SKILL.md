@@ -1,169 +1,81 @@
 ---
 name: prompt
-description: Rewrite a request into a precise, tool-ready prompt (never executes it).
+description: Rewrite a request into a precise Claude Code prompt for Opus 5.5 at high effort (never executes it).
 argument-hint: <any request>
 disable-model-invocation: true
 ---
 
 # prompt
 
-Transform the user message into a professional, precise prompt for the AI coding tool running this skill (Cursor or Claude Code). **Never execute the requested task.** Output only the optimized prompt package.
-
-**Usage:** `/prompt <any request>` — the rest of the user message is the raw request to rewrite.
+Rewrite the raw request into a prompt that a fresh Claude Code session (Opus 5.5, high effort) can run with no follow-up questions. **Never execute the request, never edit files, never write the code asked for.** Output only the package below.
 
 Raw request: $ARGUMENTS
 
----
+If the raw request is empty, ask for it in one line and stop.
 
-# Role
+## Process
 
-You are a Prompt Engineering specialist for AI coding agents.
+1. Find the real objective and the observable "done" state.
+2. Ground it in the repo, read-only and cheap: up to ~5 Glob/Grep/Read calls to confirm file paths, the test/lint/build command, and existing patterns to follow. No subagents. Skip when the request is not about this repo.
+3. Resolve ambiguity with **explicit assumptions**. Ask the operator only when a wrong guess would waste the whole run (one short question, then stop).
+4. Pick the permission mode (below).
+5. Write the prompt. Never add requirements that change the objective; improve clarity, scope, and verification only.
 
-Your mission is to transform any user request into a professional, precise, agent-optimized prompt.
+## Permission mode
 
-Never execute the requested task.
+Recommend exactly one:
 
-Your only job is to produce the best possible prompt.
-
----
-
-# Process
-
-1. Understand the user's real objective.
-2. Detect ambiguities, implicit requirements, and possible problems.
-3. Fully restructure the request.
-4. Add context when necessary.
-5. Define clear objectives.
-6. Define constraints.
-7. Define success criteria.
-8. Automatically choose the best mode.
-
----
-
-# Mode selection
-
-Recommend exactly one of the modes below. Name the matching control of the tool in use:
-
-| Mode | Cursor | Claude Code |
+| Mode | When | How to enter |
 | --- | --- | --- |
-| ASK | Ask mode | Normal chat; prompt says "do not edit files" |
-| PLAN | Plan mode | Plan mode (Shift+Tab) |
-| AGENT | Agent mode | Normal / auto-accept edits |
+| **Plan mode** | Multi-file refactor, migration, architecture, audit, unclear impact, anything where a wrong first edit is costly | Shift+Tab until "plan mode on"; approve the plan before edits |
+| **Execute** | Scope is clear: fix a bug, implement a bounded feature, add tests, rename, write docs into the repo | Default mode, or auto-accept edits (Shift+Tab) for low-risk edits |
+| **Read-only** | Explain, research, review, compare options, answer a question | Default mode; the prompt says "do not edit files" |
 
-## ASK
+Never pick Execute when the request still needs a plan.
 
-Use when the user wants to:
+## How to write for Opus 5.5 (high effort)
 
-- answer questions
-- explain code
-- research
-- review ideas
-- analyze architecture
-- brainstorm
-- documentation (read/explain, not write into the repo)
+- **Direct and specific.** No "You are an expert…" role line unless a role changes behavior (e.g. "review as a security auditor").
+- **No reasoning boosters.** High effort already thinks; skip "think step by step" / "ultrathink".
+- **Calm wording.** No ALL-CAPS, "CRITICAL", or "MUST" stacks; Opus follows plain instructions and over-applies shouted ones. Give the *why* for non-obvious constraints instead.
+- **Tight scope.** Name what to touch and what not to touch; say "smallest change that works, no unrelated refactors" (Opus tends to over-build).
+- **Files by reference.** `@path` for small key files (loads them into context); plain paths for large ones so they are read only if needed. Bound searches to folders or file types.
+- **Verifiable done.** Concrete success criteria plus the exact command to verify (focused test first). If no test exists, say how to check.
+- **Stop rules.** When to stop and ask (missing fact, destructive or irreversible step); cap retries ("after 2 failed attempts with the same approach, stop and report evidence").
+- **Git.** Do not commit or push unless the request says so; delivery goes through `/ship`.
+- **Short output.** Ask for a brief final report (what changed, how verified, open risks), not a narrative.
+- Include only sections that carry information: objective, context, scope and constraints, steps (only when order matters), success criteria, verification, do-nots, report format.
 
-## PLAN
+## Output
 
-Use when the work requires planning before modifying files.
-
-Examples:
-
-- large refactors
-- project reorganization
-- repository cleanup
-- migrations
-- architecture
-- multi-step breakdown
-- audits
-- impact analysis
-
-## AGENT
-
-Use when the intent is to execute changes.
-
-Examples:
-
-- write code
-- edit files
-- create tests
-- implement features
-- fix bugs
-- renames
-- generate documentation into the repo
-- apply refactors
-
-Never recommend AGENT when the request still needs planning.
-
----
-
-# Required improvements
-
-Whenever possible, add:
-
-- Role
-- Objective
-- Context
-- Constraints
-- Decision criteria
-- Success criteria
-- Rules
-- Expected response format
-- Execution order
-- What must not be done
-
-If ambiguities exist, make **explicit assumptions** instead of leaving the prompt vague.
-
-Never invent technical requirements that change the original objective.
-
-Improve only clarity, precision, and structure.
-
-**Token economy:** point to files by path (`src/x.ts`, `@file`) instead of pasting their content; bound the search scope (folders, file types); ask for a short output format; say what not to read or touch.
-
----
-
-# Output
-
-Your response must use exactly this structure.
+Reply in the operator's language, with exactly this structure:
 
 ## Modo recomendado
 
-PLAN | AGENT | ASK
+Plan mode | Execute | Read-only
 
 ### Motivo
 
-Explain in a few lines why this mode is the best fit.
+One or two lines.
+
+### Sessão
+
+One line: fresh session or `/clear` if the current context is unrelated; tier L0-L4 per cost-routing. Mention model or effort only when the tier does not fit Opus 5.5 high (e.g. L0 → `/model haiku` or `/effort low`).
 
 ---
 
 ## Prompt otimizado
 
 ```text
-<complete prompt>
+<self-contained prompt, ready to paste into Claude Code>
 ```
 
 ---
 
+## Suposições
+
+Assumptions made (omit the section when there are none).
+
 ## Melhorias realizadas
 
-List objectively what was improved, for example:
-
-- objective became more specific
-- context expanded
-- constraints added
-- success criteria defined
-- ambiguities removed
-- output format defined
-- execution separated from planning
-- redundant instructions removed
-
----
-
-# Rules
-
-- Never answer the original request.
-- Never execute tasks.
-- Never write the code the user asked for.
-- Never merely summarize the request.
-- Your only goal is to produce a better prompt than the one received.
-- The final prompt must be immediately usable in the tool in use with no further editing.
-- The optimized prompt inside the `text` fence must be self-contained (role, objective, context, constraints, success criteria, and do-nots as needed).
+Short bullets: what became more specific, scoped, or verifiable.

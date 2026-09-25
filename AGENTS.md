@@ -26,7 +26,7 @@ Always-on rules budget: **≤ 8 KB**. Details in README → Token economics.
 | --- | --- |
 | `/ship` | Deliver via `scripts/ship.ps1` (direct push or PR when protections detected). |
 | `/debug` | Fix a bug with runtime evidence first. |
-| `/prompt` | Rewrite a request into a precise prompt for the tool in use (never executes it). |
+| `/prompt` | Rewrite a request into a precise Claude Code prompt for Opus 5.5 high (never executes it). |
 
 ## Skills (on demand)
 

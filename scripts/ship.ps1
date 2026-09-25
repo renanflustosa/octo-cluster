@@ -218,13 +218,18 @@ function Invoke-ShipPr {
     git push -u origin $tempBranch
     if ($LASTEXITCODE -ne 0) { throw '[ship] push failed.' }
 
+    $lines = $CommitMessage.Trim() -split "`r?`n"
+    $prTitle = $lines[0].Trim()
+    $commitBody = ($lines | Select-Object -Skip 1) -join "`n"
     $prBody = @"
 ## Ship via /ship (protections detected)
+
+$($commitBody.Trim())
 
 - [ ] Review changes
 - [ ] CI green
 "@
-    $prUrl = gh pr create --base $Branch --head $tempBranch --title $CommitMessage --body $prBody
+    $prUrl = gh pr create --base $Branch --head $tempBranch --title $prTitle --body $prBody
     if ($LASTEXITCODE -ne 0) { throw '[ship] gh pr create failed.' }
     Write-Host "[ship] PR opened: $prUrl" -ForegroundColor Green
 }
