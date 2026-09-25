@@ -54,7 +54,7 @@ Each repo keeps its own git root; `/ship` runs `scripts/ship.ps1` against whiche
 
 - **`/ship`** — boundary gate, commit, push to `main` or temp branch + PR when protections are detected.
 - **`/debug`** — fix a bug with runtime evidence first.
-- **`/prompt`** — rewrite a request into a precise prompt for the tool in use (never executes it).
+- **`/prompt`** — rewrite a request into a precise Claude Code prompt for Opus 5.5 high: permission mode, scoped prompt, verification (never executes it).
 
 The on-demand skills can also be called by name: `/pr-review` reviews a GitHub Pull Request (`gh pr view` / `gh pr diff`). In Claude Code, the built-in `/code-review` covers local diffs.
 
