@@ -24,7 +24,7 @@ Always-on rules budget: **≤ 8 KB**. Details in README → Token economics.
 
 | Skill | Purpose |
 | --- | --- |
-| `/ship` | Deliver via `scripts/ship.ps1` (direct push or PR when protections detected). |
+| `/ship` | Split into logical commits, validate, deliver via `scripts/ship.ps1` (direct push, or branch + PR when `main` requires it). |
 | `/debug` | Fix a bug with runtime evidence first. |
 | `/prompt` | Rewrite a request into a precise Claude Code prompt for Opus 5.5 high (never executes it). |
 
@@ -40,12 +40,12 @@ See [INSPIRATIONS.md](./INSPIRATIONS.md) for upstream sources.
 
 ## Before any git change
 
-Deliver with `scripts/ship.ps1`. The script auto-detects repo protections:
+Deliver with `/ship`: the agent stages and commits logical changes; `scripts/ship.ps1` pushes them:
 
-- **No protections** — commit + push direct to `main`.
-- **Protections present** (e.g. `boundary-audit.ps1`, git hooks, remote branch rules, or `.ship.yaml`) — temp branch + PR.
+- **`main` open** (no protection requiring PR, or `.ship.yaml` `mode: direct`) — push direct to `main`.
+- **`main` requires PR** (branch protection, blocking rulesets, or `.ship.yaml` `mode: pr`) — `feature/`, `fix/` or `chore/` branch + PR.
 
-Do not run git by hand during `/ship`. Optional config: copy `.ship.yaml.example` to `.ship.yaml`.
+Never stash, `reset --hard`, force-push or push by hand during `/ship`. Optional config: copy `.ship.yaml.example` to `.ship.yaml`.
 
 ## Boundary patterns (optional)
 

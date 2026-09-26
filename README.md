@@ -25,7 +25,7 @@ A few always-on rules, a handful of shared skills, and two PowerShell scripts. N
 
 ## Quick start
 
-Prerequisites: [Git](https://git-scm.com/downloads), [PowerShell](https://github.com/PowerShell/PowerShell/releases). [GitHub CLI](https://cli.github.com/) (`gh`) is optional — required only when `/ship` detects protections and opens a PR, or for `pr-review`.
+Prerequisites: [Git](https://git-scm.com/downloads), [PowerShell](https://github.com/PowerShell/PowerShell/releases). [GitHub CLI](https://cli.github.com/) (`gh`) is optional — `/ship` uses it to read branch protection and to open PRs; `pr-review` needs it.
 
 ```bash
 git clone https://github.com/renanflustosa/octo-cluster.git
@@ -52,7 +52,7 @@ Each repo keeps its own git root; `/ship` runs `scripts/ship.ps1` against whiche
 
 ## Slash skills
 
-- **`/ship`** — boundary gate, commit, push to `main` or temp branch + PR when protections are detected.
+- **`/ship`** — inspect, split into logical commits, validate, then push to `main` or open a `feature/`, `fix/` or `chore/` branch + PR when `main` requires it.
 - **`/debug`** — fix a bug with runtime evidence first.
 - **`/prompt`** — rewrite a request into a precise Claude Code prompt for Opus 5.5 high: permission mode, scoped prompt, verification (never executes it).
 
@@ -60,19 +60,25 @@ The on-demand skills can also be called by name: `/pr-review` reviews a GitHub P
 
 ## Delivery (`/ship`)
 
+The skill makes the logical commits; `scripts/ship.ps1` only inspects and delivers `origin/main..HEAD`. It never stages, stashes, rebases or force-pushes.
+
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/ship.ps1 -CommitMessage "fix: short summary"
 pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/ship.ps1 -WhatIf
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/ship.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/ship.ps1 -BranchName feature/x -PrTitle "feat: x" -PrBody $body
 ```
 
-**Auto-detected mode:**
+**Mode:**
 
-| Protections | Action |
+| Signal | Action |
 | --- | --- |
-| None | Commit + push direct to `main` |
-| Any detected | Temp branch `ship/<timestamp>` + PR to `main` |
+| `.ship.yaml` / `.ship.json` `mode: direct` | Push direct to `main` |
+| `.ship.yaml` / `.ship.json` `mode: pr` or `protections: true` | Branch + PR to `main` |
+| GitHub: `main` not protected, or only `deletion` / `non_fast_forward` rules | Push direct to `main` |
+| GitHub: branch protection or blocking rulesets (e.g. `pull_request`) | Branch + PR to `main` |
+| Protection unreadable (no `gh`, no access) | Try direct push; a protection rejection falls back to PR |
 
-Protection signals: `scripts/boundary-audit.ps1`, git hooks referencing audit/gate, remote branch protection (via `gh`), or `.ship.yaml` / `.ship.json` with `mode: pr` or `protections: true`. Override with `mode: direct` in config.
+`scripts/boundary-audit.ps1`, when present, runs before every push; it is a gate, not a PR trigger.
 
 ## Token economics
 
