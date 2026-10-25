@@ -1,0 +1,21 @@
+{
+  "name": "octo-cluster",
+  "displayName": "Octo Cluster",
+  "version": "1.0.0",
+  "description": "Ship logical commits safely (direct push or PR, never force), turn rough requests into ready-to-run prompts, debug with evidence, and keep always-on context thin.",
+  "author": {
+    "name": "Renan Lustosa",
+    "url": "https://github.com/renanflustosa"
+  },
+  "homepage": "https://github.com/renanflustosa/octo-cluster",
+  "repository": "https://github.com/renanflustosa/octo-cluster",
+  "license": "MIT",
+  "keywords": ["git", "pull-request", "prompt", "debugging", "token-economy", "windows", "powershell"],
+  "skills": [
+    "./.claude/skills/ship",
+    "./.claude/skills/prompt",
+    "./.claude/skills/debug",
+    "./.claude/skills/systematic-debugging",
+    "./.claude/skills/ponytail-lite"
+  ]
+}

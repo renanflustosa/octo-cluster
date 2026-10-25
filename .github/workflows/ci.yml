@@ -17,3 +17,14 @@ jobs:
       - name: Public framework boundary audit
         shell: pwsh
         run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-audit.ps1
+
+  plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Validate Claude Code plugin and marketplace manifests
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate .
+          claude plugin validate .claude-plugin/marketplace.json
