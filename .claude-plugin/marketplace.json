@@ -1,0 +1,15 @@
+{
+  "name": "octo-cluster",
+  "description": "Octo Cluster: a lean Claude Code harness for shipping, prompting and debugging.",
+  "owner": {
+    "name": "Renan Lustosa",
+    "url": "https://github.com/renanflustosa"
+  },
+  "plugins": [
+    {
+      "name": "octo-cluster",
+      "source": "./",
+      "description": "Ship logical commits safely, turn rough requests into ready-to-run prompts, debug with evidence, and keep always-on context thin."
+    }
+  ]
+}
