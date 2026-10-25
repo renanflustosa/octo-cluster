@@ -12,3 +12,6 @@ state/
 
 # Local boundary patterns (copy from boundary-patterns.example.yaml)
 boundary-patterns.local.yaml
+
+# Plugin eval output
+evals/results/
