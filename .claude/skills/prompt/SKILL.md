@@ -1,8 +1,7 @@
 ---
 name: prompt
-description: Rewrite a request into a precise Claude Code prompt for Opus 5.5 at high effort (never executes it).
+description: Rewrite a rough request into a precise, self-contained Claude Code prompt grounded in the repo (never executes it). Use when the user asks to turn, rewrite or improve a request into a prompt for another session.
 argument-hint: <any request>
-disable-model-invocation: true
 ---
 
 # prompt
