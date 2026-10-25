@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: bugfix-regression
+tags: [debugging]
+context:
+  scaffold_script: scaffold.sh
