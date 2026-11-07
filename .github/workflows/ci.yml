@@ -18,6 +18,10 @@ jobs:
         shell: pwsh
         run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-audit.ps1
 
+      - name: Automatic lessons scenario test
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/lessons.test.ps1
+
   plugin:
     runs-on: ubuntu-latest
     steps:
