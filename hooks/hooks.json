@@ -10,6 +10,28 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/lessons.sh\" pre", "timeout": 15 }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/lessons.sh\" ok", "timeout": 15 }]
+      },
+      {
+        "matcher": "Edit|MultiEdit|Write|NotebookEdit",
+        "hooks": [{ "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/lessons.sh\" edit", "timeout": 15 }]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/lessons.sh\" fail", "timeout": 15 }]
+      }
     ]
   }
 }
