@@ -4,7 +4,7 @@ Minimal AI-assisted development harness for Windows 11 + Cursor / Claude Code.
 
 ## What this is
 
-Always-on rules in `.cursor/rules/`, shared skills in `.claude/skills/` (loaded natively by both Cursor and Claude Code), plus two PowerShell scripts in `scripts/`. No pipeline or sync step: edit these folders directly. `CLAUDE.md` imports the Cursor rules, so rules have one source.
+Always-on rules in `.cursor/rules/`, shared skills in `.claude/skills/` (loaded natively by both Cursor and Claude Code), plus PowerShell scripts in `scripts/` (`ship.ps1`, `boundary-audit.ps1`, `lessons.ps1`). No pipeline or sync step: edit these folders directly. `CLAUDE.md` imports the Cursor rules, so rules have one source.
 
 ## Rules (always apply)
 
