@@ -1,8 +1,8 @@
 {
   "name": "octo-cluster",
   "displayName": "Octo Cluster",
-  "version": "1.0.0",
-  "description": "Ship logical commits safely (direct push or PR, never force), turn rough requests into ready-to-run prompts, debug with evidence, and keep always-on context thin.",
+  "version": "1.1.0",
+  "description": "Ship logical commits safely (direct push or PR, never force), turn rough requests into ready-to-run prompts, debug with evidence, learn from failed commands automatically, and keep always-on context thin.",
   "author": {
     "name": "Renan Lustosa",
     "url": "https://github.com/renanflustosa"

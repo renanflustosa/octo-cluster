@@ -60,6 +60,7 @@ Try both in under five minutes: run `/octo-cluster:prompt <any rough request>`, 
 | `systematic-debugging`, `ponytail-lite` | On-demand playbooks: evidence-first debugging; YAGNI → reuse → stdlib → minimum code. |
 | Session-start context | Two short rules (~1.1 KB): minimal-implementation ladder and cost routing (model tier per task, no mid-task model switch, retry cap). |
 | `scripts/boundary-audit.ps1` + git hooks | Blocks consumer identifiers (client, product, internal names) from reaching a public repo. |
+| Automatic lessons (`scripts/lessons.ps1` + hooks) | Learns "this command failed, that one worked" from real exit codes and stops Claude from repeating the failure. Zero always-on tokens. |
 
 For local diffs and GitHub PRs use the built-in `/code-review`. For terse replies, pick the built-in **Concise** output style in `/config`.
 
@@ -76,6 +77,25 @@ The skill makes the logical commits; `scripts/ship.ps1` only inspects and delive
 | Protection unreadable (no `gh`, no access) | Try direct push; a protection rejection falls back to PR |
 
 `scripts/boundary-audit.ps1`, when the target repo has one, runs before every push.
+
+## Automatic lessons
+
+Claude Code repeats the same environment mistakes across sessions (`npx` missing, a CLI not on `PATH`, a flag the local tool lacks). The plugin learns them on its own, from evidence only, with no LLM and no manual step:
+
+1. **Capture.** A Bash command exits non-zero (`PostToolUseFailure`), and later in the same session a similar command exits 0 with no file edit in between. That pair is a candidate lesson.
+2. **Promote.** The same pair in a second session makes it active.
+3. **Use.** When Claude is about to run the failing command again, a `PreToolUse` hook blocks it once per session and names what worked. Running it again unchanged is allowed (override).
+4. **Retire.** A lesson is dropped when the warned command works again, after two successful overrides, or after 60 days unused. One lesson per command key (the newest evidence replaces it), at most 100.
+
+Guards against the usual memory problems: nothing is born from a summary, so errors cannot compound; nothing is loaded at session start, so context does not grow; stale lessons retire by themselves. Exploration commands (`ls`, `grep`, `rg`, …) and commands that look like they carry secrets are never stored. A lesson learned in one project applies only there until it shows up in a second one.
+
+Data stays local in the plugin data dir (`CLAUDE_PLUGIN_DATA`, under `~/.claude/plugins/data/octo-cluster-*`, removed on uninstall), never in a repo. Inspect or drop lessons from a clone, pointing at that dir:
+
+```bash
+pwsh -File scripts/lessons.ps1 list -DataDir ~/.claude/plugins/data/octo-cluster-octo-cluster
+```
+
+`forget '<key>'` removes one (the key is the `Key` column). Cost: a Bash call that touches no lesson pays a ~0.2 s shell prefilter; PowerShell (~0.7 s) starts only on failures and on commands a lesson covers. Needs `pwsh`; without it the feature is off. Claude Code only (Cursor has no equivalent hooks). Test: `pwsh -File scripts/lessons.test.ps1`.
 
 ## Public-repo boundary
 
@@ -104,10 +124,10 @@ The plugin replaces the skill junctions. Before installing it, delete the octo-c
 
 ```text
 .claude-plugin/  plugin.json + marketplace.json (Claude Code plugin)
-hooks/           SessionStart hook (injects the two thin rules)
+hooks/           SessionStart hook (injects the two thin rules) + automatic-lessons hooks
 .claude/skills/  skills (plugin, Cursor and this repo)
 .cursor/rules/   always-on rules (Cursor; the hook reads two of them)
-scripts/         ship.ps1, boundary-audit.ps1
+scripts/         ship.ps1, boundary-audit.ps1, lessons.ps1 (+ lessons.test.ps1)
 .githooks/       pre-commit + pre-push boundary gates
 examples/        optional hooks and settings (not enabled by default)
 docs/roadmap.md  diagnosis and roadmap

@@ -13,4 +13,4 @@ Contract and commands: [AGENTS.md](./AGENTS.md) (read on demand, not imported).
 
 - Skills live in `.claude/skills/` (Cursor loads the same folder). Slash: `/prompt`, `/ship`, `/debug`; auto: `ponytail-lite`, `systematic-debugging`, `pr-review`.
 - Local diffs: prefer the built-in `/code-review`; GitHub PRs: `pr-review`.
-- Use from any other folder: install the plugin (`claude plugin install octo-cluster --marketplace renanflustosa/octo-cluster`). Manifests: `.claude-plugin/`; always-on context: `hooks/hooks.json` (SessionStart injects `ponytail-lite` + `cost-routing`). Check with `claude plugin validate .`.
+- Use from any other folder: install the plugin (`claude plugin install octo-cluster --marketplace renanflustosa/octo-cluster`). Manifests: `.claude-plugin/`; always-on context: `hooks/hooks.json` (SessionStart injects `ponytail-lite` + `cost-routing`; Bash/Edit hooks feed `scripts/lessons.ps1`, test with `pwsh -File scripts/lessons.test.ps1`). Check with `claude plugin validate .`.

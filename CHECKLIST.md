@@ -12,10 +12,11 @@ Minimalist (80/20). `[x]` done, `[ ]` gap, `n/a` does not apply. The plugin shap
 
 - [x] (AI) Context: short `AGENTS.md`/`CLAUDE.md`; know-how loaded on demand by skills.
 - n/a (AI) Retrieval with permission filtering: no retrieval layer.
-- [x] Minimal tools: skills, one `hooks/hooks.json`, two scripts (`ship.ps1`, `boundary-audit.ps1`).
+- [x] Minimal tools: skills, one `hooks/hooks.json`, three scripts (`ship.ps1`, `boundary-audit.ps1`, `lessons.ps1`).
 
 ## 3. Evals & guardrails
 
+- [x] Automatic lessons: deterministic scenario test `scripts/lessons.test.ps1` (promotion, deny once, override, retirement, edit/secret/exploration filters), run in CI.
 - [x] Representative evals: `claude plugin eval` ablation cases in [evals/](evals/README.md) (bugfix regression, minimal reuse, natural and slash prompts).
 - [ ] `/ship` eval: covered only by a manual A/B because `claude plugin eval` grants Bash only inside the OS sandbox; add a sandboxed case.
 - [x] Leak protection: public-repo boundary audit (`scripts/boundary-audit.ps1`, `boundary-patterns.example.yaml`); `/ship` leaves `.env` out.
